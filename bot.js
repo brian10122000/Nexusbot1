@@ -748,7 +748,7 @@ client.on(Events.MessageCreate, async message => {
 
 // ─── START ────────────────────────────────────────────────────
 startWebhookServer();
-client.login(CONFIG.token).catch(err => {
+client.login(process.env.TOKEN).catch(err => {
   console.error('❌ Erreur connexion bot:', err.message);
   process.exit(1);
 });
