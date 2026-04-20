@@ -81,7 +81,7 @@ const db = {
   stockAlerts: {},
   // Config boutique
   shopConfig: {
-    name: 'Ma Boutique',
+    name: 'NexusStore',
     description: '',
     banner: '',
     thumb: '',
@@ -94,6 +94,15 @@ const db = {
       '💸 **Remboursement assuré** — Zéro risque, zéro perte',
       '⚡ **Ultra rapide** — Pas d\'attente, pas de blabla',
     ]
+  },
+  // Config boutique paiements & contact
+  boutiqueConfig: {
+    lien:          process.env.STORE_URL       || '',
+    nom:           process.env.STORE_NAME      || 'NexusStore',
+    emailContact:  process.env.EMAIL_CONTACT   || '',
+    emailPaiement: process.env.EMAIL_PAIEMENT  || '',
+    stripeLien:    process.env.STRIPE_LIEN     || '',
+    sumupLien:     process.env.SUMUP_LIEN      || '',
   },
   // Produits Sellhub cache
   sellhubProducts: [],
@@ -381,6 +390,18 @@ const COMMANDS = [
     .addStringOption(o=>o.setName('couleur').setDescription('Couleur hex (ex: #f0b429)'))
     .addChannelOption(o=>o.setName('channel').setDescription('Channel cible'))
     .addStringOption(o=>o.setName('mention').setDescription('@everyone ou @here')),
+  new SlashCommandBuilder().setName('ma-boutique').setDescription('🛒 Publie la boutique complète avec tous les produits et paiements').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .addChannelOption(o=>o.setName('channel').setDescription('Channel cible'))
+    .addStringOption(o=>o.setName('mention').setDescription('@everyone ou @here')),
+  new SlashCommandBuilder().setName('contact').setDescription('📧 Affiche les informations de contact de la boutique'),
+  new SlashCommandBuilder().setName('paiements').setDescription('💳 Affiche tous les moyens de paiement acceptés'),
+  new SlashCommandBuilder().setName('config-boutique').setDescription('⚙️ Configure la boutique (lien, email, paiements)').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .addStringOption(o=>o.setName('lien').setDescription('Lien Sellhub (ex: https://nexusstore.sellhub.cx)'))
+    .addStringOption(o=>o.setName('email_contact').setDescription('Email de contact'))
+    .addStringOption(o=>o.setName('email_paiement').setDescription('Email pour paiement entre proches'))
+    .addStringOption(o=>o.setName('stripe_lien').setDescription('Lien de paiement Stripe'))
+    .addStringOption(o=>o.setName('sumup_lien').setDescription('Lien de paiement Sumup'))
+    .addStringOption(o=>o.setName('nom').setDescription('Nom de la boutique')),
   new SlashCommandBuilder().setName('annonce').setDescription('📢 Annonce embed').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addStringOption(o=>o.setName('titre').setDescription('Titre').setRequired(true))
     .addStringOption(o=>o.setName('message').setDescription('Contenu').setRequired(true))
@@ -1069,6 +1090,146 @@ client.on(Events.InteractionCreate, async interaction => {
     const footer = interaction.options.getString('footer');      if (footer) emb.setFooter({text:footer});
     await target.send({ content: ment || undefined, embeds: [emb] });
     return interaction.reply({ embeds: [OK('Embed envoyé', `Publié dans ${target}.`)], ephemeral: true });
+  }
+
+  // ══ /config-boutique ══
+  if (cmd === 'config-boutique') {
+    const cfg = db.boutiqueConfig;
+    const lien    = interaction.options.getString('lien');
+    const emailC  = interaction.options.getString('email_contact');
+    const emailP  = interaction.options.getString('email_paiement');
+    const stripe  = interaction.options.getString('stripe_lien');
+    const sumup   = interaction.options.getString('sumup_lien');
+    const nom     = interaction.options.getString('nom');
+    if (lien)   cfg.lien          = lien;
+    if (emailC) cfg.emailContact  = emailC;
+    if (emailP) cfg.emailPaiement = emailP;
+    if (stripe) cfg.stripeLien    = stripe;
+    if (sumup)  cfg.sumupLien     = sumup;
+    if (nom)    cfg.nom           = nom;
+    return interaction.reply({ embeds: [new EmbedBuilder()
+      .setTitle('✅ Boutique configurée !')
+      .setColor(C('#10d982'))
+      .addFields(
+        { name: '🏪 Nom',             value: cfg.nom           || '—', inline: true  },
+        { name: '🔗 Lien boutique',   value: cfg.lien          || '—', inline: true  },
+        { name: '📧 Email contact',   value: cfg.emailContact  || '—', inline: false },
+        { name: '💶 Email paiement',  value: cfg.emailPaiement || '—', inline: true  },
+        { name: '💳 Stripe',          value: cfg.stripeLien    || '—', inline: true  },
+        { name: '💳 Sumup',           value: cfg.sumupLien     || '—', inline: true  },
+      )
+      .setFooter({ text: 'Vous pouvez aussi définir ces valeurs dans Railway → Variables' })
+      .setTimestamp()
+    ], ephemeral: true });
+  }
+
+  // ══ /ma-boutique ══
+  if (cmd === 'ma-boutique') {
+    await interaction.deferReply({ ephemeral: true });
+    const target  = interaction.options.getChannel('channel') || interaction.channel;
+    const mention = interaction.options.getString('mention') || '';
+    const cfg     = db.boutiqueConfig;
+
+    // Embed principal boutique
+    const mainEmb = new EmbedBuilder()
+      .setTitle(`🛒 ${cfg.nom || 'NexusStore'}`)
+      .setColor(C('#f0b429'))
+      .setDescription(
+        '✅ **Livraison instantanée** — Reçois en quelques secondes\n' +
+        '🔒 **100% Sécurisé** — Paiements protégés & anonymes\n' +
+        '🛠️ **Produits vérifiés** — Tout est testé & garanti\n' +
+        '💸 **Remboursement assuré** — Zéro risque, zéro perte\n' +
+        '⚡ **Ultra rapide** — Pas d\'attente, pas de blabla'
+      )
+      .setTimestamp()
+      .setFooter({ text: `${cfg.nom || 'NexusStore'} • Paiement 100% sécurisé 🔒` });
+
+    if (cfg.lien) mainEmb.addFields({ name: '🔗 Boutique', value: `[**→ Voir tous les produits**](${cfg.lien})`, inline: false });
+
+    // Boutons paiement
+    const buttons = [];
+    if (cfg.lien)          buttons.push(new ButtonBuilder().setLabel('🛒 Voir la boutique').setStyle(ButtonStyle.Link).setURL(cfg.lien));
+    if (cfg.stripeLien)    buttons.push(new ButtonBuilder().setLabel('💳 Payer par Stripe').setStyle(ButtonStyle.Link).setURL(cfg.stripeLien));
+    if (cfg.sumupLien)     buttons.push(new ButtonBuilder().setLabel('💳 Payer par Sumup').setStyle(ButtonStyle.Link).setURL(cfg.sumupLien));
+
+    const payload = { embeds: [mainEmb] };
+    if (buttons.length) payload.components = [new ActionRowBuilder().addComponents(...buttons.slice(0, 5))];
+    if (mention) payload.content = mention;
+
+    await target.send(payload);
+
+    // Publier chaque article en embed individuel
+    if (db.articles.length > 0) {
+      for (const art of db.articles.filter(a => a.visible !== false && a.stock !== 0)) {
+        const artEmb = articleEmbed(art);
+        const artBtns = [];
+        if (art.link || art.payButtons?.[0]?.url) {
+          artBtns.push(new ButtonBuilder().setLabel('🛒 Acheter').setStyle(ButtonStyle.Link).setURL(art.link || art.payButtons[0].url));
+        }
+        if (cfg.emailContact) {
+          artBtns.push(new ButtonBuilder().setLabel('📧 Contact').setStyle(ButtonStyle.Link).setURL(`mailto:${cfg.emailContact}`));
+        }
+        const artPayload = { embeds: [artEmb] };
+        if (artBtns.length) artPayload.components = [new ActionRowBuilder().addComponents(...artBtns.slice(0, 5))];
+        await target.send(artPayload);
+        await new Promise(r => setTimeout(r, 600));
+      }
+    }
+
+    addLog(`🛒 Boutique publiée dans #${target.name}`, '#f0b429');
+    return interaction.editReply({ content: `✅ Boutique publiée dans ${target} !` });
+  }
+
+  // ══ /contact ══
+  if (cmd === 'contact') {
+    const cfg = db.boutiqueConfig;
+    const emb = new EmbedBuilder()
+      .setTitle(`📧 Contact — ${cfg.nom || 'NexusStore'}`)
+      .setColor(C('#4d8fff'))
+      .setDescription('Notre équipe est disponible pour toute question ou problème.\nRéponse garantie sous 24h.')
+      .setTimestamp()
+      .setFooter({ text: `${cfg.nom || 'NexusStore'} • Support client` });
+
+    const fields = [];
+    if (cfg.emailContact)  fields.push({ name: '📧 Email de contact',   value: `\`${cfg.emailContact}\``,  inline: false });
+    if (cfg.emailPaiement) fields.push({ name: '💶 Email paiement',     value: `\`${cfg.emailPaiement}\``, inline: false });
+    fields.push({ name: '🎫 Support Discord', value: 'Ouvrez un ticket avec `/ticket`\nRéponse rapide garantie', inline: false });
+    if (fields.length) emb.addFields(fields);
+
+    const buttons = [];
+    if (cfg.emailContact) buttons.push(new ButtonBuilder().setLabel('📧 Envoyer un email').setStyle(ButtonStyle.Link).setURL(`mailto:${cfg.emailContact}`));
+    buttons.push(new ButtonBuilder().setLabel('🎫 Ouvrir un ticket').setStyle(ButtonStyle.Primary).setCustomId('t_open_sup'));
+
+    const payload = { embeds: [emb] };
+    if (buttons.length) payload.components = [new ActionRowBuilder().addComponents(...buttons)];
+    return interaction.reply(payload);
+  }
+
+  // ══ /paiements ══
+  if (cmd === 'paiements') {
+    const cfg = db.boutiqueConfig;
+    const emb = new EmbedBuilder()
+      .setTitle('💳 Moyens de Paiement Acceptés')
+      .setColor(C('#10d982'))
+      .setDescription(`**${cfg.nom || 'NexusStore'}** accepte plusieurs moyens de paiement sécurisés.`)
+      .setTimestamp()
+      .setFooter({ text: 'Paiement 100% sécurisé 🔒' });
+
+    const fields = [];
+    if (cfg.stripeLien)    fields.push({ name: '💳 Carte bancaire (Stripe)', value: `Visa, Mastercard, CB\n[**→ Payer par carte**](${cfg.stripeLien})`, inline: true });
+    if (cfg.sumupLien)     fields.push({ name: '💳 Sumup',                   value: `Paiement rapide\n[**→ Payer via Sumup**](${cfg.sumupLien})`, inline: true });
+    if (cfg.emailPaiement) fields.push({ name: '💶 Virement / Proches',      value: `PayPal Amis & Famille, Lydia, virement\nContactez : \`${cfg.emailPaiement}\``, inline: false });
+    fields.push({ name: '🎫 Commander', value: 'Ouvrez un ticket `/ticket` → choisissez votre produit → choisissez votre moyen de paiement', inline: false });
+    if (fields.length) emb.addFields(fields);
+
+    const buttons = [];
+    if (cfg.stripeLien) buttons.push(new ButtonBuilder().setLabel('💳 Payer par carte').setStyle(ButtonStyle.Link).setURL(cfg.stripeLien));
+    if (cfg.sumupLien)  buttons.push(new ButtonBuilder().setLabel('💳 Payer via Sumup').setStyle(ButtonStyle.Link).setURL(cfg.sumupLien));
+    if (cfg.lien)       buttons.push(new ButtonBuilder().setLabel('🛒 Voir la boutique').setStyle(ButtonStyle.Link).setURL(cfg.lien));
+
+    const payload = { embeds: [emb] };
+    if (buttons.length) payload.components = [new ActionRowBuilder().addComponents(...buttons.slice(0, 5))];
+    return interaction.reply(payload);
   }
 
   if (cmd === 'annonce') {
