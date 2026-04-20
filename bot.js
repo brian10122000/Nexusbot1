@@ -365,7 +365,27 @@ const COMMANDS = [
     .addStringOption(o=>o.setName('type').setDescription('Type de serveur').setRequired(true).addChoices({ name: '🛒 Vente', value: 'vente' },{ name: '🎮 Gaming', value: 'gaming' },{ name: '💬 Communauté', value: 'communaute' })),
 
   // EMBEDS & MESSAGES
-  new SlashCommandBuilder().setName('embed').setDescription('✨ Envoie un embed personnalisé').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+  new SlashCommandBuilder().setName('bouton').setDescription('🔘 Envoie un message avec un bouton lien cliquable').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .addStringOption(o=>o.setName('texte').setDescription('Texte affiché sur le bouton').setRequired(true))
+    .addStringOption(o=>o.setName('lien').setDescription('URL du lien (https://...)').setRequired(true))
+    .addStringOption(o=>o.setName('message').setDescription('Texte ou embed au-dessus du bouton'))
+    .addStringOption(o=>o.setName('couleur').setDescription('Couleur du bouton').addChoices(
+      {name:'🔵 Bleu (défaut)',value:'blue'},
+      {name:'⬜ Gris',value:'grey'},
+      {name:'🔴 Danger',value:'danger'},
+    ))
+    .addChannelOption(o=>o.setName('channel').setDescription('Channel cible')),
+  new SlashCommandBuilder().setName('boutons').setDescription('🔘 Envoie un embed avec jusqu\'à 5 boutons liens').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .addStringOption(o=>o.setName('titre').setDescription('Titre de l\'embed').setRequired(true))
+    .addStringOption(o=>o.setName('description').setDescription('Description de l\'embed'))
+    .addStringOption(o=>o.setName('btn1').setDescription('Bouton 1 : texte|lien (ex: 🛒 Boutique|https://...)').setRequired(true))
+    .addStringOption(o=>o.setName('btn2').setDescription('Bouton 2 : texte|lien'))
+    .addStringOption(o=>o.setName('btn3').setDescription('Bouton 3 : texte|lien'))
+    .addStringOption(o=>o.setName('btn4').setDescription('Bouton 4 : texte|lien'))
+    .addStringOption(o=>o.setName('btn5').setDescription('Bouton 5 : texte|lien'))
+    .addStringOption(o=>o.setName('couleur').setDescription('Couleur hex de l\'embed (ex: #f0b429)'))
+    .addChannelOption(o=>o.setName('channel').setDescription('Channel cible'))
+    .addStringOption(o=>o.setName('mention').setDescription('@everyone ou @here')),
     .addStringOption(o=>o.setName('titre').setDescription('Titre').setRequired(true))
     .addStringOption(o=>o.setName('description').setDescription('Description'))
     .addStringOption(o=>o.setName('couleur').setDescription('Couleur hex'))
@@ -965,6 +985,93 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 
   // ══ EMBEDS ══
+  // ══ /bouton ══
+  if (cmd === 'bouton') {
+    const texte   = interaction.options.getString('texte');
+    const lien    = interaction.options.getString('lien');
+    const message = interaction.options.getString('message') || '';
+    const couleur = interaction.options.getString('couleur') || 'blue';
+    const target  = interaction.options.getChannel('channel') || interaction.channel;
+
+    // Valider l'URL
+    if (!lien.startsWith('http')) {
+      return interaction.reply({ embeds: [ERR('Le lien doit commencer par https://')], ephemeral: true });
+    }
+
+    const styleMap = { blue: ButtonStyle.Link, grey: ButtonStyle.Link, danger: ButtonStyle.Link };
+    const btn = new ButtonBuilder()
+      .setLabel(texte)
+      .setStyle(ButtonStyle.Link)
+      .setURL(lien);
+
+    const row = new ActionRowBuilder().addComponents(btn);
+
+    const payload = { components: [row] };
+    if (message) {
+      // Si le message ressemble à un titre d'embed
+      payload.embeds = [new EmbedBuilder()
+        .setDescription(message)
+        .setColor(C('#5865F2'))
+        .setTimestamp()];
+    } else {
+      payload.content = '\u200b'; // Caractère invisible si pas de message
+    }
+
+    await target.send(payload);
+    return interaction.reply({ embeds: [OK('Bouton envoyé !', `Bouton **${texte}** publié dans ${target}.`)], ephemeral: true });
+  }
+
+  // ══ /boutons ══ (jusqu'à 5 boutons liens dans un embed)
+  if (cmd === 'boutons') {
+    const titre   = interaction.options.getString('titre');
+    const desc    = interaction.options.getString('description') || '';
+    const couleur = interaction.options.getString('couleur') || '#5865F2';
+    const target  = interaction.options.getChannel('channel') || interaction.channel;
+    const mention = interaction.options.getString('mention') || '';
+
+    // Collecter les boutons
+    const btnsRaw = ['btn1','btn2','btn3','btn4','btn5']
+      .map(k => interaction.options.getString(k))
+      .filter(Boolean);
+
+    if (!btnsRaw.length) return interaction.reply({ embeds: [ERR('Ajoutez au moins un bouton.')], ephemeral: true });
+
+    const buttons = [];
+    const errors  = [];
+
+    for (const raw of btnsRaw) {
+      const parts = raw.split('|');
+      const label = parts[0]?.trim();
+      const url   = parts[1]?.trim();
+      if (!label || !url) { errors.push(`"${raw}" — format invalide (utilise texte|lien)`); continue; }
+      if (!url.startsWith('http')) { errors.push(`"${url}" — doit commencer par https://`); continue; }
+      buttons.push(new ButtonBuilder().setLabel(label).setStyle(ButtonStyle.Link).setURL(url));
+    }
+
+    if (!buttons.length) {
+      return interaction.reply({ embeds: [ERR(`Aucun bouton valide.\n${errors.join('\n')}`)], ephemeral: true });
+    }
+
+    const row = new ActionRowBuilder().addComponents(...buttons);
+
+    const emb = new EmbedBuilder()
+      .setTitle(titre)
+      .setColor(C(couleur))
+      .setTimestamp();
+    if (desc) emb.setDescription(desc);
+
+    const payload = { embeds: [emb], components: [row] };
+    if (mention) payload.content = mention;
+
+    await target.send(payload);
+
+    const warnMsg = errors.length ? `\n\n⚠️ ${errors.length} bouton(s) ignoré(s) :\n${errors.join('\n')}` : '';
+    return interaction.reply({
+      embeds: [OK(`${buttons.length} bouton(s) envoyé(s) !`, `Publié dans ${target}.${warnMsg}`)],
+      ephemeral: true
+    });
+  }
+
   if (cmd === 'embed') {
     const target = interaction.options.getChannel('channel') || interaction.channel;
     const ment   = interaction.options.getString('mention') || '';
