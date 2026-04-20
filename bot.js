@@ -365,34 +365,21 @@ const COMMANDS = [
     .addStringOption(o=>o.setName('type').setDescription('Type de serveur').setRequired(true).addChoices({ name: '🛒 Vente', value: 'vente' },{ name: '🎮 Gaming', value: 'gaming' },{ name: '💬 Communauté', value: 'communaute' })),
 
   // EMBEDS & MESSAGES
-  new SlashCommandBuilder().setName('bouton').setDescription('🔘 Envoie un message avec un bouton lien cliquable').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
-    .addStringOption(o=>o.setName('texte').setDescription('Texte affiché sur le bouton').setRequired(true))
-    .addStringOption(o=>o.setName('lien').setDescription('URL du lien (https://...)').setRequired(true))
-    .addStringOption(o=>o.setName('message').setDescription('Texte ou embed au-dessus du bouton'))
-    .addStringOption(o=>o.setName('couleur').setDescription('Couleur du bouton').addChoices(
-      {name:'🔵 Bleu (défaut)',value:'blue'},
-      {name:'⬜ Gris',value:'grey'},
-      {name:'🔴 Danger',value:'danger'},
-    ))
+  new SlashCommandBuilder().setName('bouton').setDescription('🔘 Envoie un bouton lien cliquable').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .addStringOption(o=>o.setName('texte').setDescription('Texte sur le bouton').setRequired(true))
+    .addStringOption(o=>o.setName('lien').setDescription('URL (https://...)').setRequired(true))
+    .addStringOption(o=>o.setName('message').setDescription('Texte au-dessus du bouton'))
     .addChannelOption(o=>o.setName('channel').setDescription('Channel cible')),
-  new SlashCommandBuilder().setName('boutons').setDescription('🔘 Envoie un embed avec jusqu\'à 5 boutons liens').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+  new SlashCommandBuilder().setName('boutons').setDescription('🔘 Embed avec jusqu\'à 5 boutons liens').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addStringOption(o=>o.setName('titre').setDescription('Titre de l\'embed').setRequired(true))
-    .addStringOption(o=>o.setName('description').setDescription('Description de l\'embed'))
-    .addStringOption(o=>o.setName('btn1').setDescription('Bouton 1 : texte|lien (ex: 🛒 Boutique|https://...)').setRequired(true))
+    .addStringOption(o=>o.setName('description').setDescription('Description'))
+    .addStringOption(o=>o.setName('btn1').setDescription('Bouton 1 : texte|lien').setRequired(true))
     .addStringOption(o=>o.setName('btn2').setDescription('Bouton 2 : texte|lien'))
     .addStringOption(o=>o.setName('btn3').setDescription('Bouton 3 : texte|lien'))
     .addStringOption(o=>o.setName('btn4').setDescription('Bouton 4 : texte|lien'))
     .addStringOption(o=>o.setName('btn5').setDescription('Bouton 5 : texte|lien'))
-    .addStringOption(o=>o.setName('couleur').setDescription('Couleur hex de l\'embed (ex: #f0b429)'))
+    .addStringOption(o=>o.setName('couleur').setDescription('Couleur hex (ex: #f0b429)'))
     .addChannelOption(o=>o.setName('channel').setDescription('Channel cible'))
-    .addStringOption(o=>o.setName('mention').setDescription('@everyone ou @here')),
-    .addStringOption(o=>o.setName('titre').setDescription('Titre').setRequired(true))
-    .addStringOption(o=>o.setName('description').setDescription('Description'))
-    .addStringOption(o=>o.setName('couleur').setDescription('Couleur hex'))
-    .addChannelOption(o=>o.setName('channel').setDescription('Channel'))
-    .addStringOption(o=>o.setName('image').setDescription('URL image'))
-    .addStringOption(o=>o.setName('thumbnail').setDescription('URL thumbnail'))
-    .addStringOption(o=>o.setName('footer').setDescription('Footer'))
     .addStringOption(o=>o.setName('mention').setDescription('@everyone ou @here')),
   new SlashCommandBuilder().setName('annonce').setDescription('📢 Annonce embed').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addStringOption(o=>o.setName('titre').setDescription('Titre').setRequired(true))
