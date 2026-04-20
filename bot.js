@@ -372,8 +372,8 @@ const COMMANDS = [
     .addChannelOption(o=>o.setName('channel').setDescription('Channel cible')),
   new SlashCommandBuilder().setName('boutons').setDescription('🔘 Embed avec jusqu\'à 5 boutons liens').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addStringOption(o=>o.setName('titre').setDescription('Titre de l\'embed').setRequired(true))
-    .addStringOption(o=>o.setName('description').setDescription('Description'))
-    .addStringOption(o=>o.setName('btn1').setDescription('Bouton 1 : texte|lien').setRequired(true))
+    .addStringOption(o=>o.setName('btn1').setDescription('Bouton 1 : texte|lien (ex: 🛒 Boutique|https://...)').setRequired(true))
+    .addStringOption(o=>o.setName('description').setDescription('Description de l\'embed'))
     .addStringOption(o=>o.setName('btn2').setDescription('Bouton 2 : texte|lien'))
     .addStringOption(o=>o.setName('btn3').setDescription('Bouton 3 : texte|lien'))
     .addStringOption(o=>o.setName('btn4').setDescription('Bouton 4 : texte|lien'))
