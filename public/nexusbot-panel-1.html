@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NexusBot Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080a0f;--s1:#0d1018;--s2:#131620;--s3:#1a1e2e;--s4:#222638;
+  --b1:#2a2f45;--b2:#363c58;
+  --gold:#f0b429;--gold2:#ffca5c;--green:#00e676;--red:#ff3d3d;
+  --blue:#4488ff;--purple:#a855f7;--orange:#ff6b35;
+  --text:#eef0f8;--text2:#8892b0;--text3:#4a5270;
+  --f:'Outfit',sans-serif;--fm:'JetBrains Mono',monospace;
+  --r:14px;--r2:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--f);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:50;background:rgba(8,10,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),var(--orange));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 4px 16px rgba(240,180,41,0.3)}
+.header-info{flex:1;min-width:0}
+.header-title{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.header-title span{color:var(--gold)}
+.header-sub{font-size:11px;color:var(--text3)}
+.status-pill{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:100px;font-size:10px;font-weight:700}
+.online{background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2)}
+.offline{background:rgba(255,61,61,0.1);color:var(--red);border:1px solid rgba(255,61,61,0.2)}
+.sdot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(13,16,24,0.97);border-top:1px solid var(--b1);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom));backdrop-filter:blur(20px)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:10px;cursor:pointer;transition:all .2s;border:none;background:transparent;position:relative}
+.nb.active{background:rgba(240,180,41,0.08)}
+.nb .ni{font-size:20px;line-height:1;transition:transform .2s}
+.nb.active .ni{transform:scale(1.15)}
+.nb .nl{font-size:9px;font-weight:700;color:var(--text3);transition:color .2s;letter-spacing:.3px}
+.nb.active .nl{color:var(--gold)}
+.nbadge{position:absolute;top:2px;right:50%;transform:translateX(10px);background:var(--red);color:#fff;font-size:8px;font-weight:800;padding:1px 4px;border-radius:100px;min-width:14px;text-align:center;display:none}
+
+/* PAGES */
+.page{display:none;padding:16px 16px calc(90px + env(safe-area-inset-bottom));animation:fadeUp .25s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.ch{padding:14px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px}
+.ci{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ig{background:rgba(240,180,41,.12);border:1px solid rgba(240,180,41,.2)}
+.ir{background:rgba(255,61,61,.1);border:1px solid rgba(255,61,61,.2)}
+.ib{background:rgba(68,136,255,.1);border:1px solid rgba(68,136,255,.2)}
+.ip{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2)}
+.igr{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.2)}
+.ct{font-size:13px;font-weight:700;flex:1}
+.cb{padding:14px 16px}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.sc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:14px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;bottom:-10px;right:-10px;width:50px;height:50px;border-radius:50%;opacity:.06}
+.sg::after{background:var(--gold)}.sgg::after{background:var(--green)}.sb::after{background:var(--blue)}.sr::after{background:var(--red)}
+.sem{font-size:22px;margin-bottom:8px;display:block}
+.sv{font-size:24px;font-weight:900;line-height:1;font-family:var(--fm)}
+.sg .sv{color:var(--gold)}.sgg .sv{color:var(--green)}.sb .sv{color:var(--blue)}.sr .sv{color:var(--red)}
+.sl{font-size:10px;color:var(--text3);margin-top:3px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 18px;border-radius:var(--r2);border:none;cursor:pointer;font-family:var(--f);font-size:14px;font-weight:700;transition:all .15s;width:100%;-webkit-appearance:none}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.bg{background:var(--gold);color:#000}
+.bgh{background:var(--s2);color:var(--text2);border:1px solid var(--b1)}
+.bgr{background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.br{background:rgba(255,61,61,.1);color:var(--red);border:1px solid rgba(255,61,61,.25)}
+.bb{background:rgba(68,136,255,.1);color:var(--blue);border:1px solid rgba(68,136,255,.25)}
+.bsm{padding:9px 14px;font-size:12px;width:auto}
+.brow{display:flex;gap:8px}
+.brow .btn{flex:1}
+
+/* FORMS */
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px;letter-spacing:.8px;text-transform:uppercase}
+.fi,.fs,.fta{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);color:var(--text);font-family:var(--f);font-size:15px;padding:13px 14px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(240,180,41,.08)}
+.fs{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%234a5270'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+.fs option{background:var(--s2)}
+.fta{resize:none;min-height:90px;line-height:1.5}
+.fh{font-size:11px;color:var(--text3);margin-top:5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* TOGGLES */
+.tr{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--b1)}
+.tr:last-child{border-bottom:none}
+.ti{flex:1;padding-right:12px}
+.tn{font-size:14px;font-weight:600}
+.td{font-size:11px;color:var(--text3);margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.tt{position:absolute;inset:0;background:var(--s3);border:1px solid var(--b1);border-radius:100px;cursor:pointer;transition:.2s}
+.tt::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:var(--text3);border-radius:50%;transition:.2s}
+.toggle input:checked~.tt{background:rgba(240,180,41,.2);border-color:var(--gold)}
+.toggle input:checked~.tt::before{transform:translateX(20px);background:var(--gold)}
+
+/* QUICK GRID */
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qbtn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);cursor:pointer;transition:all .15s;text-align:center}
+.qbtn:active{transform:scale(.96);background:var(--s3)}
+.qe{font-size:22px}
+.ql{font-size:12px;font-weight:700;color:var(--text2)}
+.qs{font-size:10px;color:var(--text3)}
+
+/* MODALS */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:16px}
+.mo.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--b1);border-radius:20px 20px 16px 16px;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;animation:slideUp .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mh2{width:36px;height:4px;background:var(--b2);border-radius:2px;margin:10px auto 0}
+.mh{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:16px;font-weight:800}
+.mc{background:var(--s3);border:none;color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.mb{padding:16px 18px}
+.mf{padding:12px 18px 18px;display:flex;gap:8px}
+.mf .btn{flex:1}
+
+/* ALERTS */
+.alert{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:var(--r2);margin-bottom:10px;font-size:13px}
+.ai{font-size:16px;flex-shrink:0;margin-top:1px}
+.at{flex:1;line-height:1.5}
+.aw{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.2);color:var(--gold)}
+.ae{background:rgba(255,61,61,.08);border:1px solid rgba(255,61,61,.2);color:var(--red)}
+.agr{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);color:var(--green)}
+
+/* LOGS */
+.lw{background:#050709;border-radius:var(--r2);padding:12px;max-height:220px;overflow-y:auto;font-family:var(--fm);font-size:11px;line-height:1.9}
+.ll{display:flex;gap:8px}
+.lt{color:var(--text3);flex-shrink:0}
+.lok{color:var(--green)}.ler{color:var(--red)}.lwa{color:var(--gold)}.lin{color:var(--blue)}
+
+/* TAGS */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700}
+.tg{background:rgba(240,180,41,.12);color:var(--gold)}
+.tgr{background:rgba(0,230,118,.1);color:var(--green)}
+.tr2{background:rgba(255,61,61,.1);color:var(--red)}
+.tb{background:rgba(68,136,255,.1);color:var(--blue)}
+
+/* MEMBER CARD */
+.mcard{display:flex;align-items:center;gap:12px;padding:12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:8px}
+.mav{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--orange));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;font-weight:700}
+.min{flex:1;min-width:0}
+.mn{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mm{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* TOAST */
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);z-index:300;background:var(--s1);border:1px solid var(--b1);border-radius:100px;padding:10px 20px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:rgba(0,230,118,.3);color:var(--green)}
+.toast.err{border-color:rgba(255,61,61,.3);color:var(--red)}
+
+/* PROGRESS */
+.pw{background:var(--s3);border-radius:100px;height:6px;overflow:hidden;margin-top:6px}
+.pb{height:100%;border-radius:100px;transition:width .5s ease}
+.pg{background:linear-gradient(90deg,var(--gold),var(--orange))}
+.pgr{background:linear-gradient(90deg,var(--green),#00bfa5)}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px}
+.stitle{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">⚡</div>
+  <div class="header-info">
+    <div class="header-title">Nexus<span>Bot</span></div>
+    <div class="header-sub" id="hsub">Connexion...</div>
+  </div>
+  <div class="status-pill offline" id="hstatus"><div class="sdot"></div><span id="stext">Offline</span></div>
+</div>
+
+<!-- ═══ PAGE DASHBOARD ═══ -->
+<div class="page active" id="page-dashboard">
+  <div class="sgrid">
+    <div class="sc sgg"><span class="sem">👥</span><div class="sv" id="s-members">—</div><div class="sl">Membres</div></div>
+    <div class="sc sb"><span class="sem">🟢</span><div class="sv" id="s-online">—</div><div class="sl">En ligne</div></div>
+    <div class="sc sg"><span class="sem">🎫</span><div class="sv" id="s-tickets">—</div><div class="sl">Tickets</div></div>
+    <div class="sc sr"><span class="sem">⚠️</span><div class="sv" id="s-warns">—</div><div class="sl">Warns</div></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ci ig">⚡</div><div class="ct">Actions rapides</div></div>
+    <div class="cb" style="padding:12px">
+      <div class="qgrid">
+        <div class="qbtn" onclick="openModal('modal-warn')"><span class="qe">⚠️</span><span class="ql">Warn</span><span class="qs">Avertir</span></div>
+        <div class="qbtn" onclick="openModal('modal-mute')"><span class="qe">🔇</span><span class="ql">Mute</span><span class="qs">Sourdine</span></div>
+        <div class="qbtn" onclick="openModal('modal-kick')"><span class="qe">👢</span><span class="ql">Kick</span><span class="qs">Expulser</span></div>
+        <div class="qbtn" onclick="openModal('modal-ban')"><span class="qe">🔨</span><span class="ql">Ban</span><span class="qs">Bannir</span></div>
+        <div class="qbtn" onclick="openModal('modal-clear')"><span class="qe">🗑️</span><span class="ql">Clear</span><span class="qs">Messages</span></div>
+        <div class="qbtn" onclick="openModal('modal-announce')"><span class="qe">📢</span><span class="ql">Annonce</span><span class="qs">Embed</span></div>
+        <div class="qbtn" onclick="openModal('modal-lock')"><span class="qe">🔒</span><span class="ql">Lock</span><span class="qs">Salon</span></div>
+        <div class="qbtn" onclick="openModal('modal-slowmode')"><span class="qe">🐌</span><span class="ql">Slowmode</span><span class="qs">Débit</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ci ir">🛡️</div><div class="ct">Sécurité</div><span class="tag tg" id="sec-tag">—</span></div>
+    <div class="cb"><div id="sec-alerts"><div style="color:var(--text3);font-size:13px">Chargement...</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ci ib">📋</div><div class="ct">Activité récente</div></div>
+    <div class="cb" style="padding:10px"><div class="lw" id="act-log"></div></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE MODÉRATION ═══ -->
+<div class="page" id="page-mod">
+  <div class="card">
+    <div class="ch"><div class="ci ir">🔍</div><div class="ct">Rechercher un membre</div></div>
+    <div class="cb">
+      <input class="fi" id="mod-search" placeholder="ID Discord du membre..." oninput="searchMember(this.value)">
+      <div class="fh">Entrez l'ID Discord (18 chiffres)</div>
+    </div>
+  </div>
+
+  <div id="mc-result" style="display:none">
+    <div class="card">
+      <div class="ch"><div class="ci ib">👤</div><div class="ct" id="mc-name">Membre</div><span id="mc-wbadge" class="tag tgr">0 warn</span></div>
+      <div class="cb">
+        <div class="g2" style="margin-bottom:14px">
+          <div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--gold);font-family:var(--fm)" id="mc-pts">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">POINTS</div></div>
+          <div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--blue);font-family:var(--fm)" id="mc-lvl">—</div><div style="font-size:10px;color:var(--text3);margin-top:2px">NIVEAU</div></div>
+        </div>
+        <div id="mc-warns" style="margin-bottom:14px"></div>
+        <div class="brow">
+          <button class="btn bgh bsm" style="flex:1" onclick="preAction('warn')">⚠️ Warn</button>
+          <button class="btn bb bsm" style="flex:1" onclick="preAction('mute')">🔇 Mute</button>
+          <button class="btn bgh bsm" style="flex:1" onclick="preAction('kick')">👢 Kick</button>
+          <button class="btn br bsm" style="flex:1" onclick="preAction('ban')">🔨 Ban</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stitle">Sanctions de cette session</div>
+  <div id="sanctions-list"><div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">Aucune sanction cette session</div></div>
+
+  <div class="card">
+    <div class="ch"><div class="ci ig">⚙️</div><div class="ct">Modération automatique</div></div>
+    <div class="cb" style="padding:0 16px">
+      <div class="tr"><div class="ti"><div class="tn">Anti-spam</div><div class="td">Warn auto si flood</div></div><label class="toggle"><input type="checkbox" id="t1" checked><div class="tt"></div></label></div>
+      <div class="tr"><div class="ti"><div class="tn">Anti-lien</div><div class="td">Supprime les liens non autorisés</div></div><label class="toggle"><input type="checkbox" id="t2"><div class="tt"></div></label></div>
+      <div class="tr"><div class="ti"><div class="tn">3 warns → kick auto</div><div class="td">Expulsion automatique</div></div><label class="toggle"><input type="checkbox" id="t3" checked><div class="tt"></div></label></div>
+      <div class="tr"><div class="ti"><div class="tn">DM en cas de sanction</div><div class="td">Notifie le membre</div></div><label class="toggle"><input type="checkbox" id="t4" checked><div class="tt"></div></label></div>
+      <div class="tr"><div class="ti"><div class="tn">Logs des sanctions</div><div class="td">Enregistre dans le salon logs</div></div><label class="toggle"><input type="checkbox" id="t5" checked><div class="tt"></div></label></div>
+    </div>
+    <div style="padding:14px 16px;border-top:1px solid var(--b1)"><button class="btn bg" onclick="saveModConfig()">💾 Sauvegarder</button></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE SÉCURITÉ ═══ -->
+<div class="page" id="page-security">
+
+  <div class="alert aw"><span class="ai">⚠️</span><span class="at">Vérifiez régulièrement les permissions des rôles et les bots présents sur votre serveur.</span></div>
+
+  <div class="card">
+    <div class="ch"><div class="ci ir">🔐</div><div class="ct">Score de sécurité</div></div>
+    <div class="cb">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="font-size:40px;font-weight:900;font-family:var(--fm);color:var(--gold)" id="sec-big">—</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px" id="sec-label">Calcul...</div><div class="pw"><div class="pb pg" id="sec-bar" style="width:0%"></div></div></div>
+      </div>
+      <div id="sec-checks"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ci ir">🚨</div><div class="ct">Actions urgentes</div></div>
+    <div class="cb" style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn br" onclick="openModal('modal-lockdown')">🚨 Lockdown serveur complet</button>
+      <button class="btn bb" onclick="loadSecScan()">🔍 Scanner les permissions</button>
+      <button class="btn bgh" onclick="openModal('modal-unban')">🔓 Débannir un membre</button>
+      <button class="btn bgh" onclick="openModal('modal-clearwarns')">🗑️ Effacer les warns</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ci ir">🔨</div><div class="ct">Membres bannis</div><span class="tag tr2" id="bans-ct">—</span></div>
+    <div class="cb" style="padding:8px"><div id="bans-list"><div style="padding:12px;text-align:center;color:var(--text3);font-size:13px">Chargement...</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ci ip">🤖</div><div class="ct">Bots sur le serveur</div><span class="tag tb" id="bots-ct">—</span></div>
+    <div class="cb" style="padding:8px"><div id="bots-list"><div style="padding:12px;text-align:center;color:var(--text3);font-size:13px">Chargement...</div></div></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE BOUTIQUE ═══ -->
+<div class="page" id="page-shop">
+  <div class="card">
+    <div class="ch"><div class="ci ig">➕</div><div class="ct">Ajouter un article</div></div>
+    <div class="cb">
+      <div class="fg"><label class="fl">Nom</label><input class="fi" id="an" placeholder="Premium Pack"></div>
+      <div class="g2">
+        <div class="fg"><label class="fl">Prix</label><input class="fi" id="ap" placeholder="9.99€"></div>
+        <div class="fg"><label class="fl">Emoji</label><input class="fi" id="ae" placeholder="💎" value="🛒"></div>
+      </div>
+      <div class="fg"><label class="fl">Lien d'achat</label><input class="fi" id="al" placeholder="https://..." type="url"></div>
+      <div class="fg"><label class="fl">Stock (-1=illimité)</label><input class="fi" id="as" type="number" value="-1"></div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fta" id="ad" placeholder="⚡ Livraison instantanée..."></textarea></div>
+      <button class="btn bg" onclick="addArt()" id="add-art-btn">➕ Ajouter l'article</button>
+    </div>
+  </div>
+  <div class="stitle">Articles <span id="art-ct" style="color:var(--gold)"></span></div>
+  <div id="arts-list"><div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">Chargement...</div></div>
+</div>
+
+<!-- ═══ PAGE LOGS ═══ -->
+<div class="page" id="page-logs">
+  <div class="brow" style="margin-bottom:12px">
+    <button class="btn bgh bsm" style="flex:1" onclick="loadLogs()">🔄 Actualiser</button>
+    <button class="btn br bsm" style="flex:1" onclick="document.getElementById('bot-logs').innerHTML=''">🗑️ Vider</button>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci ib">📋</div><div class="ct">Logs du bot</div><span class="tag tb" id="log-ct" style="font-family:var(--fm);font-size:9px">0</span></div>
+    <div class="cb" style="padding:10px"><div class="lw" id="bot-logs" style="max-height:350px"></div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ci ir">⚠️</div><div class="ct">Sanctions (session)</div></div>
+    <div class="cb" style="padding:8px"><div id="san-log"><div style="padding:12px;text-align:center;color:var(--text3);font-size:13px">Aucune</div></div></div>
+  </div>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+<!-- WARN -->
+<div class="mo" id="modal-warn" onclick="if(event.target===this)closeModal('modal-warn')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">⚠️ Avertir</span><button class="mc" onclick="closeModal('modal-warn')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">ID du membre</label><input class="fi" id="w-id" placeholder="123456789012345678"></div>
+      <div class="fg"><label class="fl">Raison</label><textarea class="fta" id="w-r" placeholder="Raison..." style="min-height:70px"></textarea></div>
+    </div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-warn')">Annuler</button><button class="btn bg" onclick="doWarn()">⚠️ Avertir</button></div>
+  </div>
+</div>
+
+<!-- MUTE -->
+<div class="mo" id="modal-mute" onclick="if(event.target===this)closeModal('modal-mute')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">🔇 Mute</span><button class="mc" onclick="closeModal('modal-mute')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">ID du membre</label><input class="fi" id="m-id" placeholder="123456789012345678"></div>
+      <div class="fg"><label class="fl">Durée</label>
+        <select class="fs" id="m-dur">
+          <option value="5">5 minutes</option><option value="10" selected>10 minutes</option>
+          <option value="30">30 minutes</option><option value="60">1 heure</option>
+          <option value="360">6 heures</option><option value="1440">24 heures</option><option value="10080">7 jours</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Raison</label><input class="fi" id="m-r" placeholder="Raison..."></div>
+    </div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-mute')">Annuler</button><button class="btn bb" onclick="doMute()">🔇 Mute</button></div>
+  </div>
+</div>
+
+<!-- KICK -->
+<div class="mo" id="modal-kick" onclick="if(event.target===this)closeModal('modal-kick')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">👢 Expulser</span><button class="mc" onclick="closeModal('modal-kick')">✕</button></div>
+    <div class="mb">
+      <div class="alert aw"><span class="ai">⚠️</span><span class="at">Le membre peut revenir avec un lien d'invitation.</span></div>
+      <div class="fg"><label class="fl">ID du membre</label><input class="fi" id="k-id" placeholder="123456789012345678"></div>
+      <div class="fg"><label class="fl">Raison</label><input class="fi" id="k-r" placeholder="Raison..."></div>
+    </div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-kick')">Annuler</button><button class="btn br" onclick="doKick()">👢 Kick</button></div>
+  </div>
+</div>
+
+<!-- BAN -->
+<div class="mo" id="modal-ban" onclick="if(event.target===this)closeModal('modal-ban')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">🔨 Bannir</span><button class="mc" onclick="closeModal('modal-ban')">✕</button></div>
+    <div class="mb">
+      <div class="alert ae"><span class="ai">🚨</span><span class="at">Action irréversible ! Le membre ne peut plus rejoindre.</span></div>
+      <div class="fg"><label class="fl">ID du membre</label><input class="fi" id="b-id" placeholder="123456789012345678"></div>
+      <div class="fg"><label class="fl">Raison</label><input class="fi" id="b-r" placeholder="Raison..."></div>
+      <div class="fg"><label class="fl">Supprimer messages</label>
+        <select class="fs" id="b-days"><option value="0">Ne pas supprimer</option><option value="1" selected>24 dernières heures</option><option value="7">7 derniers jours</option></select>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-ban')">Annuler</button><button class="btn br" onclick="doBan()">🔨 Bannir</button></div>
+  </div>
+</div>
+
+<!-- CLEAR -->
+<div class="mo" id="modal-clear" onclick="if(event.target===this)closeModal('modal-clear')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">🗑️ Supprimer messages</span><button class="mc" onclick="closeModal('modal-clear')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">ID du salon</label><input class="fi" id="cl-ch" placeholder="ID du salon Discord"></div>
+      <div class="fg"><label class="fl">Nombre</label>
+        <select class="fs" id="cl-n"><option value="5">5</option><option value="10" selected>10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-clear')">Annuler</button><button class="btn br" onclick="doClear()">🗑️ Supprimer</button></div>
+  </div>
+</div>
+
+<!-- ANNOUNCE -->
+<div class="mo" id="modal-announce" onclick="if(event.target===this)closeModal('modal-announce')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">📢 Annonce</span><button class="mc" onclick="closeModal('modal-announce')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">ID du salon</label><input class="fi" id="ac-ch" placeholder="ID du salon Discord"></div>
+      <div class="fg"><label class="fl">Titre</label><input class="fi" id="ac-t" placeholder="📢 Annonce"></div>
+      <div class="fg"><label class="fl">Message</label><textarea class="fta" id="ac-m" placeholder="Contenu..."></textarea></div>
+      <div class="g2">
+        <div class="fg"><label class="fl">Couleur</label><input class="fi" id="ac-c" value="#5865F2"></div>
+        <div class="fg"><label class="fl">Mention</label><input class="fi" id="ac-me" placeholder="@everyone"></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-announce')">Annuler</button><button class="btn bg" onclick="doAnnounce()">📢 Envoyer</button></div>
+  </div>
+</div>
+
+<!-- LOCK -->
+<div class="mo" id="modal-lock" onclick="if(event.target===this)closeModal('modal-lock')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">🔒 Lock salon</span><button class="mc" onclick="closeModal('modal-lock')">✕</button></div>
+    <div class="mb"><div class="fg"><label class="fl">ID du salon</label><input class="fi" id="lk-ch" placeholder="ID du salon Discord"></div></div>
+    <div class="mf">
+      <button class="btn bgh" onclick="closeModal('modal-lock')">Annuler</button>
+      <button class="btn br" onclick="doLock(true)">🔒 Lock</button>
+      <button class="btn bgr" onclick="doLock(false)">🔓 Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- SLOWMODE -->
+<div class="mo" id="modal-slowmode" onclick="if(event.target===this)closeModal('modal-slowmode')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">🐌 Slow mode</span><button class="mc" onclick="closeModal('modal-slowmode')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">ID du salon</label><input class="fi" id="sm-ch" placeholder="ID du salon Discord"></div>
+      <div class="fg"><label class="fl">Délai</label>
+        <select class="fs" id="sm-s"><option value="0">Désactivé</option><option value="5">5s</option><option value="10">10s</option><option value="30" selected>30s</option><option value="60">1 min</option><option value="300">5 min</option></select>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-slowmode')">Annuler</button><button class="btn bg" onclick="doSlowmode()">🐌 Appliquer</button></div>
+  </div>
+</div>
+
+<!-- LOCKDOWN -->
+<div class="mo" id="modal-lockdown" onclick="if(event.target===this)closeModal('modal-lockdown')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">🚨 Lockdown serveur</span><button class="mc" onclick="closeModal('modal-lockdown')">✕</button></div>
+    <div class="mb">
+      <div class="alert ae"><span class="ai">🚨</span><span class="at">Verrouille TOUS les salons. À utiliser en cas de raid uniquement !</span></div>
+      <div class="fg" style="margin-top:12px"><label class="fl">Message (optionnel)</label><textarea class="fta" id="ld-m" placeholder="🚨 Le serveur est en lockdown..." style="min-height:60px"></textarea></div>
+    </div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-lockdown')">Annuler</button><button class="btn br" onclick="doLockdown()">🚨 Lockdown</button></div>
+  </div>
+</div>
+
+<!-- UNBAN -->
+<div class="mo" id="modal-unban" onclick="if(event.target===this)closeModal('modal-unban')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">🔓 Débannir</span><button class="mc" onclick="closeModal('modal-unban')">✕</button></div>
+    <div class="mb"><div class="fg"><label class="fl">ID utilisateur</label><input class="fi" id="ub-id" placeholder="123456789012345678"></div></div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-unban')">Annuler</button><button class="btn bgr" onclick="doUnban()">🔓 Débannir</button></div>
+  </div>
+</div>
+
+<!-- CLEAR WARNS -->
+<div class="mo" id="modal-clearwarns" onclick="if(event.target===this)closeModal('modal-clearwarns')">
+  <div class="modal"><div class="mh2"></div>
+    <div class="mh"><span class="mt">🗑️ Effacer warns</span><button class="mc" onclick="closeModal('modal-clearwarns')">✕</button></div>
+    <div class="mb"><div class="fg"><label class="fl">ID du membre</label><input class="fi" id="cw-id" placeholder="123456789012345678"></div></div>
+    <div class="mf"><button class="btn bgh" onclick="closeModal('modal-clearwarns')">Annuler</button><button class="btn bg" onclick="doClearWarns()">🗑️ Effacer</button></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="nb active" onclick="nav('dashboard',this)"><span class="ni">📊</span><span class="nl">Dashboard</span></button>
+  <button class="nb" onclick="nav('mod',this)"><span class="ni">🛡️</span><span class="nl">Modération</span><span class="nbadge" id="nb-warns">!</span></button>
+  <button class="nb" onclick="nav('security',this)"><span class="ni">🔐</span><span class="nl">Sécurité</span></button>
+  <button class="nb" onclick="nav('shop',this)"><span class="ni">🛒</span><span class="nl">Boutique</span></button>
+  <button class="nb" onclick="nav('logs',this)"><span class="ni">📋</span><span class="nl">Logs</span></button>
+</nav>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────
+let PASS = '';
+let curMemberId = null;
+let sessionSanctions = [];
+
+function auth() {
+  if (!PASS) PASS = prompt('🔐 Mot de passe panel :') || '';
+  return 'Basic ' + btoa('admin:' + PASS);
+}
+
+async function api(url, o = {}) {
+  o.headers = { Authorization: auth(), 'Content-Type': 'application/json', ...(o.headers||{}) };
+  const r = await fetch(url, o);
+  if (r.status === 401 || r.status === 403) { PASS = ''; throw new Error('Mot de passe incorrect'); }
+  return r;
+}
+
+// ─── NAV ─────────────────────────────────────────────────────
+function nav(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'security') loadSecScan();
+  if (name === 'logs')     loadLogs();
+  if (name === 'shop')     loadArts();
+}
+
+// ─── TOAST ───────────────────────────────────────────────────
+let tt;
+function toast(msg, type = 'ok') {
+  clearTimeout(tt);
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `toast ${type} show`;
+  tt = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ─── MODAL ───────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─── LOGS HELPER ─────────────────────────────────────────────
+function addLog(elId, msg, type = 'info') {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const t = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const d = document.createElement('div');
+  d.className = 'll';
+  d.innerHTML = `<span class="lt">${t}</span><span class="l${type==='ok'?'ok':type==='err'?'er':type==='warn'?'wa':'in'}">${esc(msg)}</span>`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+function actLog(msg, type) { addLog('act-log', msg, type); }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function v(id)  { return (document.getElementById(id)?.value||'').trim(); }
+
+// ─── INIT ────────────────────────────────────────────────────
+async function init() {
+  await checkStatus();
+  await loadArts();
+  setInterval(checkStatus, 20000);
+}
+
+// ─── STATUS ──────────────────────────────────────────────────
+async function checkStatus() {
+  try {
+    const r = await api('/api/status');
+    const d = await r.json();
+    document.getElementById('hstatus').className = 'status-pill online';
+    document.getElementById('stext').textContent  = 'Online';
+    document.getElementById('hsub').textContent   = d.tag || 'Connecté';
+    document.getElementById('s-members').textContent = d.memberCount || '—';
+    document.getElementById('s-tickets').textContent  = d.tickets || 0;
+    actLog(`Bot en ligne : ${d.tag} (${d.memberCount} membres)`, 'ok');
+    checkSecAlerts(d);
+  } catch(e) {
+    document.getElementById('hstatus').className = 'status-pill offline';
+    document.getElementById('stext').textContent  = 'Offline';
+    document.getElementById('hsub').textContent   = 'Déconnecté';
+    actLog('Bot hors ligne ou erreur API', 'err');
+  }
+  try {
+    const r = await api('/api/stats');
+    const d = await r.json();
+    const tw = d.totalWarns || 0;
+    document.getElementById('s-warns').textContent  = tw;
+    document.getElementById('s-online').textContent = d.online || '—';
+    if (tw > 0) document.getElementById('nb-warns').style.display = 'flex';
+  } catch(e) {}
+}
+
+// ─── SECURITY ALERTS ─────────────────────────────────────────
+function checkSecAlerts(data) {
+  const alerts = [];
+  if (data.memberCount > 50) alerts.push({ t: 'warn', m: 'Vérifiez le niveau de vérification Discord (Paramètres serveur → Modération).' });
+  if (!data.tickets) alerts.push({ t: 'warn', m: 'Activez le système de tickets pour gérer les litiges.' });
+  if (alerts.length === 0) alerts.push({ t: 'green', m: '✅ Aucune alerte critique détectée.' });
+  document.getElementById('sec-alerts').innerHTML = alerts.map(a =>
+    `<div class="alert ${a.t==='green'?'agr':'aw'}"><span class="ai">${a.t==='green'?'✅':'⚠️'}</span><span class="at">${esc(a.m)}</span></div>`
+  ).join('');
+  const sc = Math.max(0, 100 - alerts.filter(a=>a.t!=='green').length * 30);
+  const st = document.getElementById('sec-tag');
+  st.textContent = sc >= 80 ? '🟢 Bon' : sc >= 50 ? '🟡 Moyen' : '🔴 Faible';
+  st.className   = `tag ${sc>=80?'tgr':sc>=50?'tg':'tr2'}`;
+}
+
+// ─── SEC SCAN ────────────────────────────────────────────────
+async function loadSecScan() {
+  try {
+    const r = await api('/api/stats');
+    const d = await r.json();
+    const checks = [
+      { l: 'Bot connecté et opérationnel', ok: true },
+      { l: 'Articles boutique configurés', ok: d.articles > 0 },
+      { l: 'Système tickets actif', ok: d.tickets >= 0 },
+      { l: 'Commandes personnalisées', ok: d.customCmds >= 0 },
+    ];
+    const sc = Math.round(checks.filter(c=>c.ok).length / checks.length * 100);
+    document.getElementById('sec-big').textContent   = sc + '%';
+    document.getElementById('sec-bar').style.width   = sc + '%';
+    document.getElementById('sec-label').textContent = sc >= 80 ? '✅ Bonne sécurité' : sc >= 50 ? '⚠️ Sécurité moyenne' : '❌ Sécurité faible';
+    document.getElementById('sec-checks').innerHTML  = checks.map(c =>
+      `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b1)"><span style="font-size:16px">${c.ok?'✅':'❌'}</span><span style="font-size:13px;color:${c.ok?'var(--text)':'var(--text3)'}">${c.l}</span></div>`
+    ).join('');
+  } catch(e) {}
+  loadBans();
+}
+
+async function loadBans() {
+  try {
+    const r    = await api('/api/bans');
+    const bans = await r.json();
+    document.getElementById('bans-ct').textContent = bans.length || 0;
+    document.getElementById('bans-list').innerHTML = bans.length
+      ? bans.slice(0,10).map(b => `
+        <div class="mcard">
+          <div class="mav" style="background:linear-gradient(135deg,var(--red),var(--orange))">🔨</div>
+          <div class="min"><div class="mn">${esc(b.user?.username||b.user?.id||'—')}</div><div class="mm">${esc(b.reason||'Aucune raison')}</div></div>
+          <button class="btn bgr bsm" onclick="quickUnban('${b.user?.id}')">🔓</button>
+        </div>`).join('')
+      : '<div style="padding:12px;text-align:center;color:var(--text3);font-size:13px">Aucun ban</div>';
+  } catch(e) {
+    document.getElementById('bans-list').innerHTML = '<div style="padding:12px;text-align:center;color:var(--text3);font-size:13px">Impossible de charger — route /api/bans manquante</div>';
+  }
+}
+
+// ─── SANCTION HELPER ─────────────────────────────────────────
+async function doAction(action, body, modal) {
+  try {
+    const r = await api(`/api/mod/${action}`, { method:'POST', body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || 'Erreur');
+    if (modal) closeModal(modal);
+    toast(`✅ ${action} effectué !`, 'ok');
+    actLog(`${action.toUpperCase()} — ${body.userId||body.channelId||''}`, 'warn');
+    sessionSanctions.unshift({ action, ...body, time: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
+    renderSanctions();
+    checkStatus();
+    return d;
+  } catch(e) { toast(`❌ ${e.message}`, 'err'); throw e; }
+}
+
+// ─── ACTIONS MODÉRATION ──────────────────────────────────────
+function doWarn()     { const id=v('w-id'),r=v('w-r'); if(!id||!r) return toast('ID et raison requis','err'); doAction('warn',{userId:id,reason:r},'modal-warn'); }
+function doMute()     { const id=v('m-id'),d=v('m-dur'),r=v('m-r'); if(!id) return toast('ID requis','err'); doAction('mute',{userId:id,minutes:parseInt(d),reason:r||'Aucune'},'modal-mute'); }
+function doKick()     { const id=v('k-id'),r=v('k-r'); if(!id) return toast('ID requis','err'); doAction('kick',{userId:id,reason:r||'Aucune'},'modal-kick'); }
+function doBan()      { const id=v('b-id'),r=v('b-r'),d=v('b-days'); if(!id) return toast('ID requis','err'); doAction('ban',{userId:id,reason:r||'Aucune',days:parseInt(d)},'modal-ban'); }
+function doClear()    { const ch=v('cl-ch'),n=v('cl-n'); if(!ch) return toast('ID salon requis','err'); doAction('clear',{channelId:ch,amount:parseInt(n)},'modal-clear'); }
+function doLock(l)    { const ch=v('lk-ch'); if(!ch) return toast('ID salon requis','err'); doAction('lock',{channelId:ch,lock:l},'modal-lock'); }
+function doSlowmode() { const ch=v('sm-ch'),s=v('sm-s'); if(!ch) return toast('ID salon requis','err'); doAction('slowmode',{channelId:ch,seconds:parseInt(s)},'modal-slowmode'); }
+function doUnban()    { const id=v('ub-id'); if(!id) return toast('ID requis','err'); doAction('unban',{userId:id},'modal-unban'); loadBans(); }
+function doClearWarns() { const id=v('cw-id'); if(!id) return toast('ID requis','err'); doAction('clearwarns',{userId:id},'modal-clearwarns'); }
+function quickUnban(id) { if(!id) return; doAction('unban',{userId:id},null); setTimeout(loadBans,1000); }
+
+async function doAnnounce() {
+  const ch=v('ac-ch'),title=v('ac-t'),msg=v('ac-m'),color=v('ac-c'),mention=v('ac-me');
+  if(!ch||!msg) return toast('Salon et message requis','err');
+  try {
+    const r = await api('/api/announce',{method:'POST',body:JSON.stringify({channelId:ch,title:title||'📢 Annonce',message:msg,color:color||'#5865F2',mention})});
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error);
+    closeModal('modal-announce');
+    toast('✅ Annonce envoyée !','ok');
+    actLog(`Annonce → #${ch}`,'ok');
+  } catch(e) { toast(`❌ ${e.message}`,'err'); }
+}
+
+async function doLockdown() {
+  if(!confirm('⚠️ Lockdown de TOUT le serveur ?')) return;
+  try {
+    const r = await api('/api/mod/lockdown',{method:'POST',body:JSON.stringify({message:v('ld-m')})});
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error);
+    closeModal('modal-lockdown');
+    toast('🚨 Lockdown activé !','ok');
+    actLog('LOCKDOWN serveur activé','err');
+  } catch(e) { toast(`❌ ${e.message}`,'err'); }
+}
+
+// ─── MEMBER SEARCH ───────────────────────────────────────────
+async function searchMember(q) {
+  if (q.length < 6) return;
+  try {
+    const r = await api(`/api/member/${q.trim()}`);
+    const d = await r.json();
+    if (d.error) return;
+    curMemberId = d.id;
+    document.getElementById('mc-result').style.display = 'block';
+    document.getElementById('mc-name').textContent = d.username || d.id;
+    document.getElementById('mc-pts').textContent  = d.points || 0;
+    document.getElementById('mc-lvl').textContent  = d.level  || 1;
+    const warns = d.warns || [];
+    const wc = warns.length;
+    const wb = document.getElementById('mc-wbadge');
+    wb.textContent = `${wc} warn${wc>1?'s':''}`;
+    wb.className = `tag ${wc===0?'tgr':wc===1?'tg':wc===2?'tg':'tr2'}`;
+    document.getElementById('mc-warns').innerHTML = warns.length
+      ? warns.map((w,i) => `<div style="padding:8px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;margin-bottom:6px;font-size:12px"><span style="color:var(--gold);font-weight:700">Warn #${i+1}</span> — ${esc(w.reason)} <span style="color:var(--text3)">${w.date||''}</span></div>`).join('')
+      : '<div style="color:var(--green);font-size:13px;padding:8px 0">✅ Aucun avertissement</div>';
+  } catch(e) {}
+}
+
+function preAction(type) {
+  if (!curMemberId) return;
+  const map = { warn:['w-id','modal-warn'], mute:['m-id','modal-mute'], kick:['k-id','modal-kick'], ban:['b-id','modal-ban'] };
+  if (!map[type]) return;
+  document.getElementById(map[type][0]).value = curMemberId;
+  openModal(map[type][1]);
+}
+
+// ─── SANCTIONS RENDER ────────────────────────────────────────
+const icons = { warn:'⚠️',mute:'🔇',kick:'👢',ban:'🔨',unban:'🔓',clearwarns:'🗑️',clear:'🗑️',lock:'🔒',slowmode:'🐌',lockdown:'🚨' };
+
+function renderSanctions() {
+  const render = (elId) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (!sessionSanctions.length) { el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px">Aucune sanction</div>'; return; }
+    el.innerHTML = sessionSanctions.slice(0,15).map(s => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;margin-bottom:6px">
+        <span style="font-size:18px">${icons[s.action]||'⚡'}</span>
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase">${s.action}</div><div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.userId||s.channelId||''} ${s.reason?'— '+esc(s.reason):''}</div></div>
+        <span style="font-size:10px;color:var(--text3);flex-shrink:0">${s.time}</span>
+      </div>`).join('');
+  };
+  render('sanctions-list');
+  render('san-log');
+}
+
+// ─── MOD CONFIG ──────────────────────────────────────────────
+async function saveModConfig() {
+  try {
+    await api('/api/mod-config',{method:'POST',body:JSON.stringify({antispam:document.getElementById('t1').checked,antilink:document.getElementById('t2').checked,autosanction:document.getElementById('t3').checked,dm:document.getElementById('t4').checked,logs:document.getElementById('t5').checked})});
+    toast('✅ Config sauvegardée','ok');
+  } catch(e) { toast(`❌ ${e.message}`,'err'); }
+}
+
+// ─── ARTICLES ────────────────────────────────────────────────
+async function loadArts() {
+  try {
+    const r = await api('/api/articles');
+    const arts = await r.json();
+    document.getElementById('art-ct').textContent = `(${arts.length})`;
+    const el = document.getElementById('arts-list');
+    if (!arts.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">Aucun article.</div>'; return; }
+    el.innerHTML = arts.map(a => `
+      <div class="card" style="margin-bottom:10px">
+        <div style="padding:14px 16px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">${a.emoji}</span>
+          <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">${esc(a.name)}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${esc(a.price)} • ${a.stock===-1?'♾️ Illimité':a.stock===0?'❌ Rupture':'✅ '+a.stock}</div></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <label class="toggle"><input type="checkbox" ${a.visible?'checked':''} onchange="toggleArt(${a.id},this.checked)"><div class="tt"></div></label>
+            <button class="btn br bsm" style="padding:5px 10px;font-size:11px" onclick="delArt(${a.id})">🗑️</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function addArt() {
+  const name=v('an'),price=v('ap'),link=v('al'),emoji=v('ae')||'🛒',stock=parseInt(v('as'))||-1,desc=v('ad');
+  if(!name||!price) return toast('Nom et prix requis','err');
+  const btn=document.getElementById('add-art-btn');
+  btn.textContent='⟳ Ajout...'; btn.disabled=true;
+  try {
+    const r=await api('/api/articles',{method:'POST',body:JSON.stringify({name,price,link,emoji,stock,description:desc})});
+    const d=await r.json();
+    if(!d.ok) throw new Error(d.error);
+    toast(`✅ ${emoji} ${name} ajouté !`,'ok');
+    actLog(`Article "${name}" ajouté`,'ok');
+    ['an','ap','al','ad'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('as').value='-1';
+    document.getElementById('ae').value='🛒';
+    await loadArts();
+  } catch(e) { toast(`❌ ${e.message}`,'err'); }
+  finally { btn.textContent='➕ Ajouter l\'article'; btn.disabled=false; }
+}
+
+async function delArt(id) {
+  if(!confirm('Supprimer cet article ?')) return;
+  try { await api(`/api/articles/${id}`,{method:'DELETE'}); toast('🗑️ Supprimé','ok'); loadArts(); }
+  catch(e) { toast(`❌ ${e.message}`,'err'); }
+}
+
+async function toggleArt(id, visible) {
+  try { await api(`/api/articles/${id}`,{method:'PUT',body:JSON.stringify({visible})}); }
+  catch(e) { toast(`❌ ${e.message}`,'err'); }
+}
+
+// ─── LOGS ────────────────────────────────────────────────────
+async function loadLogs() {
+  try {
+    const r = await api('/api/logs');
+    const logs = await r.json();
+    const el = document.getElementById('bot-logs');
+    document.getElementById('log-ct').textContent = logs.length;
+    el.innerHTML = logs.slice(0,60).map(l=>`<div class="ll"><span class="lt">${esc(l.time)}</span><span class="lin">${esc(l.msg)}</span></div>`).join('');
+    el.scrollTop = el.scrollHeight;
+  } catch(e) {}
+}
+
+// ─── START ───────────────────────────────────────────────────
+init().catch(console.error);
+</script>
+</body>
+</html>
