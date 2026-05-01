@@ -239,8 +239,15 @@ hr.sep{border:none;border-top:1px solid var(--r);margin:12px 0}
 <div class="shell">
 <aside class="sb" id="sb">
   <div class="brand">
-    <div class="brow"><div class="bgem">⚡</div><div class="bnm">NexusBot</div></div>
+    <div class="brow">
+      <div class="bgem">⚡</div>
+      <div class="bnm">NexusBot</div>
+    </div>
     <div class="bst"><span class="dot" id="dotEl"></span><span id="botTagEl">Connexion...</span></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:var(--t2);font-family:'DM Mono',monospace">
+      <img id="guildIconEl" src="" style="display:none;width:16px;height:16px;border-radius:50%;object-fit:cover">
+      <span id="guildNameEl">—</span>
+    </div>
   </div>
   <nav class="nav">
     <div class="ns">Vue d'ensemble</div>
@@ -517,7 +524,7 @@ hr.sep{border:none;border-top:1px solid var(--r);margin:12px 0}
     <div class="card" style="margin-top:12px">
       <div class="ch"><span class="ct">🔗 Publier sur Discord</span></div>
       <div class="g2">
-        <div class="fg"><label>ID du salon Discord</label><input id="nsch" placeholder="ID du salon"></div>
+        <div class="fg"><label>Salon Discord</label><select id="nsch" class="sel-ch"><option value="">Chargement des salons...</option></select></div>
         <div class="fg"><label>Message</label><input id="nsmsg" value="🛒 Notre boutique est disponible !"></div>
       </div>
       <button class="btn bp" onclick="publishNsEmbed()">📤 Publier l'embed Discord</button>
@@ -666,7 +673,7 @@ hr.sep{border:none;border-top:1px solid var(--r);margin:12px 0}
       <div class="card">
         <div class="ch"><span class="ct">⚙️ Configuration</span></div>
         <div class="trow"><div><div class="tn">✅ Activer le message de bienvenue</div><div class="td2">Envoyer un message quand quelqu'un rejoint</div></div><label class="sw"><input type="checkbox" id="wlc-on"><span class="swt"></span></label></div>
-        <div class="fg"><label>Salon Discord (ID)</label><input id="wlc-ch" placeholder="ID du salon bienvenue"></div>
+        <div class="fg"><label>Salon Discord</label><select id="wlc-ch" class="sel-ch"><option value="">Chargement des salons...</option></select></div>
         <div class="fg"><label>Titre de l'embed (optionnel)</label><input id="wlc-title" placeholder="🎉 Bienvenue sur {server} !"></div>
         <div class="fg"><label>Message principal</label>
           <textarea id="wlc-msg" rows="5" oninput="updWelcomePrev()" placeholder="👋 Bienvenue **{user}** sur **{server}** !&#10;Nous sommes maintenant **{count}** membres 🎉&#10;&#10;Variables : {user} {server} {count} {mention}"></textarea>
@@ -740,10 +747,10 @@ hr.sep{border:none;border-top:1px solid var(--r);margin:12px 0}
   <div class="page" id="page-announce">
     <div class="pgh"><div class="pgt">📢 Envoyer une annonce</div></div>
     <div class="card" style="max-width:500px">
-      <div class="fg"><label>ID du salon</label><input id="anch" placeholder="ID du salon Discord"></div>
+      <div class="fg"><label>Salon</label><select id="anch" class="sel-ch"><option value="">Chargement...</option></select></div>
       <div class="fg"><label>Titre</label><input id="anti" placeholder="📢 Annonce importante"></div>
       <div class="fg"><label>Message</label><textarea id="anms" rows="5" placeholder="Contenu de l'annonce..."></textarea></div>
-      <div class="fg"><label>Mention (optionnel)</label><input id="anmn" placeholder="@everyone ou @here"></div>
+      <div class="fg"><label>Mention (optionnel)</label><select id="anmn"><option value="">Aucune mention</option><option value="@everyone">@everyone</option><option value="@here">@here</option></select></div>
       <button class="btn bp" onclick="sendAnnounce()">📢 Envoyer</button>
     </div>
   </div>
@@ -823,10 +830,10 @@ hr.sep{border:none;border-top:1px solid var(--r);margin:12px 0}
 <div class="ov" id="ov-newgw">
   <div class="modal" style="max-width:480px">
     <div class="mtitle">🎉 Créer un Giveaway</div>
-    <div class="fg"><label>ID du salon Discord</label><input id="gw-ch" placeholder="ID du salon où poster le giveaway"></div>
+    <div class="fg"><label>Salon Discord</label><select id="gw-ch" class="sel-ch"><option value="">Chargement des salons...</option></select></div>
     <div class="fg"><label>Prix / Récompense</label><input id="gw-prize" placeholder="NexusPass VIP, 100 points..."></div>
     <div class="g2"><div class="fg"><label>Durée (minutes)</label><input id="gw-min" type="number" value="60" min="1"></div><div class="fg"><label>Nombre de gagnants</label><input id="gw-win" type="number" value="1" min="1"></div></div>
-    <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:var(--rd2);padding:9px 12px;font-size:11.5px;color:var(--t1);margin-bottom:12px">🎉 Le giveaway sera posté dans le salon et les membres pourront participer en cliquant sur le bouton.</div>
+    <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:var(--rd2);padding:9px 12px;font-size:11.5px;color:var(--t1);margin-bottom:12px">🎉 Le giveaway sera posté dans le salon sélectionné.</div>
     <div class="mfoot"><button class="btn bg2" onclick="closeOv('ov-newgw')">Annuler</button><button class="btn bp" onclick="createGiveaway()">🎉 Lancer</button></div>
   </div>
 </div>
@@ -857,10 +864,38 @@ hr.sep{border:none;border-top:1px solid var(--r);margin:12px 0}
 //  NEXUSBOT PANEL v6 — COMPLET
 // ══════════════════════════════════════════
 let monacoEd=null, currentUid=null, modType=null, edMode='t';
-let arts=[], stHist={};
+let arts=[], stHist=[], allOrders=[], aboutData={team:[]};
 let nsConf=JSON.parse(localStorage.getItem('nsConf')||'{}');
 let dlvTemplates=JSON.parse(localStorage.getItem('dlvTpls')||'[]');
 let currentDlvIdx=-1;
+
+// Cache données Discord
+let guildData={textChannels:[],voiceChannels:[],categories:[],roles:[],members:[],guild:{}};
+
+// Charger toutes les données Discord
+async function loadGuildData() {
+  const d = await api('/api/guild');
+  if (!d?.ok) return;
+  guildData = d;
+  updateAllSelects();
+  // Mettre à jour le nom du serveur dans la sidebar
+  const gt=document.getElementById('guildNameEl');
+  if(gt&&guildData.guild?.name) gt.textContent=guildData.guild.name;
+  const gi=document.getElementById('guildIconEl');
+  if(gi&&guildData.guild?.icon){gi.src=guildData.guild.icon;gi.style.display='inline-block';gi.style.borderRadius='50%';gi.style.width='18px';gi.style.height='18px';}
+}
+
+// Mettre à jour tous les selects du panel avec les données Discord
+function updateAllSelects() {
+  const textOpts='<option value="">Sélectionner un salon...</option>'+guildData.textChannels.map(c=>`<option value="${c.id}">#${c.name} — ${c.category}</option>`).join('');
+  const voiceOpts='<option value="">Sélectionner un salon vocal...</option>'+guildData.voiceChannels.map(c=>`<option value="${c.id}">🔊 ${c.name}</option>`).join('');
+  const roleOpts='<option value="">Sélectionner un rôle...</option>'+guildData.roles.map(r=>`<option value="${r.id}">@${r.name} (${r.memberCount})</option>`).join('');
+
+  // Appliquer à tous les selects selon leur classe
+  document.querySelectorAll('.sel-ch').forEach(el=>{const v=el.value;el.innerHTML=textOpts;if(v)el.value=v;});
+  document.querySelectorAll('.sel-voice').forEach(el=>{const v=el.value;el.innerHTML=voiceOpts;if(v)el.value=v;});
+  document.querySelectorAll('.sel-role').forEach(el=>{const v=el.value;el.innerHTML=roleOpts;if(v)el.value=v;});
+}
 
 const TITLES={dash:'Dashboard',vocal:'Vocaux Live',editor:'Éditeur de code',cmds:'Mes commandes',statssetup:'Stats vocaux',tickets:'Tickets',shop:'Articles',stock:'Gestion du stock',orders:'Commandes',nexusstore:'NexusStore',delivery:'Fichiers livraison',giveaways:'Giveaways',welcome:'Message de bienvenue',about:'À propos',mod:'Modération',bans:'Bannis',logs:'Logs',announce:'Annonce'};
 
@@ -1276,7 +1311,19 @@ async function unban(id){if(!confirm('Débannir ?'))return;const d=await api('/a
 async function loadLogs(){const data=await api('/api/logs');document.getElementById('logsBox').innerHTML=data?.map(l=>`<div class="ll"><span class="lt">${l.time}</span><span class="lm">${esc(l.msg)}</span></div>`).join('')||'<div class="emp"><div class="et">Aucun log</div></div>';}
 
 // ── ANNONCE ──────────────────────────────
-async function sendAnnounce(){const body={channelId:document.getElementById('anch').value.trim(),title:document.getElementById('anti').value.trim()||'📢 Annonce',message:document.getElementById('anms').value.trim(),mention:document.getElementById('anmn').value.trim()};if(!body.channelId||!body.message){toast('Channel et message requis','ter');return;}const d=await api('/api/announce',{method:'POST',body:JSON.stringify(body)});if(d?.ok)toast('📢 Annonce envoyée !','tok');else toast(d?.error||'Erreur','ter');}
+async function sendAnnounce(){
+  const body={
+    channelId: document.getElementById('anch')?.value||'',
+    title:     document.getElementById('anti')?.value.trim()||'📢 Annonce',
+    message:   document.getElementById('anms')?.value.trim()||'',
+    mention:   document.getElementById('anmn')?.value||'',
+  };
+  if(!body.channelId){toast('Sélectionner un salon','ter');return;}
+  if(!body.message){toast('Message requis','ter');return;}
+  const d=await api('/api/announce',{method:'POST',body:JSON.stringify(body)});
+  if(d?.ok){toast('📢 Annonce envoyée !','tok');document.getElementById('anms').value='';}
+  else toast(d?.error||'Erreur','ter');
+}
 
 // ── RAILWAY URL ──────────────────────────
 function changeRailwayUrl() {
@@ -1310,7 +1357,6 @@ async function testRailwayConnection() {
 }
 
 // ── COMMANDES / ORDERS ───────────────────
-let allOrders = [];
 async function loadOrders() {
   const d = await api('/api/orders');
   allOrders = d?.orders || [];
@@ -1423,15 +1469,17 @@ async function loadGiveaways() {
   }).join('');
 }
 async function createGiveaway() {
+  const chSel = document.getElementById('gw-ch');
   const body = {
-    channelId: document.getElementById('gw-ch').value.trim(),
+    channelId: chSel?.value || '',
     prize:     document.getElementById('gw-prize').value.trim(),
     minutes:   parseInt(document.getElementById('gw-min').value)||60,
     winners:   parseInt(document.getElementById('gw-win').value)||1,
   };
-  if(!body.channelId||!body.prize){toast('Salon et prix requis','ter');return;}
+  if(!body.channelId){toast('Sélectionner un salon','ter');return;}
+  if(!body.prize){toast('Prix / récompense requis','ter');return;}
   const d = await api('/api/giveaways',{method:'POST',body:JSON.stringify(body)});
-  if(d?.ok){toast('🎉 Giveaway lancé !','tok');closeOv('ov-newgw');['gw-ch','gw-prize'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});loadGiveaways();}
+  if(d?.ok){toast('🎉 Giveaway lancé !','tok');closeOv('ov-newgw');document.getElementById('gw-prize').value='';loadGiveaways();}
   else toast(d?.error||'Erreur','ter');
 }
 async function endGw(id){const d=await api('/api/giveaways/'+id+'/end',{method:'POST',body:JSON.stringify({})});if(d?.ok){toast('🏁 Giveaway terminé !','tok');loadGiveaways();}else toast('Erreur','ter');}
@@ -1473,7 +1521,7 @@ function updWelcomePrev() {
 async function saveWelcome() {
   const body = {
     enabled:    document.getElementById('wlc-on')?.checked,
-    channelId:  document.getElementById('wlc-ch')?.value.trim(),
+    channelId:  document.getElementById('wlc-ch')?.value||'',
     message:    document.getElementById('wlc-msg')?.value.trim(),
     title:      document.getElementById('wlc-title')?.value.trim(),
     color:      document.getElementById('wlc-color')?.value,
@@ -1491,7 +1539,6 @@ async function testWelcome() {
 }
 
 // ── À PROPOS ──────────────────────────────
-let aboutData = { team:[] };
 async function loadAbout() {
   const d = await api('/api/about');
   if(!d?.about) return;
@@ -1551,6 +1598,14 @@ async function saveAbout() {
 // ── INIT ─────────────────────────────────
 loadDash();
 
+// Charger les données Discord au démarrage
+loadGuildData().then(() => {
+  console.log('[NexusBot] ✅ Données Discord chargées');
+});
+
+// Recharger les données Discord toutes les 10 min
+setInterval(loadGuildData, 10 * 60 * 1000);
+
 // Init bannière Railway sur GitHub Pages
 if (window.location.hostname.includes('github.io')) {
   const banner = document.getElementById('railway-banner');
@@ -1599,3 +1654,4 @@ setInterval(() => {
 </script>
 </body>
 </html>
+
