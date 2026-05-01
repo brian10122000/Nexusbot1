@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NexusBot · Panel Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08090f;--bg2:#0f1018;
+  --g:rgba(255,255,255,.038);--g2:rgba(255,255,255,.065);
+  --r:rgba(255,255,255,.07);--r2:rgba(255,255,255,.13);
+  --a1:#7c6dfa;--a2:#a855f7;--a3:#06d6a0;--a4:#fb7185;--a5:#f59e0b;--a6:#38bdf8;
+  --t0:#f0f2ff;--t1:#b4b9d4;--t2:#6b7291;--t3:#3d4264;
+  --rd:12px;--rd2:8px;--rd3:18px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t0);overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,109,250,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,109,250,.03) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+.glow{position:fixed;border-radius:50%;filter:blur(110px);pointer-events:none;z-index:0}
+.g1{width:600px;height:600px;background:rgba(124,109,250,.11);top:-220px;left:-160px}
+.g2x{width:480px;height:480px;background:rgba(168,85,247,.09);bottom:-160px;right:-120px}
+.shell{display:flex;height:100vh;position:relative;z-index:1}
+/* SIDEBAR */
+.sb{width:222px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(8,9,15,.85);backdrop-filter:blur(24px);border-right:1px solid var(--r)}
+.brand{padding:18px 14px 14px;border-bottom:1px solid var(--r);position:relative}
+.brand::after{content:'';position:absolute;bottom:0;left:14px;right:14px;height:1px;background:linear-gradient(90deg,transparent,var(--a1),transparent);opacity:.3}
+.brow{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.bgem{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--a1),var(--a2));display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 18px rgba(124,109,250,.5);flex-shrink:0}
+.bnm{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;background:linear-gradient(135deg,#a5b4fc,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.bst{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--t2);font-family:'DM Mono',monospace}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--a3);box-shadow:0 0 7px var(--a3);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav{padding:8px;flex:1;overflow-y:auto;scrollbar-width:none}
+.ns{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);padding:13px 9px 5px;font-family:'Syne',sans-serif}
+.ni{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rd2);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-size:12.5px;font-weight:500;color:var(--t2);font-family:'DM Sans',sans-serif;transition:.13s;position:relative}
+.ni:hover{background:var(--g2);color:var(--t1)}
+.ni.on{background:linear-gradient(135deg,rgba(124,109,250,.2),rgba(168,85,247,.08));color:#c4b5fd;border:1px solid rgba(124,109,250,.22);font-weight:600}
+.ni.on::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:2px;border-radius:2px;background:linear-gradient(to bottom,var(--a1),var(--a2))}
+.nii{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.pk{margin-left:auto;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;font-family:'DM Mono',monospace}
+.pv{background:rgba(124,109,250,.2);color:#c4b5fd}.pg{background:rgba(6,214,160,.2);color:var(--a3)}
+.py{background:rgba(245,158,11,.2);color:var(--a5)}.pr{background:rgba(251,113,133,.2);color:var(--a4)}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tbar{height:52px;flex-shrink:0;border-bottom:1px solid var(--r);background:rgba(8,9,15,.6);backdrop-filter:blur(18px);display:flex;align-items:center;padding:0 20px;gap:9px}
+.tbar-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;flex:1}
+.content{flex:1;overflow-y:auto;padding:18px 20px;scrollbar-width:thin;scrollbar-color:var(--r2) transparent}
+.page{display:none}.page.on{display:block}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--rd2);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.13s;font-family:'DM Sans',sans-serif}
+.bp{background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;box-shadow:0 3px 12px rgba(124,109,250,.35)}
+.bp:hover{box-shadow:0 5px 18px rgba(124,109,250,.5);transform:translateY(-1px)}
+.bg2{background:var(--g2);color:var(--t1);border:1px solid var(--r2)}.bg2:hover{background:rgba(255,255,255,.09);color:var(--t0)}
+.bgr{background:rgba(6,214,160,.1);color:var(--a3);border:1px solid rgba(6,214,160,.25)}.bgr:hover{background:rgba(6,214,160,.18)}
+.brx{background:rgba(251,113,133,.1);color:var(--a4);border:1px solid rgba(251,113,133,.25)}.brx:hover{background:rgba(251,113,133,.18)}
+.byx{background:rgba(245,158,11,.1);color:var(--a5);border:1px solid rgba(245,158,11,.25)}.byx:hover{background:rgba(245,158,11,.18)}
+.sm{padding:5px 10px;font-size:11px}.xs{padding:3px 8px;font-size:10.5px}
+/* CARDS */
+.card{background:var(--g);border:1px solid var(--r);border-radius:var(--rd3);padding:16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent)}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.ct{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t2);font-family:'Syne',sans-serif}
+/* STAT CARDS */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:900px){.sg{grid-template-columns:repeat(2,1fr)}}
+.sc{border-radius:var(--rd);padding:15px 16px;border:1px solid var(--r);background:var(--g);position:relative;overflow:hidden;transition:.18s}
+.sc:hover{transform:translateY(-2px)}
+.scg{position:absolute;width:70px;height:70px;border-radius:50%;filter:blur(25px);opacity:.22;top:-15px;right:-10px}
+.sci{font-size:19px;margin-bottom:7px}.scv{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1;letter-spacing:-1px}
+.scl{font-size:10.5px;color:var(--t2);margin-top:4px;font-weight:500}
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:720px){.g2,.g3{grid-template-columns:1fr}}
+/* TABLE */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:9px 12px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);border-bottom:1px solid var(--r);font-family:'Syne',sans-serif}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+tr:last-child td{border:none}tr:hover td{background:rgba(255,255,255,.02)}
+.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:10.5px;font-weight:600;font-family:'DM Mono',monospace}
+.tg{background:rgba(6,214,160,.13);color:var(--a3)}.tr2{background:rgba(251,113,133,.13);color:var(--a4)}
+.ty2{background:rgba(245,158,11,.13);color:var(--a5)}.tv2{background:rgba(124,109,250,.13);color:#c4b5fd}.tb2{background:rgba(56,189,248,.13);color:var(--a6)}
+/* FORMS */
+.fg{margin-bottom:11px}.fg:last-child{margin-bottom:0}
+label{display:block;font-size:10px;font-weight:700;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;font-family:'Syne',sans-serif}
+input,select,textarea{width:100%;background:rgba(255,255,255,.045);border:1px solid var(--r2);border-radius:var(--rd2);padding:9px 12px;color:var(--t0);font-size:12.5px;font-family:'DM Sans',sans-serif;outline:none;transition:.16s;-webkit-appearance:none}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+input:focus,select:focus,textarea:focus{border-color:rgba(124,109,250,.55);background:rgba(124,109,250,.05);box-shadow:0 0 0 3px rgba(124,109,250,.1)}
+select option{background:#1a1b2e;color:var(--t0)}
+textarea{resize:vertical;min-height:76px;line-height:1.6}
+input[type=color]{height:40px;padding:3px 7px;cursor:pointer}
+/* TOGGLE */
+.trow{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.025);border:1px solid var(--r);border-radius:var(--rd2);margin-bottom:7px;transition:.12s}
+.trow:hover{background:rgba(255,255,255,.04)}
+.tn{font-size:12.5px;font-weight:600;color:var(--t1)}.td2{font-size:11px;color:var(--t2);margin-top:2px}
+.sw{position:relative;width:38px;height:21px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.swt{position:absolute;inset:0;background:rgba(255,255,255,.09);border:1px solid var(--r2);border-radius:21px;cursor:pointer;transition:.17s}
+.swt::before{content:'';position:absolute;width:15px;height:15px;left:2px;top:2px;background:var(--t1);border-radius:50%;transition:.17s}
+.sw input:checked+.swt{background:linear-gradient(135deg,var(--a1),var(--a2));border-color:transparent;box-shadow:0 0 10px rgba(124,109,250,.4)}
+.sw input:checked+.swt::before{transform:translateX(17px);background:#fff}
+/* EDITOR */
+.ewrap{border:1px solid var(--r2);border-radius:var(--rd);overflow:hidden;background:#0a0b14}
+.ewrap:focus-within{border-color:rgba(124,109,250,.5);box-shadow:0 0 0 3px rgba(124,109,250,.1)}
+.etb{display:flex;align-items:center;gap:5px;padding:7px 10px;background:rgba(0,0,0,.4);border-bottom:1px solid var(--r);flex-wrap:wrap}
+.elbl{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--t3);font-family:'Syne',sans-serif;margin-right:3px}
+.snip{padding:3px 8px;background:rgba(255,255,255,.05);border:1px solid var(--r2);border-radius:5px;color:var(--t2);font-size:9.5px;font-family:'DM Mono',monospace;cursor:pointer;transition:.1s;white-space:nowrap}
+.snip:hover{background:rgba(124,109,250,.15);color:#c4b5fd;border-color:rgba(124,109,250,.3)}
+#monacoEl{width:100%;height:320px}
+.estat{display:flex;align-items:center;gap:10px;padding:5px 12px;background:rgba(124,109,250,.05);border-top:1px solid var(--r);font-family:'DM Mono',monospace;font-size:10px;color:var(--t2)}
+.esdot{width:5px;height:5px;border-radius:50%;background:var(--a3);margin-right:4px;display:inline-block}
+.esdot.err{background:var(--a4)}
+.vbox{padding:9px 12px;border-radius:var(--rd2);font-family:'DM Mono',monospace;font-size:11px;margin-top:7px;display:none;white-space:pre-wrap}
+.vok{background:rgba(6,214,160,.08);border:1px solid rgba(6,214,160,.3);color:var(--a3);display:block}
+.verr{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);color:var(--a4);display:block}
+.aref{background:rgba(0,0,0,.3);border:1px solid var(--r);border-radius:var(--rd2);padding:10px 13px;margin-top:7px;font-family:'DM Mono',monospace;font-size:10.5px;line-height:1.9;color:var(--t2)}
+.aref .v{color:#c4b5fd}.aref .f{color:var(--a3)}.aref .k{color:var(--a5)}
+/* CMD CARDS */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px}
+.cc{background:var(--g);border:1px solid var(--r);border-radius:var(--rd);padding:14px;transition:.16s;position:relative;overflow:hidden}
+.cc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a1),var(--a2));opacity:0;transition:.16s}
+.cc:hover{border-color:rgba(124,109,250,.3);transform:translateY(-2px)}.cc:hover::before{opacity:1}
+.ccn{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:#c4b5fd;margin-bottom:3px}
+.ccb{display:inline-flex;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:4px;margin-bottom:7px;font-family:'Syne',sans-serif}
+.cbt{background:rgba(124,109,250,.12);color:#c4b5fd}.cbe{background:rgba(236,72,153,.12);color:#f0abfc}.cbc{background:rgba(6,214,160,.12);color:var(--a3)}
+.ccd{font-size:11.5px;color:var(--t2);margin-bottom:7px}
+.ccp{font-family:'DM Mono',monospace;font-size:10px;background:rgba(0,0,0,.3);border-radius:5px;padding:5px 8px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cca{display:flex;gap:5px;margin-top:9px}
+/* VOICE */
+.vcb{background:var(--g);border:1px solid var(--r);border-radius:var(--rd);overflow:hidden;margin-bottom:10px}
+.vch{padding:11px 15px;background:rgba(124,109,250,.06);border-bottom:1px solid var(--r);display:flex;align-items:center;gap:9px}
+.vchn{font-weight:700;font-size:13px;font-family:'Syne',sans-serif}
+.vcm{display:flex;align-items:center;gap:11px;padding:9px 15px;border-bottom:1px solid rgba(255,255,255,.035);transition:.1s}
+.vcm:last-child{border:none}.vcm:hover{background:rgba(255,255,255,.02)}
+.vcav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;font-family:'Syne',sans-serif}
+.lpill{display:inline-flex;align-items:center;gap:4px;background:rgba(251,113,133,.14);border:1px solid rgba(251,113,133,.28);color:var(--a4);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:'DM Mono',monospace}
+.lpill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--a4);animation:pulse 1s ease-in-out infinite}
+/* STOCK */
+.stgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:10px}
+.stcard{background:var(--g);border:1px solid var(--r);border-radius:var(--rd);overflow:hidden;transition:.15s}
+.stcard:hover{border-color:rgba(124,109,250,.25)}
+.stct{display:flex;align-items:center;gap:10px;padding:12px 13px;border-bottom:1px solid var(--r)}
+.stem{font-size:21px;flex-shrink:0}.stnm{font-size:13px;font-weight:700;font-family:'Syne',sans-serif;line-height:1.2}
+.stpr{font-size:11px;color:var(--a3);font-family:'DM Mono',monospace;margin-top:1px;font-weight:600}
+.stbdg{margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;font-family:'DM Mono',monospace}
+.sbi{background:rgba(56,189,248,.13);color:var(--a6)}.sbo{background:rgba(6,214,160,.13);color:var(--a3)}
+.sbl{background:rgba(245,158,11,.13);color:var(--a5)}.sbr{background:rgba(251,113,133,.13);color:var(--a4)}
+.stctr{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--r)}
+.stvl{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;min-width:50px;text-align:center}
+.stvl.inf{color:var(--a6)}
+.stbtn{display:flex;gap:5px}
+.stb{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.07);border:1px solid var(--r2);color:var(--t1);font-size:17px;cursor:pointer;transition:.12s;display:flex;align-items:center;justify-content:center}
+.stb:hover{background:rgba(124,109,250,.2);color:var(--t0);border-color:rgba(124,109,250,.4)}
+.stb.m:hover{background:rgba(251,113,133,.2);color:var(--a4);border-color:rgba(251,113,133,.4)}
+.stact{display:flex;gap:5px;padding:9px 13px;flex-wrap:wrap}
+.sthb{margin-left:auto;font-size:10px;color:var(--t2);background:none;border:none;cursor:pointer;font-family:'DM Mono',monospace;text-decoration:underline;text-underline-offset:2px}
+.sthb:hover{color:var(--t0)}
+/* NEXUSSTORE */
+.nshdr{display:flex;align-items:center;gap:11px;padding:15px 17px;background:linear-gradient(135deg,rgba(124,109,250,.1),rgba(168,85,247,.05));border:1px solid rgba(124,109,250,.2);border-radius:var(--rd);margin-bottom:13px}
+.nsst{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;font-family:'DM Mono',monospace;background:rgba(245,158,11,.15);color:var(--a5);border:1px solid rgba(245,158,11,.28);margin-top:5px}
+.nsst.ok{background:rgba(6,214,160,.15);color:var(--a3);border-color:rgba(6,214,160,.28)}
+.nsst::before{content:'●';font-size:7px}
+/* DELIVERY */
+.dlvprev{background:rgba(0,0,0,.4);border:1px solid var(--r);border-radius:var(--rd);padding:14px;font-family:'DM Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--t1);min-height:150px;white-space:pre-wrap;word-break:break-word}
+.dlvitem{display:flex;align-items:center;gap:9px;padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid var(--r);border-radius:var(--rd2);margin-bottom:6px;cursor:pointer;transition:.13s}
+.dlvitem:hover{border-color:rgba(124,109,250,.3)}.dlvitem.on{border-color:rgba(124,109,250,.4);background:rgba(124,109,250,.07)}
+/* MEMBER */
+.mp{background:rgba(0,0,0,.3);border:1px solid var(--r);border-radius:var(--rd);padding:14px;margin-top:10px;display:none}
+.mp.on{display:block}
+.mphead{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.mpav{width:48px;height:48px;border-radius:50%;border:2px solid rgba(124,109,250,.4);object-fit:cover}
+.mpstats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}
+.mps{background:rgba(255,255,255,.03);border:1px solid var(--r);border-radius:var(--rd2);padding:8px;text-align:center}
+.mpsv{font-family:'Syne',sans-serif;font-size:16px;font-weight:800}.mpsl{font-size:9px;color:var(--t2);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.7px}
+.mpacts{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.wlist{background:rgba(0,0,0,.2);border-radius:var(--rd2);padding:8px 11px}
+.wi{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11.5px;align-items:flex-start}
+.wi:last-child{border:none}.wn{color:var(--a4);font-family:'DM Mono',monospace;font-weight:700;font-size:10.5px;flex-shrink:0;margin-top:1px}
+/* STATS PICKER */
+.chpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;margin-top:11px}
+.cho{background:rgba(255,255,255,.03);border:1px solid var(--r);border-radius:var(--rd);padding:13px;cursor:pointer;transition:.16s;position:relative;user-select:none}
+.cho:hover{border-color:rgba(124,109,250,.4);background:rgba(124,109,250,.06)}
+.cho.on{border-color:var(--a1);background:rgba(124,109,250,.12)}
+.cho.on::after{content:'✓';position:absolute;top:9px;right:11px;color:var(--a1);font-weight:800;font-size:13px;font-family:'Syne',sans-serif}
+.choi{font-size:20px;margin-bottom:7px}.chon{font-size:12.5px;font-weight:700;color:var(--t1);margin-bottom:2px;font-family:'Syne',sans-serif}.chod{font-size:10.5px;color:var(--t2)}
+/* TICKET CATS */
+.catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px}
+.catc{border-radius:var(--rd);padding:12px 13px;border:1px solid var(--r);background:var(--g);display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;transition:.14s}
+.catc:hover{border-color:rgba(124,109,250,.3)}
+.catbar{position:absolute;left:0;top:0;bottom:0;width:3px}
+.catform{background:rgba(0,0,0,.28);border:1px solid var(--r);border-radius:var(--rd);padding:14px;margin-top:10px;display:none}
+.catform.on{display:block}
+/* EMPTY */
+.emp{text-align:center;padding:40px 18px;color:var(--t2)}
+.ei{font-size:38px;margin-bottom:11px;opacity:.4}.et{font-size:13.5px;color:var(--t1)}.es{font-size:11.5px;margin-top:4px}
+/* DIVIDER */
+.divx{display:flex;align-items:center;gap:9px;margin:13px 0}
+.divx span{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);white-space:nowrap;font-family:'Syne',sans-serif}
+.divx::before,.divx::after{content:'';flex:1;height:1px;background:var(--r)}
+hr.sep{border:none;border-top:1px solid var(--r);margin:12px 0}
+/* LOG */
+.ll{display:flex;gap:9px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);align-items:flex-start}
+.ll:last-child{border:none}.lt{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);flex-shrink:0;margin-top:1px}
+.lm{font-size:12px;color:var(--t2);line-height:1.5}
+/* TOASTS */
+#toasts{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:6px}
+.toast{padding:9px 14px;border-radius:var(--rd);font-size:12.5px;font-weight:600;backdrop-filter:blur(18px);max-width:290px;animation:tin .2s ease;box-shadow:0 7px 25px rgba(0,0,0,.5);font-family:'DM Sans',sans-serif}
+@keyframes tin{from{transform:translateX(45px);opacity:0}to{transform:none;opacity:1}}
+.tok{background:rgba(6,214,160,.13);border:1px solid rgba(6,214,160,.33);color:var(--a3)}
+.ter{background:rgba(251,113,133,.13);border:1px solid rgba(251,113,133,.33);color:var(--a4)}
+.tinf{background:rgba(124,109,250,.13);border:1px solid rgba(124,109,250,.33);color:#c4b5fd}
+.twrn{background:rgba(245,158,11,.13);border:1px solid rgba(245,158,11,.33);color:var(--a5)}
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:14px}
+.ov.on{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--r2);border-radius:var(--rd3);padding:22px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 22px 65px rgba(0,0,0,.7);position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--a1),transparent);opacity:.3}
+.mtitle{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:14px}
+.mfoot{display:flex;gap:7px;justify-content:flex-end;margin-top:14px;padding-top:12px;border-top:1px solid var(--r)}
+/* PAGE HEADER */
+.pgh{margin-bottom:14px}.pgt{font-family:'Syne',sans-serif;font-size:17px;font-weight:800}.pgs{font-size:12px;color:var(--t2);margin-top:3px}
+/* EMBED PREVIEW */
+.pbox{background:rgba(0,0,0,.35);border-radius:var(--rd);padding:11px;margin-bottom:11px}
+.plbl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-family:'Syne',sans-serif}
+.pem{border-left:4px solid var(--a1);background:rgba(124,109,250,.08);border-radius:0 7px 7px 0;padding:10px 12px}
+.pt{font-size:13.5px;font-weight:600}
+/* HIST */
+.hi{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11.5px}
+.hi:last-child{border:none}.hd{font-family:'DM Mono',monospace;font-weight:700;font-size:11.5px}
+.hd.pos{color:var(--a3)}.hd.neg{color:var(--a4)}
+/* MOBILE */
+@media(max-width:640px){.sb{position:fixed;left:-222px;top:0;bottom:0;z-index:50;transition:.22s}.sb.on{left:0}.mobb{display:flex!important}.content{padding:12px}.sg{grid-template-columns:repeat(2,1fr)}}
+.mobb{display:none;position:fixed;bottom:14px;left:14px;z-index:60;width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--a1),var(--a2));border:none;cursor:pointer;font-size:17px;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(124,109,250,.5)}
+</style>
+</head>
+<body>
+<div class="glow g1"></div><div class="glow g2x"></div>
+<div class="shell">
+<aside class="sb" id="sb">
+  <div class="brand">
+    <div class="brow"><div class="bgem">⚡</div><div class="bnm">NexusBot</div></div>
+    <div class="bst"><span class="dot" id="dotEl"></span><span id="botTagEl">Connexion...</span></div>
+  </div>
+  <nav class="nav">
+    <div class="ns">Vue d'ensemble</div>
+    <button class="ni on" onclick="go('dash')"><span class="nii">📊</span>Dashboard</button>
+    <button class="ni" onclick="go('vocal')"><span class="nii">🎤</span>Vocaux Live<span class="pk pg" id="vpill">0</span></button>
+    <div class="ns">Commandes</div>
+    <button class="ni" onclick="go('editor')"><span class="nii">💻</span>Éditeur de code</button>
+    <button class="ni" onclick="go('cmds')"><span class="nii">⚡</span>Mes commandes<span class="pk pv" id="cpill">0</span></button>
+    <div class="ns">Serveur</div>
+    <button class="ni" onclick="go('statssetup')"><span class="nii">📈</span>Stats vocaux</button>
+    <button class="ni" onclick="go('tickets')"><span class="nii">🎫</span>Tickets<span class="pk py" id="tpill">0</span></button>
+    <div class="ns">Boutique</div>
+    <button class="ni" onclick="go('shop')"><span class="nii">🛒</span>Articles<span class="pk py" id="apill">0</span></button>
+    <button class="ni" onclick="go('stock')"><span class="nii">📦</span>Gestion stock<span class="pk pr" id="spill">0</span></button>
+    <button class="ni" onclick="go('nexusstore')"><span class="nii">🌐</span>NexusStore</button>
+    <button class="ni" onclick="go('delivery')"><span class="nii">📄</span>Fichiers livraison</button>
+    <div class="ns">Modération</div>
+    <button class="ni" onclick="go('mod')"><span class="nii">🛡️</span>Modérer</button>
+    <button class="ni" onclick="go('bans')"><span class="nii">🔨</span>Bannis</button>
+    <div class="ns">Système</div>
+    <button class="ni" onclick="go('logs')"><span class="nii">📜</span>Logs</button>
+    <button class="ni" onclick="go('announce')"><span class="nii">📢</span>Annonce</button>
+  </nav>
+</aside>
+<main class="main">
+  <div class="tbar">
+    <div class="tbar-title" id="pgTitle">Dashboard</div>
+    <button class="btn bg2 sm" onclick="refresh()">🔄</button>
+    <button class="btn bp sm" onclick="go('announce')">📢 Annonce</button>
+  </div>
+  <div class="content">
+  <!-- DASHBOARD -->
+  <div class="page on" id="page-dash">
+    <div class="sg">
+      <div class="sc"><div class="scg" style="background:var(--a1)"></div><div class="sci">👥</div><div class="scv" id="sm">—</div><div class="scl">Membres</div></div>
+      <div class="sc"><div class="scg" style="background:var(--a3)"></div><div class="sci">🟢</div><div class="scv" id="so">—</div><div class="scl">En ligne</div></div>
+      <div class="sc"><div class="scg" style="background:var(--a2)"></div><div class="sci">🎤</div><div class="scv" id="sv">—</div><div class="scl">En vocal</div></div>
+      <div class="sc"><div class="scg" style="background:var(--a5)"></div><div class="sci">🎫</div><div class="scv" id="stk">—</div><div class="scl">Tickets</div></div>
+      <div class="sc"><div class="scg" style="background:var(--a1)"></div><div class="sci">⚡</div><div class="scv" id="sc2">—</div><div class="scl">Cmds custom</div></div>
+      <div class="sc"><div class="scg" style="background:var(--a4)"></div><div class="sci">📦</div><div class="scv" id="sa">—</div><div class="scl">Articles</div></div>
+      <div class="sc"><div class="scg" style="background:var(--a4)"></div><div class="sci">⚠️</div><div class="scv" id="sw">—</div><div class="scl">Warns</div></div>
+      <div class="sc"><div class="scg" style="background:var(--a3)"></div><div class="sci">💓</div><div class="scv" id="sping">—</div><div class="scl">Ping</div></div>
+    </div>
+    <div class="g2">
+      <div class="card"><div class="ch"><span class="ct">🏆 Top membres</span></div><div id="topEl"><div class="emp"><div class="ei">⏳</div></div></div></div>
+      <div class="card"><div class="ch"><span class="ct">📜 Activité récente</span><button class="btn bg2 xs" onclick="go('logs')">Tout →</button></div><div id="recEl"><div class="emp"><div class="ei">⏳</div></div></div></div>
+    </div>
+  </div>
+
+  <!-- VOCAL -->
+  <div class="page" id="page-vocal">
+    <div class="pgh" style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div><div class="pgt">🎤 Vocaux Live</div><div class="pgs" id="voiceTs">Auto-refresh 30s</div></div>
+      <button class="btn bg2 sm" onclick="loadVoice()">🔄</button>
+    </div>
+    <div id="vcBoxes"><div class="emp"><div class="ei">🎤</div><div class="et">Chargement...</div></div></div>
+  </div>
+
+  <!-- ÉDITEUR -->
+  <div class="page" id="page-editor">
+    <div style="display:flex;gap:4px;background:rgba(255,255,255,.03);padding:3px;border-radius:var(--rd);border:1px solid var(--r);margin-bottom:14px">
+      <button class="btn bp sm" style="flex:1;justify-content:center" id="edtT" onclick="switchEd('t')">💬 Texte</button>
+      <button class="btn bg2 sm" style="flex:1;justify-content:center" id="edtE" onclick="switchEd('e')">🎨 Embed</button>
+      <button class="btn bg2 sm" style="flex:1;justify-content:center" id="edtC" onclick="switchEd('c')">💻 Code JS</button>
+    </div>
+    <!-- TEXTE -->
+    <div id="ed-t" class="card">
+      <div class="ch"><span class="ct">💬 Réponse texte</span></div>
+      <div class="g2"><div class="fg"><label>Nom</label><input id="tn" placeholder="ma-commande" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')"></div><div class="fg"><label>Description</label><input id="td" placeholder="Ce que fait la commande"></div></div>
+      <div class="fg"><label>Message de réponse</label><textarea id="tr" rows="4" placeholder="Bonjour {user} ! 🎉&#10;Variables : {user} {server} {count} {points}"></textarea></div>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:12px;background:rgba(124,109,250,.06);border:1px solid rgba(124,109,250,.18);border-radius:var(--rd2);padding:7px 11px">📌 Variables : <code style="color:#c4b5fd">{user}</code> <code style="color:#c4b5fd">{server}</code> <code style="color:#c4b5fd">{count}</code> <code style="color:#c4b5fd">{points}</code></div>
+      <button class="btn bp" onclick="saveCmd('text')">✅ Créer la commande</button>
+    </div>
+    <!-- EMBED -->
+    <div id="ed-e" class="card" style="display:none">
+      <div class="ch"><span class="ct">🎨 Embed stylé</span></div>
+      <div class="g2"><div class="fg"><label>Nom</label><input id="en" placeholder="mon-embed" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')"></div><div class="fg"><label>Description</label><input id="ed2" placeholder="Description"></div></div>
+      <div class="fg"><label>Contenu</label><textarea id="er" rows="3" placeholder="Bienvenue {user} !" oninput="updPrev()"></textarea></div>
+      <div class="g2"><div class="fg"><label>Couleur</label><input type="color" id="ec" value="#7c6dfa" oninput="updPrev()"></div><div class="fg"><label>Visibilité</label><select id="eep"><option value="false">🌍 Public</option><option value="true">👁️ Éphémère</option></select></div></div>
+      <div class="pbox"><div class="plbl">Aperçu</div><div class="pem" id="pem"><div class="pt" id="pt">Contenu</div></div></div>
+      <button class="btn bp" onclick="saveCmd('embed')">✅ Créer l'embed</button>
+    </div>
+    <!-- CODE JS + MONACO -->
+    <div id="ed-c" class="card" style="display:none">
+      <div class="ch"><span class="ct">💻 Éditeur JavaScript</span>
+        <div style="display:flex;gap:5px">
+          <button class="btn bg2 sm" onclick="fmtCode()">✨ Formater</button>
+          <button class="btn byx sm" onclick="valCode()">⚡ Vérifier</button>
+          <button class="btn bp sm" onclick="saveCmd('code')">🚀 Déployer</button>
+        </div>
+      </div>
+      <div class="g2" style="margin-bottom:10px">
+        <div class="fg" style="margin:0"><label>Nom</label><input id="cn" placeholder="ma-commande" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')"></div>
+        <div class="fg" style="margin:0"><label>Description</label><input id="cd" placeholder="Description"></div>
+      </div>
+      <div class="ewrap">
+        <div class="etb">
+          <span class="elbl">SNIPPETS :</span>
+          <button class="snip" onclick="ins('reply')">💬 reply</button>
+          <button class="snip" onclick="ins('embed')">🎨 embed</button>
+          <button class="snip" onclick="ins('user')">👤 profil</button>
+          <button class="snip" onclick="ins('points')">💰 points</button>
+          <button class="snip" onclick="ins('top3')">🏆 top 3</button>
+          <button class="snip" onclick="ins('xp')">⭐ XP</button>
+          <button class="snip" onclick="ins('warn')">⚠️ warn</button>
+          <button class="snip" onclick="ins('shop')">🛒 boutique</button>
+          <button class="snip" onclick="ins('stock')">📦 stock</button>
+          <button class="snip" onclick="ins('timer')">⏰ timer</button>
+          <button class="snip" onclick="ins('crime')">🔫 crime</button>
+          <button class="snip" onclick="ins('random')">🎲 aléatoire</button>
+          <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:9.5px;color:var(--t3)" id="edLines">— lignes</span>
+        </div>
+        <div id="monacoEl"></div>
+        <div class="estat">
+          <span class="esdot" id="esDot"></span>
+          <span id="esMsg">Prêt — Ctrl+S pour valider</span>
+          <span style="margin-left:auto">JavaScript ES2022 · Tab = 2 espaces</span>
+        </div>
+      </div>
+      <div class="aref"><span class="v">interaction</span> · <span class="v">guild</span> · <span class="v">user</span> · <span class="v">db</span> · <span class="f">addPts(id,n)</span> · <span class="f">addXP(id,n)</span> · <span class="f">getUser(id)</span> · <span class="f">C(hex)</span><br><span class="k">EmbedBuilder</span> · <span class="k">ActionRowBuilder</span> · <span class="k">ButtonBuilder</span> · <span style="color:var(--a4)">⛔ Interdit : require() process.env eval() fetch()</span></div>
+      <div class="vbox" id="vbox"></div>
+    </div>
+  </div>
+
+  <!-- COMMANDES -->
+  <div class="page" id="page-cmds">
+    <div class="pgh" style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div><div class="pgt">⚡ Commandes</div><div class="pgs">Tes commandes personnalisées déployées</div></div>
+      <button class="btn bp" onclick="go('editor')">➕ Nouvelle</button>
+    </div>
+    <div class="cg" id="cmdGrid"><div class="emp" style="grid-column:1/-1"><div class="ei">⚡</div><div class="et">Aucune commande</div><div class="es">Crée-en une avec l'éditeur !</div></div></div>
+  </div>
+
+  <!-- STATS SETUP -->
+  <div class="page" id="page-statssetup">
+    <div class="pgh"><div class="pgt">📈 Salons statistiques</div><div class="pgs">Sélectionnez les compteurs — mise à jour auto toutes les 10 min</div></div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="fg"><label>Nom de la catégorie Discord</label><input id="catname" value="📊 ── STATISTIQUES ──"></div>
+      <div class="divx"><span>Choisir les compteurs</span></div>
+      <div class="chpick">
+        <div class="cho on" data-k="membres" onclick="this.classList.toggle('on')"><div class="choi">👥</div><div class="chon">Membres total</div><div class="chod">Tous les membres</div></div>
+        <div class="cho on" data-k="humains" onclick="this.classList.toggle('on')"><div class="choi">👤</div><div class="chon">Humains</div><div class="chod">Sans les bots</div></div>
+        <div class="cho on" data-k="bots" onclick="this.classList.toggle('on')"><div class="choi">🤖</div><div class="chon">Bots</div><div class="chod">Nombre de bots</div></div>
+        <div class="cho on" data-k="enligne" onclick="this.classList.toggle('on')"><div class="choi">🟢</div><div class="chon">En ligne</div><div class="chod">Membres connectés</div></div>
+        <div class="cho on" data-k="vocal" onclick="this.classList.toggle('on')"><div class="choi">🎤</div><div class="chon">En vocal</div><div class="chod">Dans un vocal</div></div>
+        <div class="cho" data-k="tickets" onclick="this.classList.toggle('on')"><div class="choi">🎫</div><div class="chon">Tickets</div><div class="chod">Tickets ouverts</div></div>
+        <div class="cho" data-k="articles" onclick="this.classList.toggle('on')"><div class="choi">📦</div><div class="chon">Articles</div><div class="chod">Articles en vente</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap">
+      <button class="btn bp" onclick="createStats()">✅ Créer les salons</button>
+      <button class="btn brx" onclick="deleteStats()">🗑️ Supprimer</button>
+    </div>
+    <div id="statsInfo" style="margin-top:14px"></div>
+  </div>
+
+  <!-- TICKETS -->
+  <div class="page" id="page-tickets">
+    <div class="pgh" style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div><div class="pgt">🎫 Tickets</div><div class="pgs">Catégories sélectionnables par les membres</div></div>
+      <button class="btn bp" onclick="document.getElementById('catform').classList.toggle('on')">➕ Catégorie</button>
+    </div>
+    <div class="catform" id="catform">
+      <div class="g2"><div class="fg"><label>ID unique</label><input id="ncid" placeholder="vip-support" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')"></div><div class="fg"><label>Label</label><input id="nclb" placeholder="👑 Support VIP"></div></div>
+      <div class="g2"><div class="fg"><label>Description</label><input id="ncds" placeholder="Réservé aux VIP"></div><div class="fg"><label>Couleur</label><input type="color" id="nccl" value="#7c6dfa"></div></div>
+      <div style="display:flex;gap:6px"><button class="btn bp" onclick="addCat()">✅ Ajouter</button><button class="btn bg2" onclick="document.getElementById('catform').classList.remove('on')">Annuler</button></div>
+    </div>
+    <div class="card" style="margin-bottom:11px;margin-top:11px">
+      <div class="ch"><span class="ct">Catégories actives <span class="pk pv" id="catCnt">0</span></span></div>
+      <div class="catgrid" id="catGrid"><div class="emp"><div class="et">Chargement...</div></div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Tickets ouverts</span><span class="pk py" id="tkCnt">0</span></div>
+      <div class="tw"><table><thead><tr><th>Utilisateur</th><th>Salon</th><th>Statut</th></tr></thead><tbody id="tkTable"><tr><td colspan="3" style="text-align:center;color:var(--t2);padding:18px">Chargement...</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- ARTICLES -->
+  <div class="page" id="page-shop">
+    <div class="pgh" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div><div class="pgt">🛒 Articles</div><div class="pgs">Catalogue de ta boutique</div></div>
+      <div style="display:flex;gap:7px">
+        <button class="btn bg2 sm" onclick="go('nexusstore')">🌐 NexusStore</button>
+        <button class="btn bp sm" onclick="openArtModal()">➕ Article</button>
+      </div>
+    </div>
+    <div class="g3" style="margin-bottom:12px">
+      <div class="sc" style="padding:11px 14px"><div class="scg" style="background:var(--a3)"></div><div style="font-size:12px;color:var(--t2);margin-bottom:3px">En vente</div><div class="scv" style="font-size:20px" id="shtot">—</div></div>
+      <div class="sc" style="padding:11px 14px"><div class="scg" style="background:var(--a5)"></div><div style="font-size:12px;color:var(--t2);margin-bottom:3px">Stock faible</div><div class="scv" style="font-size:20px" id="shlow">—</div></div>
+      <div class="sc" style="padding:11px 14px"><div class="scg" style="background:var(--a4)"></div><div style="font-size:12px;color:var(--t2);margin-bottom:3px">Rupture</div><div class="scv" style="font-size:20px" id="shout">—</div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Catalogue</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input id="shq" placeholder="Rechercher..." style="width:140px;padding:4px 9px;font-size:11.5px" oninput="filterShop()">
+          <select id="shf" style="width:110px;padding:4px 9px;font-size:11.5px" onchange="filterShop()">
+            <option value="">Tous</option><option value="ok">En stock ✅</option>
+            <option value="low">Faible ⚠️</option><option value="out">Rupture ❌</option><option value="inf">Illimité ♾️</option>
+          </select>
+        </div>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Article</th><th>Prix</th><th>Stock</th><th>Lien</th><th>Actions</th></tr></thead>
+        <tbody id="artBody"><tr><td colspan="5" style="text-align:center;color:var(--t2);padding:24px">Chargement...</td></tr></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- GESTION STOCK -->
+  <div class="page" id="page-stock">
+    <div class="pgh" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div><div class="pgt">📦 Gestion du stock</div><div class="pgs">Ajustez le stock de chaque article en temps réel</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn bg2 sm" onclick="loadStock()">🔄</button>
+        <button class="btn byx sm" onclick="openOv('ov-bulk')">⚡ Ajustement rapide</button>
+      </div>
+    </div>
+    <div id="stAlerts" style="margin-bottom:10px"></div>
+    <div class="stgrid" id="stGrid"><div class="emp" style="grid-column:1/-1"><div class="ei">📦</div><div class="et">Chargement...</div></div></div>
+  </div>
+
+  <!-- NEXUSSTORE -->
+  <div class="page" id="page-nexusstore">
+    <div class="nshdr">
+      <div style="font-size:26px">🌐</div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">Intégration NexusStore</div>
+        <div style="font-size:11.5px;color:var(--t2);margin-top:2px">Sync avec <code style="color:#c4b5fd;font-family:'DM Mono',monospace">brian10122000.github.io/NexusStore</code></div>
+        <div class="nsst" id="nsStatus">Non configuré</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:13px">
+      <div class="card">
+        <div class="ch"><span class="ct">⚙️ Configuration</span></div>
+        <div class="fg"><label>URL Worker Cloudflare</label><input id="nsurl" placeholder="https://mon-worker.workers.dev"></div>
+        <div class="fg"><label>Clé API secrète</label><input id="nskey" type="password" placeholder="Ta clé API..."></div>
+        <div style="background:rgba(124,109,250,.06);border:1px solid rgba(124,109,250,.18);border-radius:var(--rd2);padding:9px 12px;font-size:11px;color:var(--t2);margin-bottom:11px;line-height:1.6">📌 Le panel envoie tes articles → NexusStore les affiche. Les achats → décrémentent le stock Discord.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn bp" onclick="saveNsCfg()">💾 Sauvegarder</button>
+          <button class="btn bg2" onclick="testNs()">🔌 Tester la connexion</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">🔄 Synchronisation</span></div>
+        <div class="trow"><div><div class="tn">🔄 Sync automatique</div><div class="td2">Envoyer à chaque modification</div></div><label class="sw"><input type="checkbox" id="nsauto"><span class="swt"></span></label></div>
+        <div class="trow" style="margin-bottom:14px"><div><div class="tn">📦 Sync du stock</div><div class="td2">Mettre à jour en direct</div></div><label class="sw"><input type="checkbox" id="nsstk"><span class="swt"></span></label></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px">
+          <button class="btn bp" onclick="pushNs()">📤 Envoyer → NexusStore</button>
+          <button class="btn bgr" onclick="pullNs()">📥 Importer ← NexusStore</button>
+        </div>
+        <div style="background:rgba(0,0,0,.25);border-radius:var(--rd2);padding:9px 12px;font-size:11.5px;color:var(--t2)">
+          <strong style="color:var(--t1);display:block;margin-bottom:4px;font-family:'Syne',sans-serif">Dernière sync</strong>
+          <span id="nsSyncTxt">Jamais synchronisé</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">👁️ Aperçu articles</span><button class="btn bg2 xs" onclick="prevNs()">🔄 Aperçu</button></div>
+      <div id="nsPrev"><div class="emp"><div class="et">Cliquez sur Aperçu</div></div></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="ch"><span class="ct">🔗 Publier sur Discord</span></div>
+      <div class="g2">
+        <div class="fg"><label>ID du salon Discord</label><input id="nsch" placeholder="ID du salon"></div>
+        <div class="fg"><label>Message</label><input id="nsmsg" value="🛒 Notre boutique est disponible !"></div>
+      </div>
+      <button class="btn bp" onclick="publishNsEmbed()">📤 Publier l'embed Discord</button>
+    </div>
+  </div>
+
+  <!-- FICHIERS LIVRAISON -->
+  <div class="page" id="page-delivery">
+    <div class="pgh"><div class="pgt">📄 Générateur de fichiers de livraison</div><div class="pgs">Crée tes modèles — envoyés automatiquement à l'acheteur après l'achat</div></div>
+    <div class="g2">
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="ch"><span class="ct">📝 Modèles</span><button class="btn bp xs" onclick="newDlv()">➕ Nouveau</button></div>
+          <div id="dlvList"><div class="emp"><div class="et">Aucun modèle</div><div class="es">Cliquez sur ➕ Nouveau pour commencer</div></div></div>
+        </div>
+        <div class="card" id="dlvEd" style="display:none">
+          <div class="ch"><span class="ct" id="dlvEdTitle">✏️ Nouveau modèle</span></div>
+          <div class="fg"><label>Nom du modèle</label><input id="dlvname" placeholder="Ex: NexusPass VIP, Compte Premium..."></div>
+          <div class="fg"><label>Article associé</label><select id="dlvart"><option value="">Tous les articles</option></select></div>
+          <div class="fg"><label>Format</label>
+            <select id="dlvfmt" onchange="updDlvPrev()">
+              <option value="txt">📄 .txt — Texte simple</option>
+              <option value="md">📝 .md — Markdown</option>
+              <option value="html">🌐 .html — Page web</option>
+            </select>
+          </div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:8px;background:rgba(124,109,250,.06);border:1px solid rgba(124,109,250,.18);border-radius:var(--rd2);padding:7px 10px;line-height:1.7">📌 Variables : <code style="color:#c4b5fd">{acheteur}</code> <code style="color:#c4b5fd">{date}</code> <code style="color:#c4b5fd">{article}</code> <code style="color:#c4b5fd">{prix}</code> <code style="color:#c4b5fd">{commande_id}</code> <code style="color:#c4b5fd">{serveur}</code></div>
+          <div class="fg"><label>Contenu du fichier</label>
+            <textarea id="dlvcontent" rows="14" style="font-family:'DM Mono',monospace;font-size:11.5px" oninput="updDlvPrev()" placeholder="═══════════════════════════&#10;⚡ NEXUSSTORE — LIVRAISON&#10;═══════════════════════════&#10;&#10;Merci {acheteur} pour ton achat !&#10;&#10;📦 Article : {article}&#10;💰 Prix : {prix}&#10;📅 Date : {date}&#10;🔖 Commande : #{commande_id}&#10;&#10;━━━━━━━━━━━━━━━━━━━━━━━━━━━&#10;CONTENU DE TA LIVRAISON :&#10;━━━━━━━━━━━━━━━━━━━━━━━━━━━&#10;&#10;[Identifiants, lien, code, instructions...]&#10;&#10;━━━━━━━━━━━━━━━━━━━━━━━━━━━&#10;Support : Ouvre un ticket Discord&#10;━━━━━━━━━━━━━━━━━━━━━━━━━━━"></textarea>
+          </div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            <button class="btn bp" onclick="saveDlv()">💾 Sauvegarder</button>
+            <button class="btn bgr" onclick="testDlvSend()">📤 Tester l'envoi</button>
+            <button class="btn bg2" onclick="dlvDl()">⬇️ Télécharger exemple</button>
+            <button class="btn brx" onclick="deleteDlv()">🗑️ Supprimer</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="ch"><span class="ct">👁️ Aperçu du fichier</span></div>
+          <div class="dlvprev" id="dlvPrev">Remplissez le contenu pour voir l'aperçu...</div>
+          <div style="margin-top:8px;font-size:10.5px;color:var(--t2)">Variables remplacées par des exemples</div>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ct">⚙️ Options d'envoi automatique</span></div>
+          <div class="trow"><div><div class="tn">📤 Envoi DM auto</div><div class="td2">Envoyer le fichier en message privé à l'achat</div></div><label class="sw"><input type="checkbox" id="dlvauto" checked><span class="swt"></span></label></div>
+          <div class="trow"><div><div class="tn">📋 Copie dans le ticket</div><div class="td2">Poster aussi dans le ticket de commande</div></div><label class="sw"><input type="checkbox" id="dlvticket" checked><span class="swt"></span></label></div>
+          <div class="trow"><div><div class="tn">🔒 Watermark acheteur</div><div class="td2">Ajouter l'ID de l'acheteur en filigrane</div></div><label class="sw"><input type="checkbox" id="dlvwm"><span class="swt"></span></label></div>
+          <div class="fg" style="margin-top:10px"><label>Message DM d'accompagnement</label><textarea id="dlvdm" rows="3" placeholder="✅ Merci pour ton achat ! Voici ta livraison. Pour tout problème, ouvre un ticket."></textarea></div>
+          <button class="btn bp" style="width:100%;justify-content:center;margin-top:4px" onclick="saveDlvOpts()">💾 Sauvegarder les options</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODÉRATION -->
+  <div class="page" id="page-mod">
+    <div class="g2">
+      <div class="card">
+        <div class="ch"><span class="ct">🔍 Rechercher un membre</span></div>
+        <div class="fg"><label>ID Discord</label><div style="display:flex;gap:7px"><input id="muid" placeholder="123456789012345678" onkeydown="if(event.key==='Enter')searchMember()"><button class="btn bp" onclick="searchMember()">Chercher</button></div></div>
+        <div class="mp" id="mpBox">
+          <div class="mphead"><img class="mpav" id="mpav" src="" alt=""><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700" id="mpn">—</div><div style="font-size:10.5px;color:var(--t2);font-family:'DM Mono',monospace;margin-top:2px" id="mpi">—</div></div></div>
+          <div class="mpstats"><div class="mps"><div class="mpsv" id="mpp">—</div><div class="mpsl">Points</div></div><div class="mps"><div class="mpsv" id="mpl">—</div><div class="mpsl">Niveau</div></div><div class="mps"><div class="mpsv" id="mpw" style="color:var(--a4)">—</div><div class="mpsl">Warns</div></div></div>
+          <div class="mpacts"><button class="btn byx xs" onclick="modAct('warn')">⚠️ Warn</button><button class="btn bg2 xs" onclick="modAct('mute')">🔇 Mute</button><button class="btn brx xs" onclick="modAct('kick')">👢 Kick</button><button class="btn brx xs" onclick="modAct('ban')">🔨 Ban</button><button class="btn bg2 xs" onclick="modAct('clearwarns')">🗑️ Clear</button></div>
+          <div class="wlist" id="warnsList"><div style="font-size:11.5px;color:var(--t2)">✅ Aucun warn</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">⚙️ Auto-Modération</span></div>
+        <div class="trow"><div><div class="tn">🚨 Anti-Spam</div><div class="td2">Supprime messages répétitifs</div></div><label class="sw"><input type="checkbox" id="togsp" onchange="saveModCfg()"><span class="swt"></span></label></div>
+        <div class="trow"><div><div class="tn">🔗 Anti-Lien</div><div class="td2">Bloque les liens non autorisés</div></div><label class="sw"><input type="checkbox" id="toglk" onchange="saveModCfg()"><span class="swt"></span></label></div>
+        <div class="trow"><div><div class="tn">🔠 Anti-Caps</div><div class="td2">Limite les majuscules</div></div><label class="sw"><input type="checkbox" id="togcp" onchange="saveModCfg()"><span class="swt"></span></label></div>
+        <div class="trow"><div><div class="tn">🤖 Auto-sanction</div><div class="td2">Mute auto après 3 warns</div></div><label class="sw"><input type="checkbox" id="togau" onchange="saveModCfg()"><span class="swt"></span></label></div>
+        <div class="trow"><div><div class="tn">📩 DM sanctions</div><div class="td2">Notifier en message privé</div></div><label class="sw"><input type="checkbox" id="togdm" onchange="saveModCfg()"><span class="swt"></span></label></div>
+        <hr class="sep">
+        <button class="btn brx" style="width:100%;justify-content:center" onclick="lockdown()">🚨 Lockdown serveur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANNIS -->
+  <div class="page" id="page-bans">
+    <div class="pgh" style="display:flex;align-items:center;justify-content:space-between"><div class="pgt">🔨 Membres bannis</div><button class="btn bg2 sm" onclick="loadBans()">🔄</button></div>
+    <div class="card"><div class="tw"><table><thead><tr><th>Membre</th><th>ID</th><th>Raison</th><th>Action</th></tr></thead><tbody id="bansBody"><tr><td colspan="4" style="text-align:center;color:var(--t2);padding:28px">Chargement...</td></tr></tbody></table></div></div>
+  </div>
+
+  <!-- LOGS -->
+  <div class="page" id="page-logs">
+    <div class="pgh" style="display:flex;align-items:center;justify-content:space-between"><div class="pgt">📜 Logs</div><button class="btn bg2 sm" onclick="loadLogs()">🔄</button></div>
+    <div class="card"><div id="logsBox" style="max-height:500px;overflow-y:auto"></div></div>
+  </div>
+
+  <!-- ANNONCE -->
+  <div class="page" id="page-announce">
+    <div class="pgh"><div class="pgt">📢 Envoyer une annonce</div></div>
+    <div class="card" style="max-width:500px">
+      <div class="fg"><label>ID du salon</label><input id="anch" placeholder="ID du salon Discord"></div>
+      <div class="fg"><label>Titre</label><input id="anti" placeholder="📢 Annonce importante"></div>
+      <div class="fg"><label>Message</label><textarea id="anms" rows="5" placeholder="Contenu de l'annonce..."></textarea></div>
+      <div class="fg"><label>Mention (optionnel)</label><input id="anmn" placeholder="@everyone ou @here"></div>
+      <button class="btn bp" onclick="sendAnnounce()">📢 Envoyer</button>
+    </div>
+  </div>
+
+  </div></main></div>
+
+<!-- MODALS -->
+<div class="ov" id="ov-art">
+  <div class="modal" style="max-width:580px">
+    <div class="mtitle" id="artTitle">📦 Ajouter un article</div>
+    <div class="g2"><div class="fg"><label>Nom</label><input id="an2" placeholder="NexusPass VIP"></div><div class="fg"><label>Prix</label><input id="ap" placeholder="9.99€"></div></div>
+    <div class="fg"><label>Lien de paiement (Stripe, SumUp...)</label><input id="al" placeholder="https://buy.stripe.com/..."></div>
+    <div class="fg"><label>Description</label><textarea id="ad" rows="2" placeholder="Description..."></textarea></div>
+    <div class="g2"><div class="fg"><label>Emoji</label><input id="ae" placeholder="🛒" maxlength="4"></div><div class="fg"><label>Catégorie</label><input id="acat" placeholder="VIP, Boost..."></div></div>
+    <div class="g2"><div class="fg"><label>Stock (-1=infini)</label><input id="as2" type="number" value="-1" min="-1"></div><div class="fg"><label>Alerte stock ≤</label><input id="aal" type="number" value="3" min="0"></div></div>
+    <div class="fg"><label>Image URL</label><input id="ai" placeholder="https://... (optionnel)"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px"><label class="sw" style="flex-shrink:0"><input type="checkbox" id="ans" checked><span class="swt"></span></label><span style="font-size:12px;color:var(--t1)">🌐 Sync NexusStore automatiquement</span></div>
+    <input type="hidden" id="aid" value="">
+    <div class="mfoot"><button class="btn bg2" onclick="closeOv('ov-art')">Annuler</button><button class="btn bp" onclick="saveArt()" id="artSaveBtn">➕ Ajouter</button></div>
+  </div>
+</div>
+
+<div class="ov" id="ov-bulk">
+  <div class="modal" style="max-width:440px">
+    <div class="mtitle">⚡ Ajustement rapide du stock</div>
+    <div class="fg"><label>Article</label><select id="blkart"><option value="">Sélectionner...</option></select></div>
+    <div class="fg"><label>Action</label>
+      <select id="blkact" onchange="document.getElementById('blkVR').style.display=['inf','zero'].includes(this.value)?'none':'block'">
+        <option value="set">= Définir à</option><option value="add">+ Ajouter</option>
+        <option value="sub">- Retirer</option><option value="inf">♾️ Illimité</option><option value="zero">❌ Rupture</option>
+      </select>
+    </div>
+    <div class="fg" id="blkVR"><label>Valeur</label><input id="blkv" type="number" min="0" value="1"></div>
+    <div class="fg"><label>Raison</label><input id="blkr" placeholder="Ex: Réassort, Vente flash..."></div>
+    <div class="mfoot"><button class="btn bg2" onclick="closeOv('ov-bulk')">Annuler</button><button class="btn bp" onclick="doBulk()">✅ Appliquer</button></div>
+  </div>
+</div>
+
+<div class="ov" id="ov-hist">
+  <div class="modal" style="max-width:460px">
+    <div class="mtitle" id="histTitle">📜 Historique</div>
+    <div id="histBody"></div>
+    <div class="mfoot"><button class="btn bg2" onclick="closeOv('ov-hist')">Fermer</button></div>
+  </div>
+</div>
+
+<div class="ov" id="ov-mod">
+  <div class="modal" style="max-width:420px">
+    <div class="mtitle" id="modTitle">Action</div>
+    <div id="modBody"></div>
+    <div class="mfoot"><button class="btn bg2" onclick="closeOv('ov-mod')">Annuler</button><button class="btn brx" onclick="execMod()">✅ Confirmer</button></div>
+  </div>
+</div>
+
+<div class="ov" id="ov-dlvtest">
+  <div class="modal" style="max-width:420px">
+    <div class="mtitle">📤 Tester l'envoi</div>
+    <div class="fg"><label>Ton ID Discord</label><input id="dlvtid" placeholder="Ton ID pour recevoir le fichier test"></div>
+    <div style="background:rgba(6,214,160,.07);border:1px solid rgba(6,214,160,.2);border-radius:var(--rd2);padding:9px 12px;font-size:11.5px;color:var(--t1);margin-bottom:12px">Le bot t'enverra le fichier en DM avec des données d'exemple.</div>
+    <div class="mfoot"><button class="btn bg2" onclick="closeOv('ov-dlvtest')">Annuler</button><button class="btn bgr" onclick="execDlvTest()">📤 Envoyer</button></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+<button class="mobb" onclick="document.getElementById('sb').classList.toggle('on')">☰</button>
+<script>
+// ══════════════════════════════════════════
+//  NEXUSBOT PANEL v6 — COMPLET
+// ══════════════════════════════════════════
+let monacoEd=null, currentUid=null, modType=null, edMode='t';
+let arts=[], stHist={};
+let nsConf=JSON.parse(localStorage.getItem('nsConf')||'{}');
+let dlvTemplates=JSON.parse(localStorage.getItem('dlvTpls')||'[]');
+let currentDlvIdx=-1;
+
+const TITLES={dash:'Dashboard',vocal:'Vocaux Live',editor:'Éditeur de code',cmds:'Mes commandes',statssetup:'Stats vocaux',tickets:'Tickets',shop:'Articles',stock:'Gestion du stock',nexusstore:'NexusStore',delivery:'Fichiers livraison',mod:'Modération',bans:'Bannis',logs:'Logs',announce:'Annonce'};
+
+// ── API ──────────────────────────────────
+async function api(path,opts={}){
+  let pw=localStorage.getItem('nbpw');
+  if(!pw){pw=prompt('🔐 Mot de passe du panel :');if(!pw)return null;localStorage.setItem('nbpw',pw);}
+  try{
+    const r=await fetch(path,{...opts,headers:{Authorization:'Basic '+btoa(':'+pw),'Content-Type':'application/json',...(opts.headers||{})}});
+    if(r.status===401||r.status===403){localStorage.removeItem('nbpw');toast('❌ Mot de passe incorrect','ter');return null;}
+    return r.json();
+  }catch{return null;}
+}
+
+// ── NAV ──────────────────────────────────
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  const pg=document.getElementById('page-'+id);if(pg)pg.classList.add('on');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')?.includes("'"+id+"'"))n.classList.add('on');});
+  document.getElementById('pgTitle').textContent=TITLES[id]||id;
+  document.getElementById('sb').classList.remove('on');
+  const L={dash:loadDash,vocal:loadVoice,cmds:loadCmds,statssetup:loadStatsInfo,tickets:loadTickets,shop:loadShop,stock:loadStock,nexusstore:loadNs,delivery:loadDelivery,bans:loadBans,logs:loadLogs};
+  if(L[id])L[id]();
+  if(id==='editor'&&edMode==='c')setTimeout(initMonaco,80);
+}
+
+// ── TOAST ────────────────────────────────
+function toast(m,t='tok'){const el=document.createElement('div');el.className='toast '+t;el.textContent=m;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),3500);}
+
+// ── UTILS ────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function refresh(){const a=document.querySelector('.page.on')?.id?.replace('page-','');if(a)go(a);toast('🔄 Actualisé','tinf');}
+function openOv(id){document.getElementById(id).classList.add('on');}
+function closeOv(id){document.getElementById(id).classList.remove('on');}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');}));
+
+// ── DASHBOARD ────────────────────────────
+async function loadDash(){
+  const[st,stats]=await Promise.all([api('/api/status'),api('/api/stats')]);
+  if(st){document.getElementById('botTagEl').textContent=st.tag||'En ligne';document.getElementById('sping').textContent=st.ping+'ms';}
+  if(stats){
+    [['sm','members'],['so','online'],['sv','voiceActive'],['stk','tickets'],['sc2','customCmds'],['sa','articles'],['sw','totalWarns']].forEach(([el,k])=>{const e=document.getElementById(el);if(e)e.textContent=stats[k]??'—';});
+    document.getElementById('vpill').textContent=stats.voiceActive||0;
+    document.getElementById('apill').textContent=stats.articles||0;
+    document.getElementById('cpill').textContent=stats.customCmds||0;
+    document.getElementById('tpill').textContent=stats.tickets||0;
+    const medals=['🥇','🥈','🥉'];
+    document.getElementById('topEl').innerHTML=stats.topPoints?.length
+      ?stats.topPoints.map((u,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="font-size:17px">${medals[i]||'•'}</span><div style="flex:1"><div style="font-size:12px;font-family:'DM Mono',monospace;color:var(--t1)">${u.id}</div><div style="font-size:10px;color:var(--t2)">${u.points} pts — Niv.${u.level}</div></div></div>`).join('')
+      :'<div class="emp"><div class="et">Aucune donnée</div></div>';
+  }
+  const logs=await api('/api/logs');
+  document.getElementById('recEl').innerHTML=logs?.slice(0,7).map(l=>`<div class="ll"><span class="lt">${l.time}</span><span class="lm">${esc(l.msg)}</span></div>`).join('')||'<div class="emp"><div class="et">Aucun log</div></div>';
+}
+
+// ── VOCAL ────────────────────────────────
+async function loadVoice(){
+  const data=await api('/api/voice-live');
+  const el=document.getElementById('vcBoxes');
+  if(!data?.length){el.innerHTML='<div class="emp"><div class="ei">🔇</div><div class="et">Personne en vocal</div></div>';document.getElementById('vpill').textContent='0';document.getElementById('voiceTs').textContent='Aucun vocal actif — '+new Date().toLocaleTimeString('fr-FR');return;}
+  let tot=0;
+  el.innerHTML=data.map(vc=>{tot+=vc.members.length;return`<div class="vcb"><div class="vch"><span style="font-size:17px">🔊</span><span class="vchn">${esc(vc.channelName)}</span><span style="margin-left:auto;font-size:10px;color:var(--t2);background:rgba(255,255,255,.05);padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace">${vc.members.length} membres</span></div>${vc.members.map(m=>`<div class="vcm"><div class="vcav">${m.username[0].toUpperCase()}</div><div><div style="font-weight:600;font-size:12.5px">${esc(m.username)}</div><div style="font-size:10px;color:var(--t2);font-family:'DM Mono',monospace">${m.id}</div></div><div style="display:flex;gap:4px;margin-left:auto;align-items:center">${m.muted?'<span style="font-size:13px;opacity:.7">🔇</span>':''}${m.deafened?'<span style="font-size:13px;opacity:.7">🔕</span>':''}${m.streaming?'<span class="lpill">LIVE</span>':''}<button class="btn bg2 xs" onclick="qWarn('${m.id}')">⚠️</button></div></div>`).join('')}</div>`;}).join('');
+  document.getElementById('vpill').textContent=tot;
+  document.getElementById('voiceTs').textContent=`${tot} membre${tot>1?'s':''} en vocal — ${new Date().toLocaleTimeString('fr-FR')}`;
+}
+setInterval(()=>{if(document.getElementById('page-vocal').classList.contains('on'))loadVoice();},30000);
+
+// ── MONACO EDITOR ────────────────────────
+function initMonaco(){
+  if(monacoEd||!document.getElementById('monacoEl'))return;
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js';
+  s.onload=()=>{
+    require.config({paths:{vs:'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs'}});
+    require(['vs/editor/editor.main'],()=>{
+      monaco.editor.defineTheme('nexus',{
+        base:'vs-dark',inherit:true,
+        rules:[
+          {token:'comment',foreground:'3d4264',fontStyle:'italic'},
+          {token:'keyword',foreground:'c4b5fd',fontStyle:'bold'},
+          {token:'string',foreground:'a7f3d0'},
+          {token:'number',foreground:'fbbf24'},
+          {token:'type',foreground:'38bdf8'},
+        ],
+        colors:{
+          'editor.background':'#0a0b14','editor.foreground':'#e2e8f0',
+          'editor.lineHighlightBackground':'#ffffff07',
+          'editor.selectionBackground':'#7c6dfa28',
+          'editorLineNumber.foreground':'#3d4264',
+          'editorLineNumber.activeForeground':'#7c6dfa',
+          'editorCursor.foreground':'#7c6dfa',
+          'editorWidget.background':'#111320',
+          'editorSuggestWidget.background':'#111320',
+          'editorSuggestWidget.border':'#7c6dfa40',
+          'editorSuggestWidget.selectedBackground':'#7c6dfa20',
+          'scrollbarSlider.background':'#ffffff10',
+        }
+      });
+      monacoEd=monaco.editor.create(document.getElementById('monacoEl'),{
+        value:`// NexusBot — Commande personnalisée
+// Variables : interaction, guild, user, db, addPts, addXP, getUser, EmbedBuilder, C
+
+await interaction.reply({
+  embeds: [
+    new EmbedBuilder()
+      .setTitle('✅ Ma commande !')
+      .setDescription(\`Bonjour \${user.username} ! 👋\`)
+      .setColor(C('#7c6dfa'))
+      .setTimestamp()
+  ]
+});`,
+        language:'javascript',theme:'nexus',
+        fontSize:13,fontFamily:"'DM Mono','Fira Code',monospace",
+        minimap:{enabled:false},scrollBeyondLastLine:false,
+        lineNumbers:'on',wordWrap:'on',automaticLayout:true,
+        tabSize:2,insertSpaces:true,folding:true,
+        bracketPairColorization:{enabled:true},
+        padding:{top:12,bottom:12},
+        scrollbar:{vertical:'auto',horizontal:'auto',verticalScrollbarSize:5,horizontalScrollbarSize:5},
+        quickSuggestions:true,suggestOnTriggerCharacters:true,
+      });
+      monaco.languages.registerCompletionItemProvider('javascript',{
+        provideCompletionItems:()=>({suggestions:[
+          {label:'interaction.reply',kind:monaco.languages.CompletionItemKind.Method,insertText:"await interaction.reply({ content: '${1:message}' });",insertTextRules:monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet},
+          {label:'EmbedBuilder',kind:monaco.languages.CompletionItemKind.Class,insertText:"new EmbedBuilder()\n  .setTitle('${1:Titre}')\n  .setDescription('${2:Description}')\n  .setColor(C('${3:#7c6dfa}'))",insertTextRules:monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet},
+          {label:'addPts',kind:monaco.languages.CompletionItemKind.Function,insertText:'addPts(user.id, ${1:100});',insertTextRules:monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet},
+          {label:'addXP',kind:monaco.languages.CompletionItemKind.Function,insertText:'addXP(user.id, ${1:100});',insertTextRules:monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet},
+          {label:'getUser',kind:monaco.languages.CompletionItemKind.Function,insertText:'getUser(user.id)',insertTextRules:monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet},
+          {label:'db.economy',kind:monaco.languages.CompletionItemKind.Variable,insertText:'db.economy'},
+          {label:'db.warns',kind:monaco.languages.CompletionItemKind.Variable,insertText:'db.warns'},
+          {label:'db.articles',kind:monaco.languages.CompletionItemKind.Variable,insertText:'db.articles'},
+        ]})
+      });
+      monacoEd.onDidChangeModelContent(()=>{const n=monacoEd.getModel().getLineCount();const el=document.getElementById('edLines');if(el)el.textContent=n+' lignes';});
+      const el=document.getElementById('edLines');if(el)el.textContent=monacoEd.getModel().getLineCount()+' lignes';
+    });
+  };
+  document.head.appendChild(s);
+}
+
+// ── SNIPPETS ─────────────────────────────
+const SNIPS={
+  reply:`await interaction.reply({ content: \`Bonjour \${user.username} ! 👋\` });`,
+  embed:`const emb = new EmbedBuilder()\n  .setTitle('✅ Titre')\n  .setDescription(\`Bonjour \${user.username} !\`)\n  .setColor(C('#7c6dfa'))\n  .setTimestamp();\nawait interaction.reply({ embeds: [emb] });`,
+  user:`const u = getUser(user.id);\nawait interaction.reply({ embeds: [new EmbedBuilder()\n  .setTitle(\`👤 \${user.username}\`)\n  .addFields(\n    {name:'💰 Points',value:\`\${u.points}\`,inline:true},\n    {name:'⭐ Niveau',value:\`\${u.level}\`,inline:true}\n  ).setColor(C('#7c6dfa'))] });`,
+  points:`addPts(user.id, 100);\nconst u = getUser(user.id);\nawait interaction.reply({ content: \`💰 +100 points ! Total : **\${u.points} pts**\` });`,
+  top3:`const top = Object.entries(db.economy).sort(([,a],[,b])=>b.points-a.points).slice(0,3);\nconst desc = top.map(([id,d],i)=>\`\${'🥇🥈🥉'[i]} <@\${id}> — **\${d.points} pts**\`).join('\\n');\nawait interaction.reply({ embeds:[new EmbedBuilder().setTitle('🏆 Top 3').setDescription(desc).setColor(C('#f59e0b'))] });`,
+  xp:`addXP(user.id, 100);\nconst u = getUser(user.id);\nawait interaction.reply({ content: \`⭐ +100 XP ! Niveau : **\${u.level}**\` });`,
+  warn:`if(!db.warns[user.id]) db.warns[user.id]=[];\ndb.warns[user.id].push({reason:'Raison',modId:user.id,date:new Date().toLocaleString('fr-FR')});\nawait interaction.reply({ content: \`⚠️ Warn ! Total : **\${db.warns[user.id].length}**\` });`,
+  shop:`const arts = db.articles.filter(a=>a.stock!==0);\nconst desc = arts.map(a=>\`\${a.emoji||'🛒'} **\${a.name}** — \${a.price}\\n> \${a.description||''}\`).join('\\n\\n');\nawait interaction.reply({ embeds:[new EmbedBuilder().setTitle('🛒 Boutique NexusStore').setDescription(desc||'Aucun article').setColor(C('#06d6a0'))] });`,
+  stock:`const nom = interaction.options.getString('article');\nconst art = db.articles.find(a=>a.name.toLowerCase().includes((nom||'').toLowerCase()));\nif(!art) return interaction.reply({content:'❌ Introuvable',ephemeral:true});\nconst s=art.stock===-1?'♾️ Illimité':art.stock===0?'❌ Rupture':\`✅ \${art.stock}\`;\nawait interaction.reply({content:\`📦 **\${art.name}** : \${s}\`});`,
+  timer:`await interaction.reply({ content: '⏱️ Lancé !' });\nsetTimeout(()=>interaction.channel?.send({content:\`⏰ <@\${user.id}> Terminé !\`}),30000);`,
+  crime:`const win=Math.random()>0.45;\nconst u=getUser(user.id);\nif(win){const g=Math.floor(Math.random()*300)+100;addPts(user.id,g);await interaction.reply({content:\`🔫 Crime réussi ! **+\${g} pts**\`});}else{const l=Math.min(u.points,150);u.points-=l;await interaction.reply({content:\`🚔 Arrêté ! **-\${l} pts**\`});}`,
+  random:`const opts=['Option A','Option B','Option C'];\nawait interaction.reply({content:\`🎲 **\${opts[Math.floor(Math.random()*opts.length)]}**\`});`,
+};
+
+function ins(k){
+  const s=SNIPS[k]||'';
+  if(monacoEd){
+    const pos=monacoEd.getPosition();
+    const line=monacoEd.getModel().getLineContent(pos.lineNumber);
+    const prefix=(line.trim()!==''&&pos.column>1)?'\n\n':'';
+    monacoEd.executeEdits('snip',[{range:new monaco.Range(pos.lineNumber,pos.column,pos.lineNumber,pos.column),text:prefix+s+'\n',forceMoveMarkers:true}]);
+    monacoEd.focus();
+  }
+}
+
+function fmtCode(){if(monacoEd){monacoEd.getAction('editor.action.formatDocument')?.run();toast('✨ Code formaté','tok');}}
+
+async function valCode(){
+  const code=monacoEd?monacoEd.getValue():'';
+  const box=document.getElementById('vbox'),dot=document.getElementById('esDot'),msg=document.getElementById('esMsg');
+  if(!code.trim()){box.className='vbox verr';box.textContent='❌ Code vide.';if(dot)dot.className='esdot err';return;}
+  const d=await api('/api/exec',{method:'POST',body:JSON.stringify({code})});if(!d)return;
+  box.className='vbox '+(d.ok?'vok':'verr');
+  box.textContent=d.ok?`✅ Valide — ${d.lines} lignes`:'❌ Erreur(s) :\n'+(d.errors||[]).join('\n');
+  if(dot)dot.className='esdot'+(d.ok?'':' err');
+  if(msg)msg.textContent=d.ok?`✅ ${d.lines} lignes OK`:`❌ ${d.errors?.length||1} erreur(s)`;
+}
+
+function switchEd(m){
+  edMode=m;
+  ['t','e','c'].forEach((x,i)=>{
+    const el=document.getElementById('ed-'+x);if(el)el.style.display=x===m?'block':'none';
+    const btn=document.getElementById('edt'+x.toUpperCase());
+    if(btn)btn.className=x===m?'btn bp sm':'btn bg2 sm';
+    if(btn){btn.style.flex='1';btn.style.justifyContent='center';}
+  });
+  if(m==='c')setTimeout(initMonaco,80);
+}
+
+async function saveCmd(type){
+  let payload={};
+  if(type==='text'){const n=document.getElementById('tn').value.trim(),r=document.getElementById('tr').value.trim();if(!n||!r){toast('Nom et réponse requis','ter');return;}payload={name:n,desc:document.getElementById('td').value.trim(),reponse:r,type:'text'};}
+  else if(type==='embed'){const n=document.getElementById('en').value.trim(),r=document.getElementById('er').value.trim();if(!n||!r){toast('Nom et contenu requis','ter');return;}payload={name:n,desc:document.getElementById('ed2').value.trim(),reponse:r,type:'embed',color:document.getElementById('ec').value,ephemeral:document.getElementById('eep').value==='true'};}
+  else{const n=document.getElementById('cn').value.trim(),code=monacoEd?monacoEd.getValue():'';if(!n||!code.trim()){toast('Nom et code requis','ter');return;}const v=await api('/api/exec',{method:'POST',body:JSON.stringify({code})});if(v&&!v.ok){toast('❌ Code invalide','ter');return;}payload={name:n,desc:document.getElementById('cd').value.trim(),code,type:'text'};}
+  const d=await api('/api/cmds',{method:'POST',body:JSON.stringify(payload)});
+  if(d?.ok){toast(`✅ /cmd ${d.name} déployée !`,'tok');['tn','tr','td','en','er','ed2','cn','cd'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});if(monacoEd)monacoEd.setValue('');}
+  else toast('Erreur lors de la création','ter');
+}
+
+function updPrev(){const txt=document.getElementById('er')?.value||'Contenu';const col=document.getElementById('ec')?.value||'#7c6dfa';const pt=document.getElementById('pt'),pem=document.getElementById('pem');if(pt)pt.textContent=txt;if(pem){pem.style.borderColor=col;pem.style.background=col+'18';}}
+
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'&&edMode==='c'){e.preventDefault();valCode();}});
+
+async function loadCmds(){
+  const data=await api('/api/cmds');const grid=document.getElementById('cmdGrid');
+  if(!data?.length){grid.innerHTML='<div class="emp" style="grid-column:1/-1"><div class="ei">⚡</div><div class="et">Aucune commande</div><div class="es">Crée-en une avec l\'éditeur !</div></div>';return;}
+  grid.innerHTML=data.map(c=>`<div class="cc"><div class="ccn">/cmd ${esc(c.name)}</div><div class="ccb ${c.code?'cbc':c.type==='embed'?'cbe':'cbt'}">${c.code?'💻 Code JS':c.type==='embed'?'🎨 Embed':'💬 Texte'}</div><div class="ccd">${esc(c.desc||'Aucune description')}</div><div class="ccp">${esc((c.code||c.reponse||'').substring(0,90))}</div><div class="cca"><button class="btn bg2 xs" onclick='editCmd(${JSON.stringify(JSON.stringify(c))})'>✏️</button><button class="btn brx xs" onclick="delCmd('${esc(c.name)}')">🗑️</button></div></div>`).join('');
+  document.getElementById('cpill').textContent=data.length;
+}
+
+function editCmd(cs){const c=JSON.parse(cs);if(c.code){switchEd('c');document.getElementById('cn').value=c.name;document.getElementById('cd').value=c.desc||'';if(monacoEd)monacoEd.setValue(c.code);}else if(c.type==='embed'){switchEd('e');document.getElementById('en').value=c.name;document.getElementById('er').value=c.reponse||'';document.getElementById('ed2').value=c.desc||'';}else{switchEd('t');document.getElementById('tn').value=c.name;document.getElementById('tr').value=c.reponse||'';document.getElementById('td').value=c.desc||'';}go('editor');}
+async function delCmd(name){if(!confirm(`Supprimer /cmd ${name} ?`))return;const d=await api('/api/cmds/'+name,{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimée','tok');loadCmds();}else toast('Erreur','ter');}
+
+// ── STATS SETUP ──────────────────────────
+async function createStats(){const sel={};document.querySelectorAll('.cho').forEach(el=>{sel[el.dataset.k]=el.classList.contains('on');});if(!Object.values(sel).some(v=>v)){toast('Sélectionnez au moins un compteur','twrn');return;}const catname=document.getElementById('catname').value.trim()||'📊 ── STATISTIQUES ──';const d=await api('/api/stats-channels',{method:'POST',body:JSON.stringify({catName:catname,...sel})});if(d?.ok){toast(`✅ ${d.count} salon(s) créé(s)!`,'tok');loadStatsInfo();}else toast(d?.error||'Erreur','ter');}
+async function deleteStats(){if(!confirm('Supprimer tous les salons stats ?'))return;const d=await api('/api/stats-channels',{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimé(s)','tok');loadStatsInfo();}else toast('Erreur','ter');}
+async function loadStatsInfo(){const d=await api('/api/stats-channels-info');const el=document.getElementById('statsInfo');if(!d||!Object.keys(d.active||{}).length){el.innerHTML='';return;}const e=Object.entries(d.active).filter(([k])=>k!=='categoryId');el.innerHTML=`<div class="card"><div class="ch"><span class="ct">✅ Salons actifs</span></div><div class="chpick" style="margin-top:0">${e.map(([k,id])=>`<div class="cho on" style="pointer-events:none"><div class="chon" style="font-size:10.5px;color:var(--t2);font-family:'DM Mono',monospace">${k}</div><div class="chod" style="color:var(--a1)">${id}</div></div>`).join('')}</div></div>`;}
+
+// ── TICKETS ──────────────────────────────
+async function loadTickets(){
+  const d=await api('/api/tickets');if(!d)return;
+  const cats=d.categories||[];document.getElementById('catCnt').textContent=cats.length;document.getElementById('tpill').textContent=cats.length;
+  document.getElementById('catGrid').innerHTML=cats.length?cats.map(c=>`<div class="catc"><div class="catbar" style="background:${c.color||'var(--a1)'}"></div><div style="font-size:20px">${c.label.split(' ')[0]||'🎫'}</div><div style="flex:1"><div style="font-size:13px;font-weight:700;font-family:'Syne',sans-serif">${esc(c.label)}</div><div style="font-size:11px;color:var(--t2);margin-top:2px">${esc(c.desc||'')}</div></div><button class="btn brx xs" style="flex-shrink:0" onclick="removeCat('${c.id}')">✕</button></div>`).join(''):'<div class="emp"><div class="ei">🎫</div><div class="et">Aucune catégorie</div></div>';
+  const active=d.active||{};const ent=Object.entries(active);
+  document.getElementById('tkCnt').textContent=ent.length;
+  document.getElementById('tkTable').innerHTML=ent.length?ent.map(([uid,chId])=>`<tr><td><code style="font-family:'DM Mono',monospace;font-size:10.5px;color:#c4b5fd">${uid}</code></td><td><code style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--t2)">${chId}</code></td><td><span class="tag tg">🔓 Ouvert</span></td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:var(--t2);padding:16px">Aucun ticket ouvert</td></tr>';
+}
+async function addCat(){const b={id:document.getElementById('ncid').value.trim(),label:document.getElementById('nclb').value.trim(),desc:document.getElementById('ncds').value.trim(),color:document.getElementById('nccl').value};if(!b.id||!b.label){toast('ID et label requis','ter');return;}const d=await api('/api/ticket-category',{method:'POST',body:JSON.stringify(b)});if(d?.ok){toast('✅ Catégorie ajoutée','tok');document.getElementById('catform').classList.remove('on');loadTickets();['ncid','nclb','ncds'].forEach(id=>document.getElementById(id).value='');}else toast('Erreur','ter');}
+async function removeCat(id){if(!confirm('Supprimer ?'))return;const d=await api('/api/ticket-category/'+id,{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimée','tok');loadTickets();}else toast('Erreur','ter');}
+
+// ── BOUTIQUE ─────────────────────────────
+async function loadShop(){
+  const data=await api('/api/articles');arts=data||[];renderShop(arts);
+  const tot=arts.length,low=arts.filter(a=>a.stock>0&&a.stock<=3).length,out=arts.filter(a=>a.stock===0).length;
+  ['shtot','shlow','shout'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=[tot,low,out][i];});
+  document.getElementById('apill').textContent=tot;document.getElementById('spill').textContent=out;
+  const sel=document.getElementById('blkart');if(sel)sel.innerHTML='<option value="">Sélectionner...</option>'+arts.map(a=>`<option value="${a.id}">${a.emoji||'🛒'} ${esc(a.name)}</option>`).join('');
+  const dsel=document.getElementById('dlvart');if(dsel)dsel.innerHTML='<option value="">Tous les articles</option>'+arts.map(a=>`<option value="${a.id}">${a.emoji||'🛒'} ${esc(a.name)}</option>`).join('');
+}
+function filterShop(){const q=(document.getElementById('shq')?.value||'').toLowerCase();const f=document.getElementById('shf')?.value||'';let arr=arts.filter(a=>!q||a.name.toLowerCase().includes(q));if(f==='ok')arr=arr.filter(a=>a.stock>3||a.stock===-1);else if(f==='low')arr=arr.filter(a=>a.stock>0&&a.stock<=3);else if(f==='out')arr=arr.filter(a=>a.stock===0);else if(f==='inf')arr=arr.filter(a=>a.stock===-1);renderShop(arr);}
+function renderShop(data){
+  const tb=document.getElementById('artBody');if(!tb)return;
+  if(!data?.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t2);padding:24px">Aucun article</td></tr>';return;}
+  tb.innerHTML=data.map(a=>{const stk=a.stock===-1?'<span class="tag tb2">♾️</span>':a.stock===0?'<span class="tag tr2">❌</span>':a.stock<=3?`<span class="tag ty2">⚠️${a.stock}</span>`:`<span class="tag tg">✅${a.stock}</span>`;const lnk=a.link?`<a href="${esc(a.link)}" target="_blank" style="color:var(--a1);font-size:10.5px;font-family:'DM Mono',monospace">Voir→</a>`:'—';return`<tr><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${a.emoji||'🛒'}</span><div><div style="font-weight:700;font-size:12.5px">${esc(a.name)}</div><div style="font-size:10px;color:var(--t2)">${esc((a.description||'').substring(0,40))}</div></div></div></td><td><span class="tag tg">${esc(a.price)}</span></td><td>${stk}</td><td>${lnk}</td><td><div style="display:flex;gap:4px"><button class="btn bg2 xs" onclick='openEditArt(${JSON.stringify(JSON.stringify(a))})'>✏️</button><button class="btn bg2 xs" onclick="qStk(${a.id},1)">+</button><button class="btn bg2 xs" onclick="qStk(${a.id},-1)">−</button><button class="btn brx xs" onclick="delArt(${a.id})">🗑️</button></div></td></tr>`;}).join('');
+}
+function openArtModal(){document.getElementById('artTitle').textContent='📦 Ajouter un article';document.getElementById('artSaveBtn').textContent='➕ Ajouter';document.getElementById('aid').value='';['an2','ap','al','ad','ae','acat','ai'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('as2').value='-1';openOv('ov-art');}
+function openEditArt(as){const a=JSON.parse(as);document.getElementById('artTitle').textContent='✏️ Modifier l\'article';document.getElementById('artSaveBtn').textContent='💾 Sauvegarder';document.getElementById('aid').value=a.id;document.getElementById('an2').value=a.name||'';document.getElementById('ap').value=a.price||'';document.getElementById('al').value=a.link||'';document.getElementById('ad').value=a.description||'';document.getElementById('ae').value=a.emoji||'🛒';document.getElementById('as2').value=a.stock??-1;document.getElementById('aal').value=a.alertThreshold||3;document.getElementById('acat').value=a.category||'';document.getElementById('ai').value=a.image||'';openOv('ov-art');}
+async function saveArt(){
+  const editId=document.getElementById('aid').value;
+  const body={name:document.getElementById('an2').value.trim(),price:document.getElementById('ap').value.trim(),link:document.getElementById('al').value.trim(),description:document.getElementById('ad').value.trim(),emoji:document.getElementById('ae').value.trim()||'🛒',stock:parseInt(document.getElementById('as2').value)||-1,alertThreshold:parseInt(document.getElementById('aal').value)||3,category:document.getElementById('acat').value.trim(),image:document.getElementById('ai').value.trim(),syncNexusStore:document.getElementById('ans')?.checked??true};
+  if(!body.name||!body.price){toast('Nom et prix requis','ter');return;}
+  const method=editId?'PUT':'POST',path=editId?`/api/articles/${editId}`:'/api/articles';
+  const d=await api(path,{method,body:JSON.stringify(body)});
+  if(d?.ok){toast(editId?'💾 Modifié':'✅ Ajouté','tok');closeOv('ov-art');loadShop();loadStock();if(body.syncNexusStore&&nsConf.url)pushNs();}else toast('Erreur','ter');
+}
+async function qStk(id,delta){const a=arts.find(x=>x.id===id);if(!a)return;if(a.stock===-1){toast('Stock illimité — via Gestion stock','twrn');return;}const ns=Math.max(0,a.stock+delta);const d=await api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:ns,reason:delta>0?`+${delta}`:`${delta}`})});if(d?.ok){addHist(id,a.name,delta,delta>0?'Ajout rapide':'Retrait rapide');toast((delta>0?`+${delta}`:String(delta))+' stock','tok');loadShop();loadStock();}else toast('Erreur','ter');}
+async function delArt(id){if(!confirm('Supprimer cet article ?'))return;const d=await api('/api/articles/'+id,{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimé','tok');loadShop();loadStock();}else toast('Erreur','ter');}
+
+// ── STOCK ────────────────────────────────
+function addHist(artId,name,delta,reason){if(!stHist[artId])stHist[artId]=[];stHist[artId].unshift({name,delta,reason,time:new Date().toLocaleString('fr-FR')});if(stHist[artId].length>20)stHist[artId].pop();}
+
+async function loadStock(){
+  const data=await api('/api/articles');arts=data||[];
+  const grid=document.getElementById('stGrid');if(!grid)return;
+  const al=document.getElementById('stAlerts');
+  const rup=arts.filter(a=>a.stock===0),fbl=arts.filter(a=>a.stock>0&&a.stock<=3);
+  if(al){al.innerHTML='';if(rup.length)al.innerHTML+=`<div style="background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.25);border-radius:var(--rd2);padding:9px 13px;font-size:12px;margin-bottom:7px">🔴 <strong>${rup.length} rupture${rup.length>1?'s':''} :</strong> ${rup.map(a=>`<span style="color:var(--a4)">${a.emoji||'🛒'} ${esc(a.name)}</span>`).join(', ')}</div>`;if(fbl.length)al.innerHTML+=`<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:var(--rd2);padding:9px 13px;font-size:12px;margin-bottom:7px">🟡 <strong>Stock faible :</strong> ${fbl.map(a=>`<span style="color:var(--a5)">${a.emoji||'🛒'} ${esc(a.name)} (${a.stock})</span>`).join(', ')}</div>`;}
+  if(!arts.length){grid.innerHTML='<div class="emp" style="grid-column:1/-1"><div class="ei">📦</div><div class="et">Aucun article</div></div>';return;}
+  grid.innerHTML=arts.map(a=>{
+    const isI=a.stock===-1,isO=a.stock===0,isL=a.stock>0&&a.stock<=3;
+    const bc=isI?'sbi':isO?'sbr':isL?'sbl':'sbo';
+    const bt=isI?'♾️ Illimité':isO?'❌ Rupture':isL?'⚠️ Stock faible':'✅ En stock';
+    const vt=isI?'∞':String(a.stock);const vc=isI?'stvl inf':'stvl';const h=stHist[a.id]||[];
+    return`<div class="stcard"><div class="stct"><div class="stem">${a.emoji||'🛒'}</div><div style="flex:1;min-width:0"><div class="stnm">${esc(a.name)}</div><div class="stpr">${esc(a.price)}</div></div><span class="stbdg ${bc}">${bt}</span></div><div class="stctr"><div style="font-size:10px;font-weight:700;color:var(--t2);font-family:'Syne',sans-serif;text-transform:uppercase;letter-spacing:.8px">Stock</div><div style="display:flex;align-items:center;gap:6px"><div class="stbtn"><button class="stb m" onclick="adjStk(${a.id},-10)" style="font-size:11px;width:auto;padding:0 8px">-10</button><button class="stb m" onclick="adjStk(${a.id},-1)">−</button></div><div class="${vc}">${vt}</div><div class="stbtn"><button class="stb" onclick="adjStk(${a.id},1)">+</button><button class="stb" onclick="adjStk(${a.id},10)" style="font-size:11px;width:auto;padding:0 8px">+10</button></div></div></div><div class="stact"><button class="btn bgr xs" onclick="setInf(${a.id})">♾️ Infini</button><button class="btn byx xs" onclick="setStk(${a.id},'${esc(a.name)}')">🔢 Définir</button><button class="btn brx xs" onclick="setZero(${a.id})">❌ Rupture</button><button class="sthb" onclick="showHist(${a.id},'${esc(a.name)}')">${h.length} modif.</button></div></div>`;
+  }).join('');
+  document.getElementById('spill').textContent=rup.length;
+}
+async function adjStk(id,delta){const a=arts.find(x=>x.id===id);if(!a)return;if(a.stock===-1&&delta<0){toast('Stock illimité — utilisez "Définir"','twrn');return;}const ns=a.stock===-1?Math.max(0,delta):Math.max(0,a.stock+delta);const d=await api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:ns,reason:delta>0?`+${delta}`:String(delta)})});if(d?.ok){addHist(id,a.name,delta,delta>0?`+${delta}`:`${delta}`);toast((delta>0?`+${delta}`:String(delta))+' stock','tok');loadStock();if(nsConf?.url&&document.getElementById('nsstk')?.checked)syncStkNs(id,ns);}else toast('Erreur','ter');}
+async function setInf(id){const a=arts.find(x=>x.id===id);const d=await api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:-1,reason:'Illimité'})});if(d?.ok){addHist(id,a?.name||'?',0,'→ Illimité');toast('♾️ Stock illimité','tok');loadStock();}else toast('Erreur','ter');}
+async function setZero(id){if(!confirm('Mettre en rupture ?'))return;const a=arts.find(x=>x.id===id);const d=await api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:0,reason:'Rupture manuelle'})});if(d?.ok){addHist(id,a?.name||'?',-999,'Rupture');toast('❌ Rupture','tok');loadStock();}else toast('Erreur','ter');}
+function setStk(id,name){const v=prompt(`Stock pour "${name}" (-1=infini, 0=rupture) :`);if(v===null)return;const n=parseInt(v);if(isNaN(n)||n<-1){toast('Valeur invalide','ter');return;}const a=arts.find(x=>x.id===id);api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:n,reason:`Défini:${n}`})}).then(d=>{if(d?.ok){addHist(id,a?.name||'?',0,`Défini→${n}`);toast(`Stock→${n===-1?'∞':n}`,'tok');loadStock();}else toast('Erreur','ter');});}
+function showHist(id,name){document.getElementById('histTitle').textContent=`📜 Historique — ${name}`;const h=stHist[id]||[];document.getElementById('histBody').innerHTML=h.length?h.map(x=>`<div class="hi"><span style="font-size:14px">${x.delta>0?'📈':x.delta<0?'📉':'🔄'}</span><div style="flex:1"><div style="font-size:12px;color:var(--t1)">${esc(x.reason)}</div><div style="font-size:10px;color:var(--t3);font-family:'DM Mono',monospace">${x.time}</div></div><div class="hd ${x.delta>=0?'pos':'neg'}">${x.delta>0?'+':''}${x.delta===0?'SET':x.delta}</div></div>`).join(''):'<div class="emp"><div class="et">Aucune modification dans cette session</div></div>';openOv('ov-hist');}
+async function doBulk(){const artId=document.getElementById('blkart').value,action=document.getElementById('blkact').value,val=parseInt(document.getElementById('blkv').value)||1,reason=document.getElementById('blkr').value.trim()||action;if(!artId){toast('Sélectionner un article','ter');return;}const a=arts.find(x=>String(x.id)===String(artId));let stock;if(action==='set')stock=val;else if(action==='add')stock=Math.max(0,(a?.stock||0)===-1?val:(a?.stock||0)+val);else if(action==='sub')stock=Math.max(0,(a?.stock||0)-val);else if(action==='inf')stock=-1;else stock=0;const d=await api('/api/articles/'+artId+'/stock',{method:'POST',body:JSON.stringify({stock,reason})});if(d?.ok){addHist(artId,a?.name||'?',0,reason);toast(`✅ Stock→${stock===-1?'∞':stock}`,'tok');closeOv('ov-bulk');loadShop();loadStock();}else toast('Erreur','ter');}
+
+// ── NEXUSSTORE ───────────────────────────
+async function loadNs(){
+  const u=document.getElementById('nsurl'),k=document.getElementById('nskey'),au=document.getElementById('nsauto'),ss=document.getElementById('nsstk');
+  if(u&&nsConf.url)u.value=nsConf.url;if(k&&nsConf.key)k.value=nsConf.key;if(au)au.checked=nsConf.auto||false;if(ss)ss.checked=nsConf.stk||false;
+  const st=document.getElementById('nsStatus');if(st){st.textContent=nsConf.url?'Configuré'+(nsConf.last?' · '+nsConf.last:''):'Non configuré';st.className='nsst'+(nsConf.url?' ok':'');}
+  const se=document.getElementById('nsSyncTxt');if(se)se.textContent=nsConf.last?'Dernière sync : '+nsConf.last:'Jamais synchronisé';
+  if(!arts.length)await loadShop();
+}
+function saveNsCfg(){nsConf.url=(document.getElementById('nsurl')?.value||'').trim();nsConf.key=(document.getElementById('nskey')?.value||'').trim();nsConf.auto=document.getElementById('nsauto')?.checked||false;nsConf.stk=document.getElementById('nsstk')?.checked||false;localStorage.setItem('nsConf',JSON.stringify(nsConf));toast('💾 Config sauvegardée','tok');}
+async function testNs(){const url=(document.getElementById('nsurl')?.value||'').trim();if(!url){toast('URL requise','ter');return;}toast('🔌 Test...','tinf');try{const r=await fetch(url+'/ping',{headers:{'X-Api-Key':nsConf.key||''},mode:'cors'});if(r.ok){toast('✅ Connexion OK !','tok');const st=document.getElementById('nsStatus');if(st){st.textContent='Connecté ✓';st.className='nsst ok';}}else toast('❌ Erreur '+r.status,'ter');}catch{toast('❌ Impossible de joindre le worker','ter');}}
+async function pushNs(){if(!arts.length)await loadShop();if(!nsConf.url){toast('URL requise','ter');return;}toast('📤 Envoi...','tinf');const payload=arts.map(a=>({id:a.id,name:a.name,price:a.price,description:a.description,emoji:a.emoji,stock:a.stock,image:a.image,link:a.link,category:a.category}));try{const r=await fetch(nsConf.url+'/sync-products',{method:'POST',headers:{'Content-Type':'application/json','X-Api-Key':nsConf.key||''},body:JSON.stringify({products:payload}),mode:'cors'});if(r.ok){const now=new Date().toLocaleString('fr-FR');nsConf.last=now;localStorage.setItem('nsConf',JSON.stringify(nsConf));const se=document.getElementById('nsSyncTxt');if(se)se.textContent='Dernière sync : '+now;const st=document.getElementById('nsStatus');if(st){st.textContent='Connecté · '+now;st.className='nsst ok';}toast(`✅ ${payload.length} articles envoyés !`,'tok');}else toast('❌ Erreur '+r.status,'ter');}catch{toast('❌ Connexion impossible','ter');}}
+async function pullNs(){if(!nsConf.url){toast('URL requise','ter');return;}toast('📥 Import...','tinf');try{const r=await fetch(nsConf.url+'/get-products',{headers:{'X-Api-Key':nsConf.key||''},mode:'cors'});if(!r.ok){toast('❌ Erreur '+r.status,'ter');return;}const data=await r.json();if(data.products?.length){let c=0;for(const p of data.products){const d=await api('/api/articles',{method:'POST',body:JSON.stringify(p)});if(d?.ok)c++;}toast(`✅ ${c} articles importés !`,'tok');loadShop();}else toast('Aucun article sur NexusStore','twrn');}catch{toast('❌ Connexion impossible','ter');}}
+async function syncStkNs(artId,ns){if(!nsConf.url)return;try{await fetch(nsConf.url+'/update-stock',{method:'POST',headers:{'Content-Type':'application/json','X-Api-Key':nsConf.key||''},body:JSON.stringify({id:artId,stock:ns}),mode:'cors'});}catch{}}
+function prevNs(){const el=document.getElementById('nsPrev');if(!el)return;if(!arts.length){el.innerHTML='<div class="emp"><div class="et">Aucun article</div></div>';return;}el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px;margin-top:7px">${arts.map(a=>`<div style="background:rgba(255,255,255,.03);border:1px solid var(--r);border-radius:var(--rd2);padding:9px 11px;display:flex;align-items:center;gap:8px"><span style="font-size:18px">${a.emoji||'🛒'}</span><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(a.name)}</div><div style="font-size:10px;color:var(--t2)">${esc(a.price)} · Stock:${a.stock===-1?'∞':a.stock}</div></div><span style="font-size:9.5px;color:${nsConf.last?'var(--a3)':'var(--a5)'};font-family:'DM Mono',monospace">${nsConf.last?'✓':'⟳'}</span></div>`).join('')}</div>`;}
+async function publishNsEmbed(){const chId=(document.getElementById('nsch')?.value||'').trim(),msg=(document.getElementById('nsmsg')?.value||'').trim();if(!chId){toast('ID salon requis','ter');return;}const d=await api('/api/announce',{method:'POST',body:JSON.stringify({channelId:chId,title:'🛒 NexusStore — Boutique officielle',message:msg||'Commandez vos articles en quelques clics !',link:'https://brian10122000.github.io/NexusStore/',color:'#7c6dfa'})});if(d?.ok)toast('✅ Embed publié !','tok');else toast(d?.error||'Erreur','ter');}
+
+// ── DELIVERY GENERATOR ───────────────────
+const DLV_EX={'{acheteur}':'Jean_Discord','{date}':new Date().toLocaleDateString('fr-FR'),'{article}':'NexusPass VIP','{prix}':'9.99€','{commande_id}':'CMD-20240001','{serveur}':'NexusBot'};
+
+function loadDelivery(){if(!arts.length)loadShop();renderDlvList();}
+
+function renderDlvList(){
+  const el=document.getElementById('dlvList');if(!el)return;
+  if(!dlvTemplates.length){el.innerHTML='<div class="emp"><div class="et">Aucun modèle</div><div class="es">Cliquez sur ➕ Nouveau</div></div>';return;}
+  el.innerHTML=dlvTemplates.map((t,i)=>`<div class="dlvitem ${i===currentDlvIdx?'on':''}" onclick="selectDlv(${i})"><span style="font-size:18px">📄</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;font-family:'Syne',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.name||'Sans titre')}</div><div style="font-size:10.5px;color:var(--t2)">.${t.format||'txt'} · ${t.article?'Article spécifique':'Tous'}</div></div><span style="font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(124,109,250,.15);color:#c4b5fd;font-family:'DM Mono',monospace;flex-shrink:0">${i===currentDlvIdx?'actif':'→'}</span></div>`).join('');
+}
+
+function newDlv(){
+  currentDlvIdx=-1;
+  document.getElementById('dlvEdTitle').textContent='✏️ Nouveau modèle';
+  document.getElementById('dlvname').value='';
+  document.getElementById('dlvart').value='';
+  document.getElementById('dlvfmt').value='txt';
+  document.getElementById('dlvcontent').value=`═══════════════════════════\n⚡ NEXUSSTORE — LIVRAISON\n═══════════════════════════\n\nMerci {acheteur} pour ton achat !\n\n📦 Article : {article}\n💰 Prix payé : {prix}\n📅 Date : {date}\n🔖 Commande : #{commande_id}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCONTENU DE TA LIVRAISON :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n[Écris ici : identifiants, lien, code...]\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSupport : Ouvre un ticket Discord\n━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+  document.getElementById('dlvEd').style.display='block';
+  updDlvPrev();renderDlvList();
+}
+
+function selectDlv(i){
+  currentDlvIdx=i;const t=dlvTemplates[i];
+  document.getElementById('dlvEdTitle').textContent='✏️ Modifier le modèle';
+  document.getElementById('dlvname').value=t.name||'';
+  document.getElementById('dlvart').value=t.article||'';
+  document.getElementById('dlvfmt').value=t.format||'txt';
+  document.getElementById('dlvcontent').value=t.content||'';
+  document.getElementById('dlvEd').style.display='block';
+  updDlvPrev();renderDlvList();
+}
+
+function updDlvPrev(){
+  let c=document.getElementById('dlvcontent').value;
+  Object.entries(DLV_EX).forEach(([k,v])=>{c=c.split(k).join(v);});
+  document.getElementById('dlvPrev').textContent=c;
+}
+
+function saveDlv(){
+  const name=document.getElementById('dlvname').value.trim();
+  if(!name){toast('Nom requis','ter');return;}
+  const t={name,article:document.getElementById('dlvart').value,format:document.getElementById('dlvfmt').value,content:document.getElementById('dlvcontent').value,auto:document.getElementById('dlvauto').checked,ticket:document.getElementById('dlvticket').checked,watermark:document.getElementById('dlvwm').checked,dm:document.getElementById('dlvdm').value,savedAt:new Date().toLocaleString('fr-FR')};
+  if(currentDlvIdx>=0){dlvTemplates[currentDlvIdx]=t;}else{dlvTemplates.push(t);currentDlvIdx=dlvTemplates.length-1;}
+  localStorage.setItem('dlvTpls',JSON.stringify(dlvTemplates));
+  toast('💾 Modèle sauvegardé !','tok');renderDlvList();
+}
+
+function deleteDlv(){
+  if(currentDlvIdx<0){toast('Aucun modèle sélectionné','ter');return;}
+  if(!confirm('Supprimer ce modèle ?'))return;
+  dlvTemplates.splice(currentDlvIdx,1);currentDlvIdx=-1;
+  localStorage.setItem('dlvTpls',JSON.stringify(dlvTemplates));
+  document.getElementById('dlvEd').style.display='none';
+  toast('🗑️ Supprimé','tok');renderDlvList();
+}
+
+function dlvDl(){
+  const name=document.getElementById('dlvname').value.trim()||'livraison';
+  const fmt=document.getElementById('dlvfmt').value;
+  let content=document.getElementById('dlvcontent').value;
+  Object.entries(DLV_EX).forEach(([k,v])=>{content=content.split(k).join(v);});
+  const mime=fmt==='html'?'text/html':fmt==='md'?'text/markdown':'text/plain';
+  const blob=new Blob([content],{type:mime});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${name}.${fmt}`;a.click();
+  toast('⬇️ Fichier téléchargé !','tok');
+}
+
+function testDlvSend(){if(currentDlvIdx<0){toast('Sélectionnez un modèle d\'abord','ter');return;}openOv('ov-dlvtest');}
+
+async function execDlvTest(){
+  const uid=document.getElementById('dlvtid').value.trim();
+  if(!uid){toast('ID requis','ter');return;}
+  const t=dlvTemplates[currentDlvIdx];if(!t)return;
+  const d=await api('/api/delivery/test',{method:'POST',body:JSON.stringify({userId:uid,template:t})});
+  if(d?.ok){toast('📤 Fichier envoyé en DM !','tok');closeOv('ov-dlvtest');}
+  else toast(d?.error||'Erreur — vérifiez que le bot peut DM cet utilisateur','ter');
+}
+
+function saveDlvOpts(){toast('💾 Options sauvegardées','tok');}
+
+// ── MODÉRATION ───────────────────────────
+async function searchMember(){const id=document.getElementById('muid').value.trim();if(!id)return;const d=await api('/api/member/'+id);if(!d||d.error){toast('Membre introuvable','ter');return;}currentUid=d.id;document.getElementById('mpav').src=d.avatar;document.getElementById('mpn').textContent=d.username;document.getElementById('mpi').textContent=d.id;document.getElementById('mpp').textContent=d.points;document.getElementById('mpl').textContent=d.level;document.getElementById('mpw').textContent=d.warns?.length||0;const wl=document.getElementById('warnsList');wl.innerHTML=d.warns?.length?d.warns.map((w,i)=>`<div class="wi"><span class="wn">#${i+1}</span><div><div>${esc(w.reason)}</div><div style="font-size:10px;color:var(--t2)">${w.date}</div></div></div>`).join(''):'<div style="font-size:11.5px;color:var(--t2)">✅ Aucun warn</div>';document.getElementById('mpBox').classList.add('on');}
+function qWarn(id){currentUid=id;document.getElementById('muid').value=id;searchMember();}
+function modAct(t){if(!currentUid){toast('Aucun membre sélectionné','ter');return;}modType=t;const T={warn:'⚠️ Avertir',mute:'🔇 Sourdine',kick:'👢 Expulser',ban:'🔨 Bannir',clearwarns:'🗑️ Clear warns'};document.getElementById('modTitle').textContent=T[t]||t;let html='';if(t==='warn')html=`<div class="fg"><label>Raison</label><input id="mr" placeholder="Raison..."></div>`;else if(t==='mute')html=`<div class="g2"><div class="fg"><label>Durée (min)</label><input id="mmin" type="number" value="10" min="1"></div><div class="fg"><label>Raison</label><input id="mr" placeholder="Raison..."></div></div>`;else if(t==='kick'||t==='ban')html=`<div class="fg"><label>Raison</label><input id="mr" placeholder="Raison..."></div>`;else html=`<div style="background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.2);border-radius:var(--rd2);padding:10px;font-size:12.5px;color:var(--t1)">Tous les warns seront effacés.</div>`;document.getElementById('modBody').innerHTML=html;openOv('ov-mod');}
+async function execMod(){const r=document.getElementById('mr')?.value||'',min=parseInt(document.getElementById('mmin')?.value||'10');const eps={warn:'/api/mod/warn',mute:'/api/mod/mute',kick:'/api/mod/kick',ban:'/api/mod/ban',clearwarns:'/api/mod/clearwarns'};const body={userId:currentUid,reason:r};if(modType==='mute')body.minutes=min;const d=await api(eps[modType],{method:'POST',body:JSON.stringify(body)});if(d?.ok){toast('✅ Action effectuée','tok');closeOv('ov-mod');searchMember();}else toast('Erreur : '+(d?.error||'?'),'ter');}
+async function saveModCfg(){const d=await api('/api/mod-config',{method:'POST',body:JSON.stringify({antispam:document.getElementById('togsp').checked,antilink:document.getElementById('toglk').checked,anticaps:document.getElementById('togcp').checked,autosanction:document.getElementById('togau').checked,dm:document.getElementById('togdm').checked})});if(d?.ok)toast('⚙️ Config mise à jour','tok');}
+async function lockdown(){const msg=prompt('Message du lockdown :');if(!confirm('⚠️ Verrouiller TOUS les salons ?'))return;const d=await api('/api/mod/lockdown',{method:'POST',body:JSON.stringify({message:msg||'🚨 Lockdown.'})});if(d?.ok)toast(`🚨 ${d.locked} salons verrouillés`,'twrn');else toast('Erreur','ter');}
+
+// ── BANNIS ───────────────────────────────
+async function loadBans(){const data=await api('/api/bans');const tb=document.getElementById('bansBody');if(!data?.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--t2);padding:28px">✅ Aucun banni</td></tr>';return;}tb.innerHTML=data.map(b=>`<tr><td style="font-weight:600">${esc(b.user.username)}</td><td><span class="tag tv2">${b.user.id}</span></td><td style="color:var(--t2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(b.reason||'—')}</td><td><button class="btn bgr xs" onclick="unban('${b.user.id}')">🔓 Débannir</button></td></tr>`).join('');}
+async function unban(id){if(!confirm('Débannir ?'))return;const d=await api('/api/mod/unban',{method:'POST',body:JSON.stringify({userId:id})});if(d?.ok){toast('🔓 Débanni','tok');loadBans();}else toast(d?.error||'Erreur','ter');}
+
+// ── LOGS ─────────────────────────────────
+async function loadLogs(){const data=await api('/api/logs');document.getElementById('logsBox').innerHTML=data?.map(l=>`<div class="ll"><span class="lt">${l.time}</span><span class="lm">${esc(l.msg)}</span></div>`).join('')||'<div class="emp"><div class="et">Aucun log</div></div>';}
+
+// ── ANNONCE ──────────────────────────────
+async function sendAnnounce(){const body={channelId:document.getElementById('anch').value.trim(),title:document.getElementById('anti').value.trim()||'📢 Annonce',message:document.getElementById('anms').value.trim(),mention:document.getElementById('anmn').value.trim()};if(!body.channelId||!body.message){toast('Channel et message requis','ter');return;}const d=await api('/api/announce',{method:'POST',body:JSON.stringify(body)});if(d?.ok)toast('📢 Annonce envoyée !','tok');else toast(d?.error||'Erreur','ter');}
+
+// ── INIT ─────────────────────────────────
+loadDash();
+</script>
+</body>
+</html>
