@@ -99,6 +99,18 @@ const db = {
   giveaways: {},
   polls: {},
 
+  // Commandes clients (suivi)
+  orders: [],  // [{ id, userId, discordId, username, articleId, articleName, price, status, date, deliveryFile, notes }]
+
+  // Page À propos
+  aboutPage: {
+    title: 'À propos de NexusStore',
+    description: 'Bienvenue sur NexusStore, votre boutique Discord de confiance.',
+    team: [],       // [{ name, role, avatar, discord }]
+    stats: { orders:0, clients:0, rating:'5.0' },
+    socials: { discord:'', twitter:'', instagram:'' },
+  },
+
   // Reaction roles
   reactionRoles: {}, // { msgId: { emoji: roleId } }
 
@@ -650,6 +662,9 @@ const COMMANDS = [
     .addStringOption(o=>o.setName('nom').setDescription('Nom'))
     .addStringOption(o=>o.setName('couleur').setDescription('Couleur hex'))
     .addStringOption(o=>o.setName('footer').setDescription('Footer')),
+  new SlashCommandBuilder().setName('macommande').setDescription('📦 Suivre le statut de ta commande')
+    .addStringOption(o=>o.setName('id').setDescription('ID de ta commande (ex: CMD-001)').setRequired(true)),
+  new SlashCommandBuilder().setName('commandes').setDescription('📋 Voir toutes tes commandes'),
   new SlashCommandBuilder().setName('config-bienvenue').setDescription('⚙️ Configurer le message de bienvenue').setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addStringOption(o=>o.setName('message').setDescription('Message ({user},{server},{count})'))
     .addStringOption(o=>o.setName('couleur').setDescription('Couleur hex')),
@@ -1623,6 +1638,44 @@ client.on(Events.InteractionCreate, async interaction => {
 
   if (cmd==='giveaway-reroll') { const gw=db.giveaways[interaction.options.getString('messageid')];if(!gw)return interaction.reply({embeds:[ERR('Introuvable.')],ephemeral:true});const entries=[...gw.entries];if(!entries.length)return interaction.reply({embeds:[ERR('Aucun participant.')],ephemeral:true});const winner=entries[Math.floor(Math.random()*entries.length)];gw.winner=winner;addPts(winner,100);return interaction.reply({embeds:[new EmbedBuilder().setTitle('🔄 Nouveau Gagnant !').setDescription(`**Prix :** ${gw.prize}\n**Gagnant :** <@${winner}>`).setColor(C('#10d982')).setTimestamp()]}); }
 
+  // ── SUIVI DE COMMANDE ──────────────────────────────────────────
+  if (cmd === 'macommande') {
+    const orderId = interaction.options.getString('id').toUpperCase().replace('CMD-','');
+    const order   = db.orders.find(o => o.id === `CMD-${orderId}` || o.id === orderId);
+    if (!order) return interaction.reply({ embeds: [ERR(`Commande **CMD-${orderId}** introuvable.\nVérifie l'ID ou ouvre un ticket.`)], ephemeral: true });
+    if (order.userId && order.userId !== interaction.user.id) return interaction.reply({ embeds: [ERR('Cette commande ne t\'appartient pas.')], ephemeral: true });
+    const statusEmoji = { pending:'⏳', confirmed:'✅', delivered:'📦', cancelled:'❌', refunded:'💸' };
+    const statusLabel = { pending:'En attente', confirmed:'Confirmée', delivered:'Livrée', cancelled:'Annulée', refunded:'Remboursée' };
+    const emb = new EmbedBuilder()
+      .setTitle(`📦 Commande ${order.id}`)
+      .setColor(C(order.status==='delivered'?'#10d982':order.status==='cancelled'?'#ff4d4d':'#5865F2'))
+      .addFields(
+        { name:'📦 Article',  value: order.articleName || '—', inline: true },
+        { name:'💰 Prix',     value: order.price || '—',       inline: true },
+        { name:'📅 Date',     value: order.date || '—',        inline: true },
+        { name:'📊 Statut',   value: `${statusEmoji[order.status]||'❓'} ${statusLabel[order.status]||order.status}`, inline: true },
+      )
+      .setFooter({ text: 'Pour toute question → ouvrez un ticket' })
+      .setTimestamp();
+    if (order.notes) emb.addFields({ name:'📝 Note', value: order.notes });
+    return interaction.reply({ embeds: [emb], ephemeral: true });
+  }
+
+  if (cmd === 'commandes') {
+    const userOrders = db.orders.filter(o => o.userId === interaction.user.id);
+    if (!userOrders.length) return interaction.reply({ embeds: [new EmbedBuilder().setTitle('📋 Tes commandes').setDescription('Aucune commande trouvée.\nPassez votre première commande sur **NexusStore** !').setColor(C('#5865F2'))], ephemeral: true });
+    const statusEmoji = { pending:'⏳', confirmed:'✅', delivered:'📦', cancelled:'❌', refunded:'💸' };
+    const desc = userOrders.slice(0,10).map(o =>
+      `**${o.id}** — ${o.articleName} — ${o.price}\n└ ${statusEmoji[o.status]||'❓'} ${o.status} · ${o.date}`
+    ).join('\n\n');
+    return interaction.reply({ embeds: [new EmbedBuilder()
+      .setTitle(`📋 Tes commandes (${userOrders.length})`)
+      .setDescription(desc)
+      .setColor(C('#5865F2'))
+      .setFooter({ text: 'Utilise /macommande <ID> pour les détails' })
+    ], ephemeral: true });
+  }
+
   // ══ SONDAGES ══
   if (cmd==='sondage') { const question=interaction.options.getString('question'),opts=interaction.options.getString('options').split('|').map(s=>s.trim()).filter(Boolean).slice(0,9);if(opts.length<2)return interaction.reply({embeds:[ERR('Minimum 2 options.')],ephemeral:true});const emojis=['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣'],msg=await interaction.reply({embeds:[new EmbedBuilder().setTitle(`📊 ${question}`).setDescription(opts.map((o,i)=>`${emojis[i]} ${o}`).join('\n')).setColor(C('#4d8fff')).setTimestamp().setFooter({text:`Par ${interaction.user.username} • Cliquez sur une réaction pour voter`})],fetchReply:true});db.polls[msg.id]={question,options:opts,votes:Object.fromEntries(opts.map((_,i)=>[i,[]]))};for(let i=0;i<opts.length;i++)await msg.react(emojis[i]);return; }
 
@@ -2177,6 +2230,222 @@ app.post('/api/mod-config', authPanel, (req, res) => {
   Object.assign(db.modConfig, req.body);
   log('⚙️ Config modération mise à jour');
   res.json({ ok:true });
+});
+
+// ════════════════════════════════════════════════════════════════
+//  COMMANDES / ORDERS
+// ════════════════════════════════════════════════════════════════
+
+// Lister toutes les commandes
+app.get('/api/orders', authPanel, (req, res) => {
+  res.json({ ok:true, orders: db.orders || [] });
+});
+
+// Créer une commande (depuis NexusStore ou panel)
+app.post('/api/orders', authPanel, async (req, res) => {
+  const { userId, discordId, username, articleId, articleName, price, notes } = req.body;
+  if (!articleName || !price) return res.status(400).json({ error:'articleName et price requis' });
+  const order = {
+    id:          'CMD-' + String(db.orders.length + 1).padStart(4,'0'),
+    userId:      userId || discordId || '',
+    discordId:   discordId || userId || '',
+    username:    username || 'Inconnu',
+    articleId:   articleId || null,
+    articleName: articleName,
+    price:       price,
+    status:      'pending',
+    date:        new Date().toLocaleDateString('fr-FR'),
+    dateISO:     new Date().toISOString(),
+    notes:       notes || '',
+  };
+  db.orders.push(order);
+  // Décrémenter le stock si article bot
+  if (articleId) {
+    const art = db.articles.find(a => a.id == articleId);
+    if (art && art.stock > 0) art.stock--;
+  }
+  // Notifier le staff via CH_SALES si défini
+  const salCh = client.channels.cache.get(process.env.CH_SALES || '');
+  if (salCh) {
+    await salCh.send({ embeds: [new EmbedBuilder()
+      .setTitle('🛒 Nouvelle commande !')
+      .setColor(C('#10d982'))
+      .addFields(
+        { name:'🔖 ID',      value: order.id,          inline: true },
+        { name:'👤 Client',  value: username||'Inconnu',inline: true },
+        { name:'📦 Article', value: articleName,        inline: true },
+        { name:'💰 Prix',    value: price,              inline: true },
+      )
+      .setTimestamp()
+    ]}).catch(()=>{});
+  }
+  log(`🛒 Commande ${order.id} créée — ${articleName} — ${username}`);
+  res.json({ ok:true, order });
+});
+
+// Modifier le statut d'une commande
+app.put('/api/orders/:id', authPanel, async (req, res) => {
+  const order = db.orders.find(o => o.id === req.params.id);
+  if (!order) return res.status(404).json({ error:'Commande introuvable' });
+  const { status, notes } = req.body;
+  if (status) order.status = status;
+  if (notes !== undefined) order.notes = notes;
+  // Notifier le client en DM si status change
+  if (status && order.discordId) {
+    const statusLabel = { pending:'⏳ En attente', confirmed:'✅ Confirmée', delivered:'📦 Livrée !', cancelled:'❌ Annulée', refunded:'💸 Remboursée' };
+    const user = await client.users.fetch(order.discordId).catch(()=>null);
+    if (user) {
+      await user.send({ embeds: [new EmbedBuilder()
+        .setTitle('📦 Mise à jour de ta commande')
+        .setColor(C(status==='delivered'?'#10d982':status==='cancelled'?'#ff4d4d':'#5865F2'))
+        .setDescription(`Ta commande **${order.id}** a été mise à jour !`)
+        .addFields(
+          { name:'📦 Article', value: order.articleName, inline:true },
+          { name:'📊 Statut',  value: statusLabel[status]||status, inline:true },
+        )
+        .setFooter({ text:'Pour toute question → /macommande '+order.id })
+        .setTimestamp()
+      ]}).catch(()=>{});
+    }
+  }
+  log(`📦 Commande ${order.id} → ${status}`);
+  res.json({ ok:true, order });
+});
+
+// Supprimer une commande
+app.delete('/api/orders/:id', authPanel, (req, res) => {
+  const idx = db.orders.findIndex(o => o.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error:'Introuvable' });
+  const [removed] = db.orders.splice(idx, 1);
+  log(`🗑️ Commande ${removed.id} supprimée`);
+  res.json({ ok:true });
+});
+
+// ════════════════════════════════════════════════════════════════
+//  GIVEAWAYS — Gestion depuis le panel
+// ════════════════════════════════════════════════════════════════
+
+app.get('/api/giveaways', authPanel, (req, res) => {
+  const list = Object.entries(db.giveaways).map(([id, gw]) => ({
+    id, prize: gw.prize, end: gw.end, ended: gw.ended,
+    entries: gw.entries ? [...gw.entries].length : 0,
+    winner: gw.winner || null,
+    channelId: gw.channel,
+    winners: gw.winners || 1,
+  }));
+  res.json({ ok:true, giveaways: list });
+});
+
+app.post('/api/giveaways', authPanel, async (req, res) => {
+  try {
+    const { channelId, prize, minutes, winners=1 } = req.body;
+    if (!channelId || !prize || !minutes) return res.status(400).json({ error:'channelId, prize, minutes requis' });
+    const guild = client.guilds.cache.get(GUILD_ID);
+    const ch    = guild?.channels.cache.get(channelId);
+    if (!ch) return res.status(404).json({ error:'Salon introuvable' });
+    const end = Date.now() + minutes * 60 * 1000;
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId('gw_join').setLabel('🎉 Participer').setStyle(ButtonStyle.Primary)
+    );
+    const msg = await ch.send({ embeds: [new EmbedBuilder()
+      .setTitle('🎉 GIVEAWAY')
+      .setDescription(`**🏆 Prix :** ${prize}\n\n⏱️ **Fin :** ${new Date(end).toLocaleString('fr-FR')}\n🏅 **Gagnants :** ${winners}\n👥 **Participants :** 0\n\nClique sur le bouton pour participer !`)
+      .setColor(C('#f0b429'))
+      .setTimestamp(new Date(end))
+      .setFooter({ text:'Giveaway créé depuis le panel admin' })
+    ], components:[row] });
+    db.giveaways[msg.id] = { prize, end, channel:channelId, entries:new Set(), ended:false, winners };
+    log(`🎉 Giveaway créé depuis panel: ${prize} dans #${ch.name}`);
+    res.json({ ok:true, messageId:msg.id, channelId, prize });
+  } catch(e) { res.status(500).json({ error:e.message }); }
+});
+
+app.post('/api/giveaways/:id/end', authPanel, async (req, res) => {
+  const guild = client.guilds.cache.get(GUILD_ID);
+  await endGiveaway(req.params.id, guild).catch(()=>{});
+  res.json({ ok:true });
+});
+
+app.post('/api/giveaways/:id/reroll', authPanel, async (req, res) => {
+  const gw = db.giveaways[req.params.id];
+  if (!gw) return res.status(404).json({ error:'Giveaway introuvable' });
+  const entries = [...(gw.entries||new Set())];
+  if (!entries.length) return res.status(400).json({ error:'Aucun participant' });
+  const winner = entries[Math.floor(Math.random()*entries.length)];
+  gw.winner = winner;
+  const ch = client.channels.cache.get(gw.channel);
+  if (ch) await ch.send({ embeds:[new EmbedBuilder().setTitle('🔄 Nouveau Gagnant !').setDescription(`**Prix :** ${gw.prize}\n**Gagnant :** <@${winner}>`).setColor(C('#10d982')).setTimestamp()] }).catch(()=>{});
+  res.json({ ok:true, winner });
+});
+
+app.delete('/api/giveaways/:id', authPanel, (req, res) => {
+  if (!db.giveaways[req.params.id]) return res.status(404).json({ error:'Introuvable' });
+  delete db.giveaways[req.params.id];
+  res.json({ ok:true });
+});
+
+// ════════════════════════════════════════════════════════════════
+//  MESSAGE DE BIENVENUE — Éditeur
+// ════════════════════════════════════════════════════════════════
+
+app.get('/api/welcome', authPanel, (req, res) => {
+  res.json({ ok:true, config: db.welcomeConfig });
+});
+
+app.post('/api/welcome', authPanel, async (req, res) => {
+  const { enabled, channelId, message, title, color, showAvatar, showBanner, footerText, imageUrl } = req.body;
+  if (enabled !== undefined) db.welcomeConfig.enabled = enabled;
+  if (channelId)    db.welcomeConfig.channelId  = channelId;
+  if (message)      db.welcomeConfig.message     = message;
+  if (title)        db.welcomeConfig.title        = title;
+  if (color)        db.welcomeConfig.color        = color;
+  if (showAvatar !== undefined) db.welcomeConfig.showAvatar = showAvatar;
+  if (showBanner !== undefined) db.welcomeConfig.showBanner = showBanner;
+  if (footerText)   db.welcomeConfig.footerText   = footerText;
+  if (imageUrl)     db.welcomeConfig.imageUrl      = imageUrl;
+  log('👋 Config bienvenue mise à jour');
+  res.json({ ok:true, config: db.welcomeConfig });
+});
+
+// Test message de bienvenue
+app.post('/api/welcome/test', authPanel, async (req, res) => {
+  try {
+    const guild  = client.guilds.cache.get(GUILD_ID);
+    const cfg    = db.welcomeConfig;
+    const ch     = guild?.channels.cache.get(cfg.channelId || req.body.channelId);
+    if (!ch) return res.status(404).json({ error:'Salon bienvenue introuvable. Configurez CH_WELCOME dans Railway.' });
+    const member = guild.members.cache.get(req.body.userId || client.user.id) || guild.me;
+    const user   = member?.user || client.user;
+    const msg    = (cfg.message||'👋 Bienvenue **{user}** sur **{server}** !')
+      .replace(/{user}/g, user.username)
+      .replace(/{server}/g, guild.name)
+      .replace(/{count}/g, guild.memberCount)
+      .replace(/{mention}/g, `<@${user.id}>`);
+    const emb = new EmbedBuilder()
+      .setDescription(msg)
+      .setColor(C(cfg.color||'#5865F2'))
+      .setTimestamp();
+    if (cfg.title) emb.setTitle(cfg.title.replace(/{user}/g, user.username).replace(/{server}/g, guild.name));
+    if (cfg.showAvatar !== false) emb.setThumbnail(user.displayAvatarURL({ dynamic:true }));
+    if (cfg.imageUrl)  emb.setImage(cfg.imageUrl);
+    if (cfg.footerText) emb.setFooter({ text: cfg.footerText.replace(/{server}/g, guild.name) });
+    await ch.send({ content:`🧪 **TEST** — Voici à quoi ressemblera le message de bienvenue :`, embeds:[emb] });
+    res.json({ ok:true });
+  } catch(e) { res.status(500).json({ error:e.message }); }
+});
+
+// ════════════════════════════════════════════════════════════════
+//  PAGE À PROPOS
+// ════════════════════════════════════════════════════════════════
+
+app.get('/api/about', authPanel, (req, res) => {
+  res.json({ ok:true, about: db.aboutPage || {} });
+});
+
+app.post('/api/about', authPanel, (req, res) => {
+  Object.assign(db.aboutPage, req.body);
+  log('📝 Page À propos mise à jour');
+  res.json({ ok:true, about: db.aboutPage });
 });
 
 // ── Actions modération ────────────────────────────────────────
@@ -2968,3 +3237,4 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 client.login(TOKEN).catch(e => { console.error('❌', e.message); process.exit(1); });
+
