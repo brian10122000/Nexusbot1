@@ -2013,10 +2013,13 @@ app.post('/api/stats-channels', authPanel, async (req, res) => {
       permissionOverwrites: [{ id: guild.id, deny: [PermissionFlagsBits.Connect, PermissionFlagsBits.SendMessages] }],
     });
 
-    const makeVC = async (name) => guild.channels.create({
-      name, type: ChannelType.GuildVoice, parent: category.id,
-      permissionOverwrites: [{ id: guild.id, deny: [PermissionFlagsBits.Connect], allow: [PermissionFlagsBits.ViewChannel] }],
-    });
+    const makeVC = async (name) => {
+      await new Promise(r => setTimeout(r, 1200)); // délai anti-rate-limit
+      return guild.channels.create({
+        name, type: ChannelType.GuildVoice, parent: category.id,
+        permissionOverwrites: [{ id: guild.id, deny: [PermissionFlagsBits.Connect], allow: [PermissionFlagsBits.ViewChannel] }],
+      });
+    };
 
     const created = { categoryId: category.id };
     let count = 0;
@@ -2911,3 +2914,4 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 client.login(TOKEN).catch(e => { console.error('❌', e.message); process.exit(1); });
+
