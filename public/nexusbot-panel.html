@@ -974,61 +974,117 @@ input[type=color]{height:42px;padding:3px 8px;cursor:pointer;border-radius:var(-
 
 <!-- ═══ PAGE: LIVRAISON ═══ -->
 <section class="page" id="page-delivery">
-  <div class="ph"><div class="ph-left"><div class="ph-title">📄 Fichiers de livraison</div><div class="ph-sub">Modèles envoyés automatiquement aux acheteurs</div></div></div>
-  <div class="grid-2">
-    <div>
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span class="icon">📄</span>Modèles</span><button class="btn btn-primary btn-xs" onclick="newDelivery()">➕ Nouveau</button></div>
-        <div id="deliveryList"><div class="empty"><div class="empty-icon">📄</div><div class="empty-title">Aucun modèle</div></div></div>
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">📄 Livraison</div><div class="ph-sub">Modèles liés à chaque article — comptes, clés, liens secrets</div></div>
+    <div class="ph-actions">
+      <button class="btn btn-primary btn-sm" onclick="openNewTemplate()">➕ Nouveau modèle</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadDeliveryPage()">🔄</button>
+    </div>
+  </div>
+
+  <!-- CATALOGUE DISCORD -->
+  <div style="background:linear-gradient(135deg,rgba(124,109,250,.1),rgba(168,85,247,.05));border:1px solid rgba(124,109,250,.25);border-radius:var(--r3);padding:16px 20px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <div style="font-size:26px">🛒</div>
+      <div>
+        <div style="font-size:15px;font-weight:800;font-family:'Outfit',sans-serif">Publier le catalogue sur Discord</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:2px">Envoie un embed avec tous tes articles + lien boutique</div>
       </div>
-      <div class="card" id="deliveryEditor" style="display:none">
-        <div class="card-title"><span id="dlvEdTitle">✏️ Nouveau modèle</span></div>
-        <div class="form-group"><label class="form-label">Nom du modèle</label><input class="form-input" id="dlv-name" placeholder="NexusPass VIP, Compte Premium..."></div>
-        <div class="form-group"><label class="form-label">Article associé</label><select class="form-select" id="dlv-article"><option value="">Tous les articles</option></select></div>
-        <div class="form-group"><label class="form-label">Format</label><select class="form-select" id="dlv-format" onchange="updateDeliveryPreview()"><option value="txt">📄 .txt — Texte</option><option value="md">📝 .md — Markdown</option><option value="html">🌐 .html — HTML</option></select></div>
-        <div style="font-size:11.5px;color:var(--t2);background:rgba(124,109,250,.06);border:1px solid rgba(124,109,250,.2);border-radius:var(--r2);padding:8px 12px;margin-bottom:12px">
-          📌 Variables : <code style="color:#c4b5fd">{acheteur}</code> <code style="color:#c4b5fd">{date}</code> <code style="color:#c4b5fd">{article}</code> <code style="color:#c4b5fd">{prix}</code> <code style="color:#c4b5fd">{commande_id}</code> <code style="color:#c4b5fd">{serveur}</code>
+    </div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group" style="margin:0"><label class="form-label">Salon Discord</label><select class="form-select sel-ch" id="cat-channel"><option value="">Choisir un salon...</option></select></div>
+      <div class="form-group" style="margin:0"><label class="form-label">URL de ta boutique</label><input class="form-input" id="cat-url" value="https://brian10122000.github.io/NexusStore/" placeholder="https://..."></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="toggle-row" style="flex:0 0 auto;padding:7px 12px;margin:0" onclick="toggleEl('cat-stock')"><div><div class="toggle-label" style="font-size:12px">📦 Afficher le stock</div></div><label class="switch"><input type="checkbox" id="cat-stock" checked><span class="switch-track"></span></label></div>
+      <div class="toggle-row" style="flex:0 0 auto;padding:7px 12px;margin:0" onclick="toggleEl('cat-link')"><div><div class="toggle-label" style="font-size:12px">🔗 Liens articles</div></div><label class="switch"><input type="checkbox" id="cat-link"><span class="switch-track"></span></label></div>
+      <select class="form-select" id="cat-mention" style="width:140px;padding:7px 11px;font-size:12px"><option value="">Aucune mention</option><option value="@everyone">@everyone</option><option value="@here">@here</option></select>
+      <button class="btn btn-primary" onclick="publishCatalogue()">📢 Publier le catalogue</button>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- LISTE DES MODÈLES -->
+    <div class="card">
+      <div class="card-title"><span class="icon">📄</span>Modèles de livraison <span class="tag tag-violet" id="tplCountBadge">0</span></div>
+      <div id="deliveryTemplatesList"><div class="empty"><div class="empty-icon">📄</div><div class="empty-title">Aucun modèle</div><div class="empty-sub">Crée-en un avec le bouton ➕</div></div></div>
+    </div>
+
+    <!-- ÉDITEUR DE MODÈLE -->
+    <div id="deliveryEditor" style="display:none">
+      <div class="card">
+        <div class="card-title"><span id="tplEditorTitle" class="icon">✏️</span> Éditeur de modèle</div>
+
+        <!-- Article lié -->
+        <div class="form-group">
+          <label class="form-label">Article lié (obligatoire)</label>
+          <select class="form-select" id="tpl-article" onchange="onTplArticleChange()">
+            <option value="">Sélectionner un article...</option>
+          </select>
+          <div class="form-hint">Ce modèle sera utilisé automatiquement pour les commandes de cet article.</div>
         </div>
-        <div class="form-group"><label class="form-label">Contenu du fichier</label><textarea class="form-textarea" id="dlv-content" rows="14" style="font-family:'JetBrains Mono',monospace;font-size:12px" oninput="updateDeliveryPreview()" placeholder="═══════════════════════════
+
+        <div class="form-group">
+          <label class="form-label">Nom du modèle</label>
+          <input class="form-input" id="tpl-name" placeholder="Livraison NexusPass VIP">
+        </div>
+
+        <!-- SECTION SECRETS — Comptes / Clés / Liens -->
+        <div class="divider"><span>🔐 Contenu secret (compte / clé / lien)</span></div>
+        <div style="background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.2);border-radius:var(--r2);padding:12px 14px;margin-bottom:12px">
+          <div style="font-size:11px;color:var(--rose);margin-bottom:10px;font-weight:600">⚠️ Ces informations seront envoyées en DM uniquement à l'acheteur. Ne les partage jamais.</div>
+          <div id="secretLinesContainer" style="display:flex;flex-direction:column;gap:7px;margin-bottom:9px"></div>
+          <button class="btn btn-ghost btn-sm" onclick="addSecretLine()">➕ Ajouter une ligne</button>
+        </div>
+
+        <!-- Template texte accompagnant -->
+        <div class="divider"><span>📝 Texte du fichier de livraison</span></div>
+        <div style="font-size:11.5px;color:var(--t2);background:rgba(124,109,250,.06);border:1px solid rgba(124,109,250,.2);border-radius:var(--r2);padding:8px 12px;margin-bottom:10px">
+          Variables : <code style="color:#c4b5fd">{acheteur}</code> <code style="color:#c4b5fd">{article}</code> <code style="color:#c4b5fd">{prix}</code> <code style="color:#c4b5fd">{commande_id}</code> <code style="color:#c4b5fd">{date}</code> <code style="color:#c4b5fd">{serveur}</code>
+        </div>
+        <div class="form-group">
+          <textarea class="form-textarea" id="tpl-content" rows="10" style="font-family:'JetBrains Mono',monospace;font-size:12px" oninput="updateTplPreview()" placeholder="═══════════════════════
 ⚡ NEXUSSTORE — LIVRAISON
-═══════════════════════════
+═══════════════════════
 
 Merci {acheteur} pour ton achat !
 📦 Article : {article}
 💰 Prix : {prix}
-📅 Date : {date}
 🔖 Commande : #{commande_id}
+📅 Date : {date}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CONTENU DE TA LIVRAISON :
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━
+ACCÈS / INFORMATIONS :
+━━━━━━━━━━━━━━━━━━━━━━━
+(Les accès seront ajoutés automatiquement)
 
-[Ici : identifiants, lien, code...]
+━━━━━━━━━━━━━━━━━━━━━━━
+Support → Ticket Discord
+━━━━━━━━━━━━━━━━━━━━━━━"></textarea>
+        </div>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Support : Ticket Discord
-━━━━━━━━━━━━━━━━━━━━━━━━━━━"></textarea></div>
-        <div style="display:flex;gap:7px;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="saveDelivery();saveDeliveryToDB()">💾 Sauvegarder</button>
-          <button class="btn btn-green" onclick="testDeliverySend()">📤 Tester</button>
-          <button class="btn btn-ghost" onclick="downloadDelivery()">⬇️ Télécharger</button>
-          <button class="btn btn-red" onclick="deleteDelivery()">🗑️ Supprimer</button>
+        <!-- Options -->
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Format du fichier</label><select class="form-select" id="tpl-format"><option value="txt">📄 .txt</option><option value="md">📝 .md</option></select></div>
+          <div class="form-group"><label class="form-label">Message DM</label><input class="form-input" id="tpl-dm" placeholder="✅ Merci ! Voici ta livraison 📦" value="✅ Merci pour ton achat ! Voici ta livraison 📦"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div class="toggle-row" onclick="toggleEl('tpl-wm')"><div><div class="toggle-label" style="font-size:12px">🔒 Watermark</div></div><label class="switch"><input type="checkbox" id="tpl-wm"><span class="switch-track"></span></label></div>
+          <div class="toggle-row" onclick="toggleEl('tpl-ticket')"><div><div class="toggle-label" style="font-size:12px">🎫 Dans ticket</div></div><label class="switch"><input type="checkbox" id="tpl-ticket" checked><span class="switch-track"></span></label></div>
+          <div class="toggle-row" onclick="toggleEl('tpl-auto')"><div><div class="toggle-label" style="font-size:12px">⚡ Auto à l'achat</div></div><label class="switch"><input type="checkbox" id="tpl-auto" checked><span class="switch-track"></span></label></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="saveTplToDB()">💾 Sauvegarder</button>
+          <button class="btn btn-green" onclick="openTestDelivery()">📤 Tester</button>
+          <button class="btn btn-red" id="tpl-delete-btn" style="display:none" onclick="deleteTpl()">🗑️ Supprimer</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('deliveryEditor').style.display='none'">✕ Fermer</button>
         </div>
       </div>
-    </div>
-    <div>
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-title"><span class="icon">👁️</span>Aperçu</div>
-        <div style="background:rgba(0,0,0,.4);border-radius:var(--r2);border:1px solid var(--border);padding:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--t1);min-height:140px;white-space:pre-wrap;word-break:break-word" id="deliveryPreview">Remplissez le contenu pour voir l'aperçu...</div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">⚙️</span>Options d'envoi auto</div>
-        <div class="toggle-row" onclick="toggleEl('dlv-auto')"><div><div class="toggle-label">📤 DM automatique à l'achat</div><div class="toggle-sub">⚡ Livraison AUTOMATIQUE à chaque nouvelle commande</div></div><label class="switch"><input type="checkbox" id="dlv-auto" checked><span class="switch-track"></span></label></div>
-        <div id="dlv-auto-warn" style="font-size:11.5px;color:var(--amber);background:rgba(255,183,3,.07);border:1px solid rgba(255,183,3,.2);border-radius:var(--r2);padding:8px 12px;margin-top:6px">⚡ Avec cette option, dès qu'une commande est créée, ce template sera envoyé automatiquement en DM au client.</div>
-        <div class="toggle-row" onclick="toggleEl('dlv-ticket')"><div><div class="toggle-label">📋 Copier dans le ticket</div><div class="toggle-sub">Poster aussi dans le ticket</div></div><label class="switch"><input type="checkbox" id="dlv-ticket" checked><span class="switch-track"></span></label></div>
-        <div class="toggle-row" onclick="toggleEl('dlv-wm')"><div><div class="toggle-label">🔒 Watermark acheteur</div><div class="toggle-sub">Ajouter l'ID en filigrane</div></div><label class="switch"><input type="checkbox" id="dlv-wm"><span class="switch-track"></span></label></div>
-        <div class="form-group" style="margin-top:10px"><label class="form-label">Message DM accompagnement</label><textarea class="form-textarea" id="dlv-dm" rows="3" placeholder="✅ Merci pour ton achat ! Voici ta livraison. Pour tout problème, ouvre un ticket."></textarea></div>
-        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveDeliveryOptions()">💾 Sauvegarder les options</button>
+
+      <!-- Aperçu -->
+      <div class="card" style="margin-top:14px">
+        <div class="card-title"><span class="icon">👁️</span>Aperçu du fichier</div>
+        <div id="tplPreview" style="background:rgba(0,0,0,.4);border-radius:var(--r2);border:1px solid var(--border);padding:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--t1);min-height:120px;white-space:pre-wrap;word-break:break-word;max-height:280px;overflow-y:auto">Remplissez le contenu pour voir l'aperçu...</div>
       </div>
     </div>
   </div>
@@ -2105,24 +2161,370 @@ function globalSearchFn(){const q=(document.getElementById('globalSearch')?.valu
 
 
 // ══════════════════════════════════════════════════════════════
-//  SYSTÈME DE LIVRAISON — Manuel & Automatique
+//  SYSTÈME DE LIVRAISON v2 — Par article, secrets, catalogue
 // ══════════════════════════════════════════════════════════════
 
 let deliveryTemplates = [];
+let currentTplName    = null;
+let secretLines       = [];  // [{label, value}]
 
-// Charger les templates de livraison depuis le bot
+// ── Charger la page livraison ────────────────────────────────
+async function loadDelivery() { await loadDeliveryPage(); }
+async function loadDeliveryPage() {
+  if (!arts.length) await loadShop();
+  await loadDeliveryTemplates();
+  populateTplArticleSelect();
+}
+
+// ── Charger les templates depuis le bot/Supabase ─────────────
 async function loadDeliveryTemplates() {
   const d = await api('/api/delivery-templates');
   deliveryTemplates = d?.templates || [];
-  // Mettre à jour tous les selects de templates
-  const tplOpts = '<option value="">— Sélectionner —</option>' +
-    deliveryTemplates.map(t => `<option value="${esc(t.name)}">${esc(t.name)}${t.article ? ' (article spécifique)' : ''}</option>`).join('');
-  ['ov-dlv-tpl', 'ov-ord-tpl', 'dlv-tpl-sel'].forEach(id => {
+  document.getElementById('tplCountBadge').textContent = deliveryTemplates.length;
+  renderTemplatesList();
+  // Mettre à jour les selects dans les modals
+  const opts = '<option value="">— Choisir un template —</option>' +
+    deliveryTemplates.map(t =>
+      `<option value="${esc(t.name)}">${esc(t.name)}${t.articleName?' ('+esc(t.articleName)+')':''}</option>`
+    ).join('');
+  ['ov-dlv-tpl','ov-ord-tpl'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) { el.innerHTML = tplOpts || '<option value="">Aucun template</option>'; }
+    if (el) el.innerHTML = opts;
   });
-  return deliveryTemplates;
 }
+
+// ── Remplir le select article dans l'éditeur ─────────────────
+function populateTplArticleSelect() {
+  const sel = document.getElementById('tpl-article');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Sélectionner un article...</option>' +
+    arts.map(a => `<option value="${a.id}" data-name="${esc(a.name)}" data-price="${esc(a.price)}">${a.emoji||'🛒'} ${esc(a.name)} — ${esc(a.price)}</option>`).join('');
+}
+
+// ── Afficher la liste des templates ──────────────────────────
+function renderTemplatesList() {
+  const el = document.getElementById('deliveryTemplatesList');
+  if (!deliveryTemplates.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📄</div><div class="empty-title">Aucun modèle</div><div class="empty-sub">Crée-en un avec ➕</div></div>';
+    return;
+  }
+  el.innerHTML = deliveryTemplates.map(t => {
+    const isLinked = t.articleId;
+    const art = arts.find(a => String(a.id) === String(t.articleId));
+    return `<div style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:${currentTplName===t.name?'rgba(124,109,250,.1)':'rgba(255,255,255,.03)'};border:1px solid ${currentTplName===t.name?'rgba(124,109,250,.4)':'var(--border)'};border-radius:var(--r2);margin-bottom:6px;cursor:pointer;transition:.12s" onclick="editTemplate('${esc(t.name)}')" onmouseenter="this.style.borderColor='rgba(124,109,250,.3)'" onmouseleave="this.style.borderColor='${currentTplName===t.name?'rgba(124,109,250,.4)':'var(--border)'}'">
+      <div style="font-size:22px">${art?.emoji||'📄'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.name)}</div>
+        <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap">
+          ${isLinked?`<span class="tag tag-violet">📦 ${esc(t.articleName||'Article')}</span>`:'<span class="tag tag-gray">🌐 Global</span>'}
+          ${t.auto?'<span class="tag tag-green">⚡ Auto</span>':''}
+          ${t.secretLines?.length?`<span class="tag tag-amber">🔐 ${t.secretLines.length} secret(s)</span>`:''}
+          <span class="tag tag-gray">.${t.format||'txt'}</span>
+        </div>
+      </div>
+      <button class="btn btn-red btn-xs" onclick="event.stopPropagation();deleteTplByName('${esc(t.name)}')">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Ouvrir éditeur — nouveau template ─────────────────────────
+function openNewTemplate() {
+  currentTplName = null;
+  secretLines    = [];
+  document.getElementById('tplEditorTitle').textContent = '✏️ Nouveau modèle';
+  document.getElementById('tpl-name').value    = '';
+  document.getElementById('tpl-article').value = '';
+  document.getElementById('tpl-content').value = '';
+  document.getElementById('tpl-format').value  = 'txt';
+  document.getElementById('tpl-dm').value      = '✅ Merci pour ton achat ! Voici ta livraison 📦';
+  document.getElementById('tpl-wm').checked     = false;
+  document.getElementById('tpl-ticket').checked = true;
+  document.getElementById('tpl-auto').checked   = true;
+  document.getElementById('tpl-delete-btn').style.display = 'none';
+  renderSecretLines();
+  updateTplPreview();
+  document.getElementById('deliveryEditor').style.display = 'block';
+  document.getElementById('deliveryEditor').scrollIntoView({behavior:'smooth'});
+}
+
+// ── Éditer un template existant ───────────────────────────────
+function editTemplate(name) {
+  const t = deliveryTemplates.find(x => x.name === name);
+  if (!t) return;
+  currentTplName = name;
+  secretLines    = t.secretLines ? JSON.parse(JSON.stringify(t.secretLines)) : [];
+  document.getElementById('tplEditorTitle').textContent = '✏️ ' + name;
+  document.getElementById('tpl-name').value    = t.name;
+  document.getElementById('tpl-article').value = t.articleId || '';
+  document.getElementById('tpl-content').value = t.content || '';
+  document.getElementById('tpl-format').value  = t.format || 'txt';
+  document.getElementById('tpl-dm').value      = t.dm || '';
+  document.getElementById('tpl-wm').checked     = t.watermark || false;
+  document.getElementById('tpl-ticket').checked = t.ticket !== false;
+  document.getElementById('tpl-auto').checked   = t.auto || false;
+  document.getElementById('tpl-delete-btn').style.display = 'inline-flex';
+  renderSecretLines();
+  updateTplPreview();
+  document.getElementById('deliveryEditor').style.display = 'block';
+  document.getElementById('deliveryEditor').scrollIntoView({behavior:'smooth'});
+  renderTemplatesList();
+}
+
+// ── Article change → auto-remplir le nom ─────────────────────
+function onTplArticleChange() {
+  const sel  = document.getElementById('tpl-article');
+  const opt  = sel?.options[sel.selectedIndex];
+  const name = document.getElementById('tpl-name');
+  if (opt?.value && name && !name.value) {
+    name.value = 'Livraison ' + (opt.dataset.name || '');
+  }
+}
+
+// ── Gestion des lignes secrètes ───────────────────────────────
+function renderSecretLines() {
+  const container = document.getElementById('secretLinesContainer');
+  if (!container) return;
+  container.innerHTML = secretLines.map((line, i) => `
+    <div style="display:flex;gap:7px;align-items:center">
+      <input class="form-input" style="flex:0 0 140px;font-size:12px;padding:7px 10px" placeholder="Label (ex: Email)" value="${esc(line.label||'')}" oninput="secretLines[${i}].label=this.value;updateTplPreview()">
+      <input class="form-input" style="flex:1;font-size:12px;padding:7px 10px;font-family:'JetBrains Mono',monospace" placeholder="Valeur (compte, clé, lien...)" value="${esc(line.value||'')}" oninput="secretLines[${i}].value=this.value;updateTplPreview()">
+      <button class="btn btn-red btn-xs" onclick="removeSecretLine(${i})">✕</button>
+    </div>`).join('');
+}
+
+function addSecretLine() {
+  secretLines.push({ label: '', value: '' });
+  renderSecretLines();
+}
+
+function removeSecretLine(i) {
+  secretLines.splice(i, 1);
+  renderSecretLines();
+  updateTplPreview();
+}
+
+// ── Aperçu en temps réel ─────────────────────────────────────
+function updateTplPreview() {
+  const artSel = document.getElementById('tpl-article');
+  const artOpt = artSel?.options[artSel?.selectedIndex];
+  const DLV_VARS = {
+    '{acheteur}':    'Jean_Discord',
+    '{date}':        new Date().toLocaleDateString('fr-FR'),
+    '{article}':     artOpt?.dataset?.name || 'Article Test',
+    '{prix}':        artOpt?.dataset?.price || '9.99€',
+    '{commande_id}': 'CMD-0001',
+    '{serveur}':     'NexusBot',
+  };
+  let preview = document.getElementById('tpl-content')?.value || '';
+  Object.entries(DLV_VARS).forEach(([k, v]) => { preview = preview.split(k).join(v); });
+
+  // Injecter les lignes secrètes dans l'aperçu
+  if (secretLines.filter(l => l.label || l.value).length) {
+    preview += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━\n🔐 ACCÈS / LIVRAISON\n━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+    secretLines.forEach(l => { if (l.label || l.value) preview += `${l.label||'—'} : ${l.value||'—'}
+`; });
+    preview += '━━━━━━━━━━━━━━━━━━━━━━━━━';
+  }
+
+  const prev = document.getElementById('tplPreview');
+  if (prev) prev.textContent = preview || 'Contenu vide...';
+}
+
+// ── Sauvegarder dans Supabase ────────────────────────────────
+async function saveTplToDB() {
+  const artSel    = document.getElementById('tpl-article');
+  const artOpt    = artSel?.options[artSel?.selectedIndex];
+  const name      = document.getElementById('tpl-name')?.value.trim();
+  const content   = document.getElementById('tpl-content')?.value.trim();
+  const articleId = artSel?.value || null;
+
+  if (!name)      { toast('Nom du modèle requis', 'warn'); return; }
+  if (!articleId) { toast('Sélectionner un article', 'warn'); return; }
+  if (!content && !secretLines.length) { toast('Contenu ou lignes secrètes requises', 'warn'); return; }
+
+  const body = {
+    name,
+    content,
+    format:      document.getElementById('tpl-format')?.value || 'txt',
+    dm:          document.getElementById('tpl-dm')?.value || '',
+    watermark:   document.getElementById('tpl-wm')?.checked || false,
+    ticket:      document.getElementById('tpl-ticket')?.checked || false,
+    auto:        document.getElementById('tpl-auto')?.checked || false,
+    articleId,
+    articleName: artOpt?.dataset?.name || '',
+    secretLines: secretLines.filter(l => l.label || l.value),
+  };
+
+  const d = await api('/api/delivery-templates', { method: 'POST', body: JSON.stringify(body) });
+  if (d?.ok) {
+    currentTplName = name;
+    toast('✅ Modèle sauvegardé dans Supabase !', 'ok');
+    await loadDeliveryTemplates();
+    renderTemplatesList();
+  } else {
+    toast(d?.error || 'Erreur de sauvegarde', 'err');
+  }
+}
+
+// ── Supprimer un template ─────────────────────────────────────
+async function deleteTpl() {
+  if (currentTplName) await deleteTplByName(currentTplName);
+}
+async function deleteTplByName(name) {
+  if (!confirm('Supprimer le modèle "' + name + '" ?')) return;
+  const d = await api('/api/delivery-templates/' + encodeURIComponent(name), { method: 'DELETE' });
+  if (d?.ok) {
+    if (currentTplName === name) {
+      currentTplName = null;
+      document.getElementById('deliveryEditor').style.display = 'none';
+    }
+    toast('🗑️ Modèle supprimé', 'ok');
+    await loadDeliveryTemplates();
+  } else toast('Erreur', 'err');
+}
+
+// ── Tester une livraison ──────────────────────────────────────
+function openTestDelivery() {
+  const name = document.getElementById('tpl-name')?.value.trim();
+  if (!name) { toast('Sauvegarde le modèle dabord', 'warn'); return; }
+  document.getElementById('dlv-test-uid').value = '';
+  openOv('ov-dlvtest');
+}
+async function execDeliveryTest() {
+  const uid  = document.getElementById('dlv-test-uid')?.value.trim();
+  const name = document.getElementById('tpl-name')?.value.trim() || currentTplName;
+  if (!uid)  { toast('ID Discord requis', 'warn'); return; }
+
+  const tpl = deliveryTemplates.find(t => t.name === name);
+  const artSel = document.getElementById('tpl-article');
+  const artOpt = artSel?.options[artSel?.selectedIndex];
+
+  // Construire un faux order de test
+  const fakeOrder = {
+    id: 'CMD-TEST',
+    discordId: uid,
+    userId: uid,
+    username: 'Test_User',
+    articleName: artOpt?.dataset?.name || 'Article Test',
+    price: artOpt?.dataset?.price || '9.99€',
+    date: new Date().toLocaleDateString('fr-FR'),
+  };
+
+  const body = {
+    templateName:  name,
+    customContent: document.getElementById('tpl-content')?.value || tpl?.content || '',
+    format:        document.getElementById('tpl-format')?.value || tpl?.format || 'txt',
+    dm:            document.getElementById('tpl-dm')?.value || tpl?.dm || '',
+    watermark:     document.getElementById('tpl-wm')?.checked ?? tpl?.watermark ?? false,
+    ticket:        false,
+    secretLines:   secretLines.filter(l => l.label || l.value),
+  };
+
+  // Créer un faux order temporaire dans le bot pour le test
+  const d = await api('/api/delivery/test', { method: 'POST', body: JSON.stringify({ userId: uid, template: { ...body, content: body.customContent, secretLines: body.secretLines } }) });
+  if (d?.ok) { toast('📤 Test envoyé en DM !', 'ok'); closeOv('ov-dlvtest'); }
+  else toast(d?.error || 'Erreur', 'err');
+}
+
+// ── Publier le catalogue sur Discord ─────────────────────────
+async function publishCatalogue() {
+  const channelId = document.getElementById('cat-channel')?.value;
+  const shopUrl   = document.getElementById('cat-url')?.value.trim();
+  const showStock = document.getElementById('cat-stock')?.checked !== false;
+  const showLink  = document.getElementById('cat-link')?.checked || false;
+  const mention   = document.getElementById('cat-mention')?.value || '';
+
+  if (!channelId) { toast('Sélectionner un salon', 'warn'); return; }
+
+  toast('📢 Publication en cours...', 'info');
+  const d = await api('/api/catalogue', {
+    method: 'POST',
+    body: JSON.stringify({ channelId, shopUrl, showStock, showLink, mention }),
+  });
+
+  if (d?.ok) toast(`✅ Catalogue publié dans #${d.channel} — ${d.count} articles !`, 'ok');
+  else toast(d?.error || 'Erreur', 'err');
+}
+
+// ── Livraison manuelle depuis le panel orders ─────────────────
+async function openDeliverModal(orderId, username, articleName) {
+  document.getElementById('ov-dlv-id').value               = orderId;
+  document.getElementById('ov-dlv-ordid').textContent       = orderId;
+  document.getElementById('ov-dlv-username').textContent    = username || '—';
+  document.getElementById('ov-dlv-article').textContent     = articleName || '—';
+  document.getElementById('ov-dlv-result').style.display   = 'none';
+  document.getElementById('ov-dlv-content').value          = '';
+  document.getElementById('ov-dlv-dm').value               = '✅ Merci pour ton achat ! Voici ta livraison 📦';
+  if (!deliveryTemplates.length) await loadDeliveryTemplates();
+  // Pré-sélectionner le template de l'article si disponible
+  const order = allOrdersData.find(o => o.id === orderId);
+  if (order?.articleId) {
+    const matchTpl = deliveryTemplates.find(t => String(t.articleId) === String(order.articleId));
+    const sel = document.getElementById('ov-dlv-tpl');
+    if (sel && matchTpl) sel.value = matchTpl.name;
+  }
+  openOv('ov-deliver');
+}
+
+// ── Prévisualiser template dans modal livraison ───────────────
+function previewDeliveryTemplate() {
+  const name = document.getElementById('ov-dlv-tpl')?.value;
+  const tpl  = deliveryTemplates.find(t => t.name === name);
+  const prev = document.getElementById('ov-dlv-tpl-preview');
+  if (!prev) return;
+  if (tpl) {
+    prev.style.display = 'block';
+    const DLV_VARS = { '{acheteur}':'Jean_Discord','{date}':new Date().toLocaleDateString('fr-FR'),'{article}':document.getElementById('ov-dlv-article')?.textContent||'Article','{prix}':'9.99€','{commande_id}':document.getElementById('ov-dlv-id')?.value||'CMD-0001','{serveur}':'NexusBot' };
+    let preview = tpl.content || '';
+    Object.entries(DLV_VARS).forEach(([k,v]) => { preview = preview.split(k).join(v); });
+    if (tpl.secretLines?.length) {
+      preview += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━\n🔐 ACCÈS / LIVRAISON\n━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+      tpl.secretLines.forEach(l => { if (l.label||l.value) preview += `${l.label||'—'} : ${l.value||'—'}
+`; });
+      preview += '━━━━━━━━━━━━━━━━━━━━━━━━━';
+    }
+    prev.textContent = preview;
+  } else { prev.style.display = 'none'; }
+}
+
+async function sendDelivery(closeAfter = false) {
+  const id     = document.getElementById('ov-dlv-id')?.value;
+  const isTpl  = !document.querySelector('#dlvm-tpl')?.style.display || document.querySelector('#dlvm-tpl')?.style.display !== 'none';
+  const wm     = document.getElementById('ov-dlv-wm')?.checked || false;
+  const ticket = document.getElementById('ov-dlv-ticket')?.checked || false;
+  let body = { watermark: wm, ticket };
+
+  if (isTpl) {
+    const tplName = document.getElementById('ov-dlv-tpl')?.value;
+    if (!tplName) { toast('Sélectionner un template', 'warn'); return; }
+    const tpl = deliveryTemplates.find(t => t.name === tplName);
+    if (!tpl) { toast('Template introuvable', 'err'); return; }
+    body = { ...body, templateName: tplName, customContent: tpl.content, format: tpl.format || 'txt', dm: tpl.dm || '', secretLines: tpl.secretLines || [] };
+  } else {
+    const c = document.getElementById('ov-dlv-content')?.value.trim();
+    if (!c) { toast('Contenu requis', 'warn'); return; }
+    body = { ...body, customContent: c, format: document.getElementById('ov-dlv-fmt')?.value || 'txt', dm: document.getElementById('ov-dlv-dm')?.value || '' };
+  }
+
+  const resultEl = document.getElementById('ov-dlv-result');
+  resultEl.style.display = 'block';
+  resultEl.style.cssText += ';background:rgba(124,109,250,.08);border:1px solid rgba(124,109,250,.2);color:#c4b5fd;border-radius:var(--r2);padding:10px 13px';
+  resultEl.textContent = '📤 Envoi en cours...';
+
+  const d = await api('/api/orders/' + id + '/deliver', { method: 'POST', body: JSON.stringify(body) });
+  if (d?.ok) {
+    resultEl.style.cssText += ';background:rgba(0,229,160,.08);border-color:rgba(0,229,160,.25);color:var(--emerald)';
+    resultEl.textContent = '✅ Envoyé à ' + d.username + ' — ' + d.filename;
+    toast('📦 Livraison envoyée à ' + d.username + ' !', 'ok');
+    loadOrders();
+    if (closeAfter) setTimeout(() => closeOv('ov-deliver'), 1500);
+  } else {
+    resultEl.style.cssText += ';background:rgba(255,77,109,.08);border-color:rgba(255,77,109,.25);color:var(--rose)';
+    resultEl.textContent = '❌ ' + (d?.error || 'Erreur');
+    toast('❌ ' + (d?.error || 'Erreur'), 'err');
+  }
+}
+async function sendDeliveryAndClose() { await sendDelivery(true); }
 
 // Afficher/masquer options livraison selon statut
 function toggleDeliveryOptions() {
@@ -2131,160 +2533,6 @@ function toggleDeliveryOptions() {
   if (opts) opts.style.display = status === 'delivered' ? 'block' : 'none';
 }
 
-// Ouvrir le modal de livraison manuelle
-async function openDeliverModal(orderId, username, articleName) {
-  document.getElementById('ov-dlv-id').value      = orderId;
-  document.getElementById('ov-dlv-ordid').textContent = orderId;
-  document.getElementById('ov-dlv-username').textContent = username || '—';
-  document.getElementById('ov-dlv-article').textContent  = articleName || '—';
-  document.getElementById('ov-dlv-result').style.display = 'none';
-  document.getElementById('ov-dlv-content').value = '';
-  document.getElementById('ov-dlv-dm').value = '✅ Merci pour ton achat ! Voici ta livraison 📦';
-
-  // Charger les templates
-  await loadDeliveryTemplates();
-
-  openOv('ov-deliver');
-}
-
-// Prévisualiser un template sélectionné
-function previewDeliveryTemplate() {
-  const name = document.getElementById('ov-dlv-tpl')?.value;
-  const tpl  = deliveryTemplates.find(t => t.name === name);
-  const prev = document.getElementById('ov-dlv-tpl-preview');
-  if (!prev) return;
-  if (tpl && tpl.content) {
-    prev.style.display = 'block';
-    const DLV_VARS = {
-      '{acheteur}':    'Jean_Discord',
-      '{date}':        new Date().toLocaleDateString('fr-FR'),
-      '{article}':     document.getElementById('ov-dlv-article')?.textContent || 'Article',
-      '{prix}':        '9.99€',
-      '{commande_id}': document.getElementById('ov-dlv-id')?.value || 'CMD-0001',
-      '{serveur}':     'NexusBot',
-    };
-    let preview = tpl.content;
-    Object.entries(DLV_VARS).forEach(([k, v]) => { preview = preview.split(k).join(v); });
-    prev.textContent = preview;
-  } else {
-    prev.style.display = 'none';
-  }
-}
-
-// Envoyer la livraison
-async function sendDelivery(closeAfter = false) {
-  const id      = document.getElementById('ov-dlv-id')?.value;
-  const isTpl   = document.getElementById('dlvm-tpl')?.style.display !== 'none';
-  const watermark = document.getElementById('ov-dlv-wm')?.checked || false;
-  const ticket    = document.getElementById('ov-dlv-ticket')?.checked || true;
-
-  let body = { watermark, ticket };
-
-  if (isTpl) {
-    const tplName = document.getElementById('ov-dlv-tpl')?.value;
-    if (!tplName) { toast('Sélectionner un template', 'warn'); return; }
-    body.templateName = tplName;
-    const tpl = deliveryTemplates.find(t => t.name === tplName);
-    if (tpl) {
-      body.customContent = tpl.content;
-      body.format = tpl.format || 'txt';
-      body.dm     = tpl.dm || '✅ Merci pour ton achat !';
-    }
-  } else {
-    const customContent = document.getElementById('ov-dlv-content')?.value.trim();
-    if (!customContent) { toast('Contenu requis', 'warn'); return; }
-    body.customContent = customContent;
-    body.format = document.getElementById('ov-dlv-fmt')?.value || 'txt';
-    body.dm     = document.getElementById('ov-dlv-dm')?.value || '✅ Livraison !';
-  }
-
-  const resultEl = document.getElementById('ov-dlv-result');
-  resultEl.style.display = 'block';
-  resultEl.style.background = 'rgba(124,109,250,.08)';
-  resultEl.style.border = '1px solid rgba(124,109,250,.2)';
-  resultEl.style.color = '#c4b5fd';
-  resultEl.textContent = '📤 Envoi en cours...';
-
-  const d = await api('/api/orders/' + id + '/deliver', {
-    method: 'POST',
-    body: JSON.stringify(body),
-  });
-
-  if (d?.ok) {
-    resultEl.style.background = 'rgba(0,229,160,.08)';
-    resultEl.style.border     = '1px solid rgba(0,229,160,.25)';
-    resultEl.style.color      = 'var(--emerald)';
-    resultEl.textContent      = '✅ Livraison envoyée à ' + d.username + ' ! Fichier : ' + d.filename;
-    toast('📦 Livraison envoyée en DM à ' + d.username + ' !', 'ok');
-    loadOrders();
-    if (closeAfter) setTimeout(() => closeOv('ov-deliver'), 1500);
-  } else {
-    resultEl.style.background = 'rgba(255,77,109,.08)';
-    resultEl.style.border     = '1px solid rgba(255,77,109,.25)';
-    resultEl.style.color      = 'var(--rose)';
-    resultEl.textContent      = '❌ Erreur : ' + (d?.error || 'Connexion impossible');
-    toast('❌ ' + (d?.error || 'Erreur'), 'err');
-  }
-}
-
-async function sendDeliveryAndClose() {
-  await sendDelivery(true);
-}
-
-// Sauvegarder un template de livraison dans la DB bot (Supabase)
-async function saveDeliveryToDB() {
-  const name    = document.getElementById('dlv-name')?.value.trim();
-  const content = document.getElementById('dlv-content')?.value.trim();
-  if (!name || !content) { toast('Nom et contenu requis', 'warn'); return; }
-
-  const body = {
-    name,
-    content,
-    format:    document.getElementById('dlv-format')?.value || 'txt',
-    article:   document.getElementById('dlv-article')?.value || '',
-    dm:        document.getElementById('dlv-dm')?.value || '',
-    watermark: document.getElementById('dlv-wm')?.checked || false,
-    ticket:    document.getElementById('dlv-ticket')?.checked || false,
-    auto:      document.getElementById('dlv-auto')?.checked || false,
-  };
-
-  const d = await api('/api/delivery-templates', {
-    method: 'POST',
-    body: JSON.stringify(body),
-  });
-
-  if (d?.ok) {
-    toast('✅ Template sauvegardé dans Supabase !', 'ok');
-    // Sauvegarder aussi localement
-    const localIdx = dlvTemplates.findIndex(t => t.name === name);
-    if (localIdx >= 0) dlvTemplates[localIdx] = body;
-    else dlvTemplates.push(body);
-    localStorage.setItem('dlvTpls', JSON.stringify(dlvTemplates));
-    currentDlvIdx = dlvTemplates.length - 1;
-    renderDeliveryList();
-    await loadDeliveryTemplates();
-  } else {
-    toast(d?.error || 'Erreur de sauvegarde', 'err');
-  }
-}
-
-// Supprimer un template de la DB bot
-async function deleteDeliveryFromDB(name) {
-  if (!confirm('Supprimer le template "' + name + '" ?')) return;
-  const d = await api('/api/delivery-templates/' + encodeURIComponent(name), { method: 'DELETE' });
-  if (d?.ok) {
-    toast('🗑️ Template supprimé', 'ok');
-    await loadDeliveryTemplates();
-  } else toast('Erreur', 'err');
-}
-
-// Charger les templates au chargement de la page livraison
-const origLoadDelivery = loadDelivery;
-async function loadDelivery() {
-  if (!arts.length) await loadShop();
-  renderDeliveryList();
-  await loadDeliveryTemplates();
-}
 
 // ─── INIT ──────────────────────────────────────────────────────
 async function init(){
