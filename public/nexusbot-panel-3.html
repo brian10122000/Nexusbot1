@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusBot — Command Center v8</title>
+  <meta name="description" content="Panel admin ultra-complet pour NexusBot">
+  <style>
+/* NEXUSBOT COMMAND CENTER v8 — Ultra Premium Admin Panel */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  /* Core */
+  --ink:#04050a;--ink2:#080b14;--ink3:#0d1120;--ink4:#111827;
+  --glass:rgba(255,255,255,.03);--glass2:rgba(255,255,255,.06);--glass3:rgba(255,255,255,.09);
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--border3:rgba(255,255,255,.18);
+  /* Accents */
+  --violet:#7c6dfa;--purple:#a855f7;--cyan:#06d6ff;--emerald:#00e5a0;
+  --rose:#ff4d6d;--amber:#ffb703;--sky:#38bdf8;--orange:#ff6b35;
+  /* Text */
+  --t0:#f8faff;--t1:#c8d0e8;--t2:#7a85a8;--t3:#3a4060;--t4:#1e2340;
+  /* Gradients */
+  --grad-main:linear-gradient(135deg,#7c6dfa,#a855f7);
+  --grad-cyan:linear-gradient(135deg,#06d6ff,#00e5a0);
+  --grad-rose:linear-gradient(135deg,#ff4d6d,#ff6b35);
+  --grad-amber:linear-gradient(135deg,#ffb703,#ff6b35);
+  /* Shadows */
+  --shadow-violet:0 0 40px rgba(124,109,250,.25);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.4);
+  --shadow-md:0 8px 32px rgba(0,0,0,.5);
+  --shadow-lg:0 24px 64px rgba(0,0,0,.6);
+  /* Radii */
+  --r1:6px;--r2:10px;--r3:14px;--r4:20px;--r5:28px;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:14px;scroll-behavior:smooth}
+body{
+  font-family:'Outfit',system-ui,sans-serif;
+  background:var(--ink);color:var(--t0);
+  min-height:100vh;overflow-x:hidden;
+  line-height:1.5;
+}
+
+/* ═══ ANIMATED BACKGROUND ═══ */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 0%,rgba(124,109,250,.08) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 100%,rgba(168,85,247,.06) 0%,transparent 70%),
+    radial-gradient(ellipse 30% 30% at 50% 50%,rgba(6,214,255,.04) 0%,transparent 70%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(124,109,250,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,109,250,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask:radial-gradient(ellipse at center,black 20%,transparent 80%);
+}
+
+/* ═══ SHELL ═══ */
+.shell{display:flex;min-height:100vh;position:relative;z-index:1}
+
+/* ═══ SIDEBAR ═══ */
+.sb{
+  width:260px;flex-shrink:0;display:flex;flex-direction:column;
+  background:rgba(4,5,10,.9);backdrop-filter:blur(32px);
+  border-right:1px solid var(--border);
+  position:fixed;top:0;left:0;bottom:0;z-index:50;
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+}
+.sb-brand{
+  padding:20px 18px 16px;border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.sb-brand::after{
+  content:'';position:absolute;bottom:0;left:18px;right:18px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--violet),transparent);opacity:.5;
+}
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sb-gem{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--grad-main);display:flex;align-items:center;justify-content:center;
+  font-size:18px;box-shadow:var(--shadow-violet),0 0 0 1px rgba(124,109,250,.3);
+  flex-shrink:0;
+}
+.sb-title{
+  font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;
+  background:var(--grad-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-.3px;
+}
+.sb-subtitle{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:1px}
+.sb-guild{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:8px 10px;
+}
+.sb-guild-icon{width:24px;height:24px;border-radius:6px;background:var(--grad-main);object-fit:cover;flex-shrink:0}
+.sb-guild-name{font-size:12px;font-weight:600;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-status{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t2);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* NAV */
+.sb-nav{flex:1;overflow-y:auto;padding:10px 10px;scrollbar-width:none}
+.sb-nav::-webkit-scrollbar{display:none}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);padding:14px 8px 6px;font-family:'JetBrains Mono',monospace}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  border-radius:var(--r2);cursor:pointer;border:none;background:none;
+  width:100%;text-align:left;font-size:13px;font-weight:500;
+  color:var(--t2);font-family:'Outfit',sans-serif;
+  transition:all .15s;position:relative;margin-bottom:1px;
+}
+.sb-item:hover{background:var(--glass2);color:var(--t1)}
+.sb-item.active{
+  background:linear-gradient(135deg,rgba(124,109,250,.15),rgba(168,85,247,.06));
+  color:#c4b5fd;border:1px solid rgba(124,109,250,.2);font-weight:600;
+}
+.sb-item.active::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;
+  width:2.5px;border-radius:2px;background:var(--grad-main);
+}
+.sb-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sb-badge{
+  margin-left:auto;font-size:9px;font-weight:700;padding:2px 6px;
+  border-radius:20px;font-family:'JetBrains Mono',monospace;
+}
+.badge-v{background:rgba(124,109,250,.2);color:#c4b5fd}
+.badge-g{background:rgba(0,229,160,.18);color:var(--emerald)}
+.badge-y{background:rgba(255,183,3,.18);color:var(--amber)}
+.badge-r{background:rgba(255,77,109,.18);color:var(--rose)}
+.badge-c{background:rgba(6,214,255,.18);color:var(--cyan)}
+
+/* ═══ MAIN ═══ */
+.main{margin-left:260px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{
+  height:56px;display:flex;align-items:center;padding:0 24px;gap:10px;
+  background:rgba(4,5,10,.7);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40;
+}
+.topbar-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;flex:1}
+.topbar-search{
+  display:flex;align-items:center;gap:7px;
+  background:var(--glass2);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:6px 11px;
+  font-size:12px;color:var(--t2);cursor:text;
+  transition:.15s;
+}
+.topbar-search:hover{border-color:var(--border3);color:var(--t1)}
+.topbar-search input{background:none;border:none;outline:none;color:var(--t0);font-size:12.5px;font-family:'Outfit',sans-serif;width:200px}
+.topbar-search input::placeholder{color:var(--t3)}
+
+/* CONTENT */
+.content{flex:1;padding:20px 24px;max-width:1600px}
+
+/* ═══ PAGE SYSTEM ═══ */
+.page{display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ═══ COMPONENTS ═══ */
+
+/* Page Header */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.ph-left{}
+.ph-title{font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1.2}
+.ph-sub{font-size:12.5px;color:var(--t2);margin-top:4px}
+.ph-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* Cards */
+.card{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:var(--r3);padding:18px;position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);
+}
+.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:14px;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:6px}
+.card-title .icon{font-size:14px}
+
+/* Stat Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:18px}
+.stat-card{
+  background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);
+  padding:16px;position:relative;overflow:hidden;cursor:default;
+  transition:.2s;
+}
+.stat-card:hover{border-color:var(--border3);transform:translateY(-2px)}
+.stat-glow{position:absolute;width:80px;height:80px;border-radius:50%;filter:blur(30px);opacity:.2;top:-20px;right:-15px}
+.stat-icon{font-size:20px;margin-bottom:8px}
+.stat-value{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;line-height:1;letter-spacing:-1px}
+.stat-label{font-size:10.5px;color:var(--t2);margin-top:5px;font-weight:500}
+.stat-delta{font-size:10px;color:var(--emerald);margin-top:3px;font-family:'JetBrains Mono',monospace}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 15px;
+  border-radius:var(--r2);font-size:12.5px;font-weight:600;cursor:pointer;
+  border:none;transition:.15s;font-family:'Outfit',sans-serif;white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--grad-main);color:#fff;box-shadow:0 4px 15px rgba(124,109,250,.35)}
+.btn-primary:hover{box-shadow:0 6px 22px rgba(124,109,250,.5);transform:translateY(-1px)}
+.btn-ghost{background:var(--glass2);color:var(--t1);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--glass3);color:var(--t0);border-color:var(--border3)}
+.btn-green{background:rgba(0,229,160,.12);color:var(--emerald);border:1px solid rgba(0,229,160,.25)}
+.btn-green:hover{background:rgba(0,229,160,.2)}
+.btn-red{background:rgba(255,77,109,.12);color:var(--rose);border:1px solid rgba(255,77,109,.25)}
+.btn-red:hover{background:rgba(255,77,109,.2)}
+.btn-amber{background:rgba(255,183,3,.12);color:var(--amber);border:1px solid rgba(255,183,3,.25)}
+.btn-amber:hover{background:rgba(255,183,3,.2)}
+.btn-cyan{background:rgba(6,214,255,.12);color:var(--cyan);border:1px solid rgba(6,214,255,.25)}
+.btn-cyan:hover{background:rgba(6,214,255,.2)}
+.btn-sm{padding:5px 11px;font-size:11.5px}
+.btn-xs{padding:3px 8px;font-size:11px}
+.btn-icon{padding:7px;width:34px;height:34px;justify-content:center}
+
+/* Tags/Badges */
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:600;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.tag-green{background:rgba(0,229,160,.12);color:var(--emerald)}
+.tag-red{background:rgba(255,77,109,.12);color:var(--rose)}
+.tag-amber{background:rgba(255,183,3,.12);color:var(--amber)}
+.tag-violet{background:rgba(124,109,250,.15);color:#c4b5fd}
+.tag-cyan{background:rgba(6,214,255,.12);color:var(--cyan)}
+.tag-gray{background:rgba(255,255,255,.06);color:var(--t2)}
+
+/* Tables */
+.table-wrap{overflow-x:auto;border-radius:var(--r2);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  text-align:left;padding:10px 14px;font-size:9.5px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--t3);
+  background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;white-space:nowrap;
+}
+tbody td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tbody tr:last-child td{border:none}
+tbody tr{transition:.1s}
+tbody tr:hover td{background:rgba(255,255,255,.025)}
+
+/* Forms */
+.form-group{margin-bottom:14px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:block;font-size:10px;font-weight:700;color:var(--t2);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
+.form-input,.form-select,.form-textarea{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:10px 13px;color:var(--t0);
+  font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:.15s;
+  -webkit-appearance:none;
+}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--t3)}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:rgba(124,109,250,.6);background:rgba(124,109,250,.06);
+  box-shadow:0 0 0 3px rgba(124,109,250,.12);
+}
+.form-select option{background:#0d1120;color:var(--t0)}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.6}
+input[type=color]{height:42px;padding:3px 8px;cursor:pointer;border-radius:var(--r2)}
+.form-hint{font-size:10.5px;color:var(--t3);margin-top:5px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* Toggle Switch */
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 13px;background:rgba(255,255,255,.025);border:1px solid var(--border);
+  border-radius:var(--r2);margin-bottom:7px;transition:.12s;cursor:pointer;
+}
+.toggle-row:hover{background:var(--glass2)}
+.toggle-row:last-child{margin-bottom:0}
+.toggle-label{font-size:13px;font-weight:600;color:var(--t1)}
+.toggle-sub{font-size:11px;color:var(--t2);margin-top:2px}
+.switch{position:relative;width:42px;height:23px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.switch-track{
+  position:absolute;inset:0;background:rgba(255,255,255,.1);
+  border:1px solid var(--border2);border-radius:23px;cursor:pointer;transition:.18s;
+}
+.switch-track::before{
+  content:'';position:absolute;width:17px;height:17px;
+  left:2px;top:2px;background:var(--t2);border-radius:50%;transition:.18s;
+}
+.switch input:checked+.switch-track{background:var(--grad-main);border-color:transparent;box-shadow:0 0 12px rgba(124,109,250,.4)}
+.switch input:checked+.switch-track::before{transform:translateX(19px);background:#fff}
+
+/* Grid Layouts */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+
+/* Member Card */
+.member-card{
+  background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);
+  overflow:hidden;transition:.2s;cursor:pointer;
+}
+.member-card:hover{border-color:rgba(124,109,250,.3);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.member-banner{height:60px;background:var(--grad-main);position:relative;overflow:hidden}
+.member-banner-img{width:100%;height:100%;object-fit:cover}
+.member-avatar{
+  width:52px;height:52px;border-radius:50%;border:3px solid var(--ink);
+  position:absolute;bottom:-20px;left:14px;object-fit:cover;background:var(--ink3);
+}
+.member-body{padding:26px 14px 14px}
+.member-name{font-size:14px;font-weight:700;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-tag{font-size:10.5px;color:var(--t2);font-family:'JetBrains Mono',monospace;margin-bottom:8px}
+.member-roles{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;min-height:20px}
+.member-role{font-size:9.5px;padding:2px 7px;border-radius:4px;font-weight:600;font-family:'JetBrains Mono',monospace;border:1px solid}
+.member-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:10px}
+.member-stat{background:rgba(255,255,255,.04);border-radius:6px;padding:5px;text-align:center}
+.member-stat-v{font-size:13px;font-weight:700;font-family:'Outfit',sans-serif}
+.member-stat-l{font-size:8.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px}
+.member-actions{display:flex;gap:5px}
+
+/* Activity Feed */
+.feed-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start}
+.feed-item:last-child{border:none}
+.feed-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.feed-content{flex:1;min-width:0}
+.feed-text{font-size:12.5px;color:var(--t1);line-height:1.4}
+.feed-time{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+
+/* Voice Channels Live */
+.voice-channel{background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden;margin-bottom:10px}
+.voice-header{padding:11px 15px;background:rgba(124,109,250,.07);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.voice-name{font-weight:700;font-size:13.5px}
+.voice-count{margin-left:auto;font-size:10px;background:rgba(255,255,255,.06);padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;color:var(--t2)}
+.voice-member{display:flex;align-items:center;gap:10px;padding:9px 15px;border-bottom:1px solid rgba(255,255,255,.03);transition:.1s}
+.voice-member:last-child{border:none}
+.voice-member:hover{background:rgba(255,255,255,.02)}
+.voice-av{width:32px;height:32px;border-radius:50%;background:var(--grad-main);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;overflow:hidden}
+.voice-av img{width:100%;height:100%;object-fit:cover}
+.live-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.3);color:var(--rose);font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace}
+.live-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--rose);animation:pulse 1s infinite}
+
+/* Toasts */
+#toasts{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{
+  padding:10px 16px;border-radius:var(--r2);font-size:13px;font-weight:600;
+  backdrop-filter:blur(24px);max-width:300px;animation:toastIn .25s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 8px 30px rgba(0,0,0,.5);pointer-events:auto;
+}
+@keyframes toastIn{from{transform:translateX(60px) scale(.9);opacity:0}to{transform:none;opacity:1}}
+.toast-ok{background:rgba(0,229,160,.12);border:1px solid rgba(0,229,160,.3);color:var(--emerald)}
+.toast-err{background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.3);color:var(--rose)}
+.toast-info{background:rgba(124,109,250,.12);border:1px solid rgba(124,109,250,.3);color:#c4b5fd}
+.toast-warn{background:rgba(255,183,3,.12);border:1px solid rgba(255,183,3,.3);color:var(--amber)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r4);padding:24px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:var(--shadow-lg)}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--violet),transparent);opacity:.4}
+.modal-title{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px;letter-spacing:-.3px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0}
+.divider span{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);white-space:nowrap;font-family:'JetBrains Mono',monospace}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Empty State */
+.empty{text-align:center;padding:48px 20px;color:var(--t2)}
+.empty-icon{font-size:42px;margin-bottom:12px;opacity:.35}
+.empty-title{font-size:14px;color:var(--t1);font-weight:600;margin-bottom:4px}
+.empty-sub{font-size:12px}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:var(--r2);padding:3px;border:1px solid var(--border);margin-bottom:16px;width:fit-content}
+.tab{padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--t2);transition:.15s;font-family:'Outfit',sans-serif}
+.tab.active{background:var(--grad-main);color:#fff;box-shadow:0 3px 10px rgba(124,109,250,.35)}
+.tab:not(.active):hover{color:var(--t1);background:var(--glass2)}
+
+/* Progress Bar */
+.progress{height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:var(--grad-main);transition:.3s}
+
+/* Chart placeholder */
+.chart-area{background:rgba(255,255,255,.025);border-radius:var(--r2);border:1px solid var(--border);padding:16px;position:relative;overflow:hidden}
+
+/* Embed Preview */
+.embed-preview{border-left:4px solid var(--violet);background:rgba(124,109,250,.07);border-radius:0 8px 8px 0;padding:12px 14px}
+.embed-title{font-size:14px;font-weight:700;margin-bottom:5px}
+.embed-desc{font-size:12.5px;color:var(--t1);line-height:1.5}
+
+/* Stock Cards */
+.stock-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden;transition:.2s}
+.stock-card:hover{border-color:rgba(124,109,250,.25)}
+.stock-top{display:flex;align-items:center;gap:11px;padding:13px 14px;border-bottom:1px solid var(--border)}
+.stock-emoji{font-size:22px;flex-shrink:0}
+.stock-name{font-size:14px;font-weight:700;line-height:1.2}
+.stock-price{font-size:11px;color:var(--emerald);font-family:'JetBrains Mono',monospace;font-weight:600;margin-top:2px}
+.stock-badge{margin-left:auto;flex-shrink:0}
+.stock-controls{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.15)}
+.stock-value{font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;min-width:55px;text-align:center}
+.stock-value.infinite{color:var(--cyan)}
+.stock-value.zero{color:var(--rose)}
+.stock-value.low{color:var(--amber)}
+.stock-btns{display:flex;gap:6px}
+.stock-btn{
+  width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.07);
+  border:1px solid var(--border2);color:var(--t1);font-size:18px;cursor:pointer;
+  transition:.12s;display:flex;align-items:center;justify-content:center;font-weight:700;
+}
+.stock-btn:hover{background:rgba(124,109,250,.2);color:var(--t0);border-color:rgba(124,109,250,.4)}
+.stock-btn.minus:hover{background:rgba(255,77,109,.2);color:var(--rose);border-color:rgba(255,77,109,.4)}
+.stock-actions{display:flex;gap:5px;padding:10px 14px;flex-wrap:wrap}
+
+/* Giveaway Cards */
+.gw-card{background:var(--glass);border:1px solid rgba(255,183,3,.2);border-radius:var(--r3);padding:16px;position:relative;overflow:hidden;transition:.2s}
+.gw-card.ended{border-color:var(--border);opacity:.8}
+.gw-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad-amber)}
+.gw-card.ended::before{background:linear-gradient(90deg,var(--t3),var(--t4))}
+
+/* Welcome Preview */
+.welcome-demo{background:rgba(0,0,0,.4);border-radius:var(--r2);padding:14px}
+
+/* Checkerboard for avatar fallback */
+.av-fallback{background:linear-gradient(135deg,var(--grad-main))}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:5px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+
+/* Mobile */
+@media(max-width:768px){
+  .sb{transform:translateX(-100%)}
+  .sb.open{transform:none}
+  .main{margin-left:0}
+  .mob-btn{display:flex!important}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .content{padding:14px}
+}
+.mob-btn{
+  display:none;position:fixed;bottom:16px;left:16px;z-index:100;
+  width:46px;height:46px;border-radius:13px;background:var(--grad-main);
+  border:none;cursor:pointer;font-size:20px;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(124,109,250,.5);
+}
+
+  </style>
+</head>
+<body>
+<div class="shell">
+<!-- SIDEBAR -->
+<aside class="sb" id="sb">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <div class="sb-gem">⚡</div>
+      <div>
+        <div class="sb-title">NexusBot</div>
+        <div class="sb-subtitle">COMMAND CENTER v8</div>
+      </div>
+    </div>
+    <div class="sb-guild">
+      <img id="guildIcon" class="sb-guild-icon" src="" onerror="this.style.display='none'">
+      <div>
+        <div class="sb-guild-name" id="guildName">Chargement...</div>
+        <div class="sb-status"><span class="sb-dot"></span><span id="botStatus">Connexion...</span></div>
+      </div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Vue d'ensemble</div>
+    <button class="sb-item active" onclick="go('dashboard')"><span class="sb-icon">📊</span>Dashboard</button>
+    <button class="sb-item" onclick="go('activity')"><span class="sb-icon">📡</span>Activité live<span class="sb-badge badge-g" id="liveCount">0</span></button>
+
+    <div class="sb-section">Membres</div>
+    <button class="sb-item" onclick="go('members')"><span class="sb-icon">👥</span>Tous les membres<span class="sb-badge badge-v" id="membCount">0</span></button>
+    <button class="sb-item" onclick="go('economy')"><span class="sb-icon">💰</span>Économie & XP</button>
+    <button class="sb-item" onclick="go('moderation')"><span class="sb-icon">🛡️</span>Modération<span class="sb-badge badge-r" id="warnCount">0</span></button>
+    <button class="sb-item" onclick="go('bans')"><span class="sb-icon">🔨</span>Bannis</button>
+
+    <div class="sb-section">Commandes</div>
+    <button class="sb-item" onclick="go('editor')"><span class="sb-icon">💻</span>Éditeur de code</button>
+    <button class="sb-item" onclick="go('cmds')"><span class="sb-icon">⚡</span>Mes commandes<span class="sb-badge badge-v" id="cmdCount">0</span></button>
+
+    <div class="sb-section">Serveur</div>
+    <button class="sb-item" onclick="go('stats-setup')"><span class="sb-icon">📈</span>Salons stats</button>
+    <button class="sb-item" onclick="go('tickets')"><span class="sb-icon">🎫</span>Tickets<span class="sb-badge badge-y" id="tickCount">0</span></button>
+    <button class="sb-item" onclick="go('giveaways')"><span class="sb-icon">🎉</span>Giveaways<span class="sb-badge badge-y" id="gwCount">0</span></button>
+    <button class="sb-item" onclick="go('welcome')"><span class="sb-icon">👋</span>Bienvenue</button>
+    <button class="sb-item" onclick="go('roles')"><span class="sb-icon">🏷️</span>Rôles</button>
+
+    <div class="sb-section">Boutique</div>
+    <button class="sb-item" onclick="go('shop')"><span class="sb-icon">🛒</span>Articles<span class="sb-badge badge-y" id="artCount">0</span></button>
+    <button class="sb-item" onclick="go('stock')"><span class="sb-icon">📦</span>Gestion stock<span class="sb-badge badge-r" id="stockAlert">0</span></button>
+    <button class="sb-item" onclick="go('orders')"><span class="sb-icon">📋</span>Commandes<span class="sb-badge badge-g" id="ordCount">0</span></button>
+    <button class="sb-item" onclick="go('delivery')"><span class="sb-icon">📄</span>Livraison</button>
+    <button class="sb-item" onclick="go('nexusstore')"><span class="sb-icon">🌐</span>NexusStore</button>
+    <button class="sb-item" onclick="go('about')"><span class="sb-icon">ℹ️</span>À propos</button>
+
+    <div class="sb-section">Système</div>
+    <button class="sb-item" onclick="go('logs')"><span class="sb-icon">📜</span>Logs</button>
+    <button class="sb-item" onclick="go('announce')"><span class="sb-icon">📢</span>Annonce</button>
+    <button class="sb-item" onclick="go('settings')"><span class="sb-icon">⚙️</span>Paramètres</button>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title" id="pageTitle">Dashboard</div>
+    <div class="topbar-search">
+      <span>🔍</span>
+      <input id="globalSearch" placeholder="Rechercher membre, article, commande..." oninput="globalSearchFn()">
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="refreshPage()">🔄 Actualiser</button>
+    <button class="btn btn-ghost btn-sm" onclick="saveAllConfig()" title="Sauvegarder configuration dans Supabase">💾 Sauvegarder</button>
+    <button class="btn btn-primary btn-sm" onclick="go('announce')">📢 Annonce</button>
+  </header>
+
+  <div class="content">
+
+<!-- ═══ PAGE: DASHBOARD ═══ -->
+<section class="page active" id="page-dashboard">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Dashboard</div><div class="ph-sub" id="db-sub">Chargement des données en cours...</div></div>
+    <div class="ph-actions">
+      <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">🔄 Refresh</button>
+    </div>
+  </div>
+  <!-- Stats Grid -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="stat-glow" style="background:#7c6dfa"></div><div class="stat-icon">👥</div><div class="stat-value" id="st-members">—</div><div class="stat-label">Membres total</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#00e5a0"></div><div class="stat-icon">🟢</div><div class="stat-value" id="st-online">—</div><div class="stat-label">En ligne</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#a855f7"></div><div class="stat-icon">🎤</div><div class="stat-value" id="st-voice">—</div><div class="stat-label">En vocal</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#ffb703"></div><div class="stat-icon">🎫</div><div class="stat-value" id="st-tickets">—</div><div class="stat-label">Tickets ouverts</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#ff4d6d"></div><div class="stat-icon">⚠️</div><div class="stat-value" id="st-warns">—</div><div class="stat-label">Warnings</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#38bdf8"></div><div class="stat-icon">📦</div><div class="stat-value" id="st-articles">—</div><div class="stat-label">Articles</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#00e5a0"></div><div class="stat-icon">📋</div><div class="stat-value" id="st-orders">—</div><div class="stat-label">Commandes</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#ff6b35"></div><div class="stat-icon">💓</div><div class="stat-value" id="st-ping">—</div><div class="stat-label">Ping bot</div></div>
+  </div>
+  <div class="grid-2" style="margin-bottom:14px">
+    <!-- Top Membres -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🏆</span>Top membres (points)</div>
+      <div id="topMembersEl"><div class="empty"><div class="empty-icon">⏳</div></div></div>
+    </div>
+    <!-- Activité récente -->
+    <div class="card">
+      <div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span class="icon">📡</span>Activité récente</span><button class="btn btn-ghost btn-xs" onclick="go('logs')">Tout voir →</button></div>
+      <div id="recentActivity"><div class="empty"><div class="empty-icon">⏳</div></div></div>
+    </div>
+  </div>
+  <!-- Vocaux live sur le dashboard -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span class="icon">🎤</span>Vocaux en direct</span><span class="tag tag-green" id="voiceLiveCount">0 membres</span></div>
+    <div id="voiceLiveEl"><div class="empty"><div class="empty-icon">🔇</div><div class="empty-title">Aucun membre en vocal</div></div></div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: ACTIVITÉ LIVE ═══ -->
+<section class="page" id="page-activity">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">📡 Activité en direct</div><div class="ph-sub">Vocaux, membres en ligne, événements temps réel</div></div>
+    <div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="loadActivity()">🔄</button></div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title"><span class="icon">🎤</span>Salons vocaux actifs</div>
+        <div id="voiceChannelsEl"><div class="empty"><div class="empty-icon">🔇</div><div class="empty-title">Aucun vocal actif</div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📊</span>Stats vocaux (top temps)</div>
+        <div id="voiceStatsEl"><div class="empty"><div class="empty-icon">⏳</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: MEMBRES ═══ -->
+<section class="page" id="page-members">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">👥 Membres</div><div class="ph-sub" id="membSub">Chargement...</div></div>
+    <div class="ph-actions">
+      <button class="btn btn-ghost btn-sm" onclick="toggleMembView()">⊞ Vue</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadMembers()">🔄</button>
+    </div>
+  </div>
+  <!-- Filtres -->
+  <div class="card" style="margin-bottom:14px;padding:12px 16px">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input class="form-input" id="membSearch" placeholder="🔍 Pseudo, ID..." style="width:200px;padding:7px 12px;font-size:12.5px" oninput="filterMembers()">
+      <select class="form-select" id="membRoleFilter" style="width:180px;padding:7px 12px;font-size:12.5px" onchange="filterMembers()">
+        <option value="">Tous les rôles</option>
+      </select>
+      <select class="form-select" id="membSort" style="width:150px;padding:7px 12px;font-size:12.5px" onchange="filterMembers()">
+        <option value="joinedAt">Date d'arrivée</option>
+        <option value="points">Points</option>
+        <option value="level">Niveau</option>
+        <option value="name">Pseudo A→Z</option>
+        <option value="warns">Warnings</option>
+        <option value="created">Création compte</option>
+      </select>
+      <span style="font-size:11.5px;color:var(--t2);margin-left:auto" id="membCount2">— membres</span>
+    </div>
+  </div>
+  <!-- Grid de membres -->
+  <div class="grid-auto" id="membersGrid">
+    <div class="empty" style="grid-column:1/-1"><div class="empty-icon">⏳</div><div class="empty-title">Chargement des membres...</div></div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: ÉCONOMIE ═══ -->
+<section class="page" id="page-economy">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">💰 Économie & XP</div><div class="ph-sub">Points, niveaux, classement</div></div>
+    <div class="ph-actions">
+      <button class="btn btn-primary btn-sm" onclick="openOv('ov-addpoints')">➕ Ajouter points</button>
+    </div>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+    <div class="stat-card"><div class="stat-glow" style="background:#ffb703"></div><div class="stat-icon">💰</div><div class="stat-value" id="eco-total">—</div><div class="stat-label">Points distribués</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#7c6dfa"></div><div class="stat-icon">⭐</div><div class="stat-value" id="eco-players">—</div><div class="stat-label">Joueurs actifs</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#00e5a0"></div><div class="stat-icon">🏆</div><div class="stat-value" id="eco-maxlvl">—</div><div class="stat-label">Niveau max</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#06d6ff"></div><div class="stat-icon">📊</div><div class="stat-value" id="eco-avg">—</div><div class="stat-label">Moyenne pts</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:6px"><span class="icon">🏆</span>Classement complet</span>
+      <input class="form-input" id="ecoSearch" placeholder="Rechercher..." style="width:180px;padding:5px 11px;font-size:12px" oninput="filterEco()">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Membre</th><th>Points</th><th>XP</th><th>Niveau</th><th>Messages</th><th>Actions</th></tr></thead>
+        <tbody id="ecoTable"><tr><td colspan="7" style="text-align:center;padding:28px;color:var(--t2)">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: MODERATION ═══ -->
+<section class="page" id="page-moderation">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">🛡️ Modération</div><div class="ph-sub">Gestion des sanctions et de l'auto-modération</div></div>
+  </div>
+  <div class="grid-2">
+    <!-- Recherche membre -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🔍</span>Rechercher un membre</div>
+      <div class="form-group">
+        <label class="form-label">ID ou pseudo Discord</label>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="modSearch" placeholder="ID Discord (ex: 123456789...)">
+          <button class="btn btn-primary" onclick="searchModMember()">Chercher</button>
+        </div>
+      </div>
+      <div id="modMemberBox" style="display:none;margin-top:14px">
+        <div style="display:flex;gap:12px;align-items:center;padding:14px;background:rgba(255,255,255,.03);border-radius:var(--r2);border:1px solid var(--border);margin-bottom:12px">
+          <img id="mod-av" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(124,109,250,.4)" onerror="this.style.display='none'">
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700" id="mod-name">—</div>
+            <div style="font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace" id="mod-id">—</div>
+            <div style="display:flex;gap:5px;margin-top:5px">
+              <span class="tag tag-amber" id="mod-warns">0 warn(s)</span>
+              <span class="tag tag-violet" id="mod-pts">0 pts</span>
+              <span class="tag tag-cyan" id="mod-lvl">Niv. 1</span>
+            </div>
+          </div>
+        </div>
+        <!-- Actions rapides -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+          <button class="btn btn-amber btn-sm" onclick="modAction('warn')">⚠️ Avertir</button>
+          <button class="btn btn-ghost btn-sm" onclick="modAction('mute')">🔇 Mute</button>
+          <button class="btn btn-red btn-sm" onclick="modAction('kick')">👢 Expulser</button>
+          <button class="btn btn-red btn-sm" onclick="modAction('ban')">🔨 Bannir</button>
+          <button class="btn btn-ghost btn-sm" onclick="modAction('addpoints')">💰 Pts</button>
+          <button class="btn btn-ghost btn-sm" onclick="modAction('clearwarns')">🗑️ Clear warns</button>
+        </div>
+        <!-- Liste des warns -->
+        <div class="card-title"><span class="icon">⚠️</span>Avertissements</div>
+        <div id="warnsList" style="background:rgba(0,0,0,.25);border-radius:var(--r2);border:1px solid var(--border);padding:10px 13px;max-height:200px;overflow-y:auto">
+          <div style="font-size:12.5px;color:var(--t2)">✅ Aucun avertissement</div>
+        </div>
+      </div>
+    </div>
+    <!-- Auto-mod config -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🤖</span>Auto-Modération</div>
+      <div class="toggle-row" onclick="toggleEl('tog-spam')"><div><div class="toggle-label">🚨 Anti-Spam</div><div class="toggle-sub">Supprime les messages répétitifs</div></div><label class="switch"><input type="checkbox" id="tog-spam" onchange="saveModConfig()"><span class="switch-track"></span></label></div>
+      <div class="toggle-row" onclick="toggleEl('tog-link')"><div><div class="toggle-label">🔗 Anti-Lien</div><div class="toggle-sub">Bloque les liens non autorisés</div></div><label class="switch"><input type="checkbox" id="tog-link" onchange="saveModConfig()"><span class="switch-track"></span></label></div>
+      <div class="toggle-row" onclick="toggleEl('tog-caps')"><div><div class="toggle-label">🔠 Anti-Caps</div><div class="toggle-sub">Limite les majuscules excessives</div></div><label class="switch"><input type="checkbox" id="tog-caps" onchange="saveModConfig()"><span class="switch-track"></span></label></div>
+      <div class="toggle-row" onclick="toggleEl('tog-auto')"><div><div class="toggle-label">⚙️ Auto-sanction</div><div class="toggle-sub">Mute automatique après 3 warns</div></div><label class="switch"><input type="checkbox" id="tog-auto" onchange="saveModConfig()"><span class="switch-track"></span></label></div>
+      <div class="toggle-row" onclick="toggleEl('tog-dm')"><div><div class="toggle-label">📩 Notif DM</div><div class="toggle-sub">DM au membre sanctionné</div></div><label class="switch"><input type="checkbox" id="tog-dm" onchange="saveModConfig()"><span class="switch-track"></span></label></div>
+      <div class="divider"><span>Actions globales</span></div>
+      <button class="btn btn-red" style="width:100%;justify-content:center" onclick="lockdown()">🚨 Lockdown serveur</button>
+    </div>
+  </div>
+  <!-- Historique sanctions -->
+  <div class="card" style="margin-top:14px">
+    <div class="card-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:6px"><span class="icon">📜</span>Sanctions récentes</span>
+      <button class="btn btn-ghost btn-xs" onclick="loadSanctions()">🔄</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Membre</th><th>Type</th><th>Raison</th><th>Modérateur</th><th>Date</th></tr></thead>
+        <tbody id="sanctionsTable"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--t2)">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: ÉDITEUR CODE ═══ -->
+<section class="page" id="page-editor">
+  <div class="ph"><div class="ph-left"><div class="ph-title">💻 Éditeur de commandes</div><div class="ph-sub">Crée des commandes Discord personnalisées</div></div></div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('ed','text',this)">💬 Texte</button>
+    <button class="tab" onclick="switchTab('ed','embed',this)">🎨 Embed</button>
+    <button class="tab" onclick="switchTab('ed','code',this)">💻 JavaScript</button>
+  </div>
+  <!-- Text Tab -->
+  <div id="ed-text" class="card">
+    <div class="card-title"><span class="icon">💬</span>Réponse texte simple</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Nom de la commande</label><input class="form-input" id="txt-name" placeholder="ma-commande" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')"></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="txt-desc" placeholder="Description de la commande"></div></div>
+    <div class="form-group"><label class="form-label">Réponse</label><textarea class="form-textarea" id="txt-reply" rows="5" placeholder="Bonjour {user} ! Bienvenue sur {server} ! 🎉&#10;Variables: {user} {server} {count} {points}"></textarea></div>
+    <div style="font-size:11.5px;color:var(--t2);background:rgba(124,109,250,.06);border:1px solid rgba(124,109,250,.2);border-radius:var(--r2);padding:8px 12px;margin-bottom:14px">📌 Variables : <code style="color:#c4b5fd">{user}</code> <code style="color:#c4b5fd">{server}</code> <code style="color:#c4b5fd">{count}</code> <code style="color:#c4b5fd">{points}</code> <code style="color:#c4b5fd">{level}</code></div>
+    <button class="btn btn-primary" onclick="saveCmd('text')">✅ Créer la commande</button>
+  </div>
+  <!-- Embed Tab -->
+  <div id="ed-embed" class="card" style="display:none">
+    <div class="card-title"><span class="icon">🎨</span>Embed stylé</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="emb-name" placeholder="mon-embed" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')"></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="emb-desc" placeholder="Description"></div></div>
+    <div class="form-group"><label class="form-label">Contenu</label><textarea class="form-textarea" id="emb-content" rows="4" oninput="updateEmbedPreview()" placeholder="Bienvenue {user} !"></textarea></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Couleur</label><input type="color" class="form-input" id="emb-color" value="#7c6dfa" oninput="updateEmbedPreview()"></div><div class="form-group"><label class="form-label">Visibilité</label><select class="form-select" id="emb-eph"><option value="false">🌍 Public</option><option value="true">👁️ Éphémère</option></select></div></div>
+    <div class="welcome-demo" style="margin-bottom:14px"><div style="font-size:10px;color:var(--t3);margin-bottom:8px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px">Aperçu</div><div class="embed-preview" id="embedPreview"><div class="embed-title" id="embed-title-prev">Titre</div><div class="embed-desc" id="embed-desc-prev">Contenu...</div></div></div>
+    <button class="btn btn-primary" onclick="saveCmd('embed')">✅ Créer l'embed</button>
+  </div>
+  <!-- Code Tab -->
+  <div id="ed-code" class="card" style="display:none">
+    <div class="card-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:6px"><span class="icon">💻</span>Code JavaScript</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="formatCode()">✨ Formater</button>
+        <button class="btn btn-amber btn-sm" onclick="validateCode()">⚡ Vérifier</button>
+        <button class="btn btn-primary btn-sm" onclick="saveCmd('code')">🚀 Déployer</button>
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px"><div class="form-group" style="margin:0"><label class="form-label">Nom</label><input class="form-input" id="code-name" placeholder="ma-commande" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')"></div><div class="form-group" style="margin:0"><label class="form-label">Description</label><input class="form-input" id="code-desc" placeholder="Description"></div></div>
+    <!-- Monaco Editor -->
+    <div style="border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;background:#06070e">
+      <div style="display:flex;align-items:center;gap:5px;padding:7px 12px;background:rgba(0,0,0,.5);border-bottom:1px solid var(--border);flex-wrap:wrap">
+        <span style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-right:4px">SNIPPETS:</span>
+        <button class="btn btn-ghost btn-xs" onclick="insertSnippet('reply')">💬 reply</button>
+        <button class="btn btn-ghost btn-xs" onclick="insertSnippet('embed')">🎨 embed</button>
+        <button class="btn btn-ghost btn-xs" onclick="insertSnippet('user')">👤 profil</button>
+        <button class="btn btn-ghost btn-xs" onclick="insertSnippet('points')">💰 points</button>
+        <button class="btn btn-ghost btn-xs" onclick="insertSnippet('top3')">🏆 top 3</button>
+        <button class="btn btn-ghost btn-xs" onclick="insertSnippet('shop')">🛒 boutique</button>
+        <button class="btn btn-ghost btn-xs" onclick="insertSnippet('crime')">🔫 crime</button>
+        <button class="btn btn-ghost btn-xs" onclick="insertSnippet('timer')">⏰ timer</button>
+        <span style="margin-left:auto;font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace" id="editorLines">— lignes</span>
+      </div>
+      <div id="monacoEl" style="width:100%;height:320px"></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:5px 13px;background:rgba(124,109,250,.06);border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t2)">
+        <span id="editorDot" style="width:5px;height:5px;border-radius:50%;background:var(--emerald);display:inline-block"></span>
+        <span id="editorStatus">Prêt — Ctrl+S pour valider</span>
+        <span style="margin-left:auto">JavaScript ES2022</span>
+      </div>
+    </div>
+    <div id="validationBox" style="display:none;margin-top:8px;padding:9px 13px;border-radius:var(--r2);font-family:'JetBrains Mono',monospace;font-size:11px;white-space:pre-wrap"></div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: COMMANDES ═══ -->
+<section class="page" id="page-cmds">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">⚡ Mes commandes</div><div class="ph-sub">Commandes personnalisées déployées</div></div>
+    <div class="ph-actions"><button class="btn btn-primary btn-sm" onclick="go('editor')">➕ Nouvelle</button></div>
+  </div>
+  <div class="grid-auto" id="cmdsGrid"><div class="empty" style="grid-column:1/-1"><div class="empty-icon">⚡</div><div class="empty-title">Aucune commande</div><div class="empty-sub">Crée-en une dans l'éditeur</div></div></div>
+</section>
+
+<!-- ═══ PAGE: STATS SETUP ═══ -->
+<section class="page" id="page-stats-setup">
+  <div class="ph"><div class="ph-left"><div class="ph-title">📈 Salons statistiques</div><div class="ph-sub">Compteurs automatiques dans Discord</div></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span>Configuration</div>
+      <div class="form-group"><label class="form-label">Nom de la catégorie</label><input class="form-input" id="statCatName" value="📊 ── STATISTIQUES ──"></div>
+      <div class="divider"><span>Sélectionner les compteurs</span></div>
+      <div id="statsPickerGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="toggle-row" onclick="toggleEl('st-members2')"><div><div class="toggle-label">👥 Membres</div></div><label class="switch"><input type="checkbox" id="st-members2" checked><span class="switch-track"></span></label></div>
+        <div class="toggle-row" onclick="toggleEl('st-humans')"><div><div class="toggle-label">👤 Humains</div></div><label class="switch"><input type="checkbox" id="st-humans" checked><span class="switch-track"></span></label></div>
+        <div class="toggle-row" onclick="toggleEl('st-bots')"><div><div class="toggle-label">🤖 Bots</div></div><label class="switch"><input type="checkbox" id="st-bots" checked><span class="switch-track"></span></label></div>
+        <div class="toggle-row" onclick="toggleEl('st-online2')"><div><div class="toggle-label">🟢 En ligne</div></div><label class="switch"><input type="checkbox" id="st-online2" checked><span class="switch-track"></span></label></div>
+        <div class="toggle-row" onclick="toggleEl('st-voice2')"><div><div class="toggle-label">🎤 En vocal</div></div><label class="switch"><input type="checkbox" id="st-voice2" checked><span class="switch-track"></span></label></div>
+        <div class="toggle-row" onclick="toggleEl('st-tickets2')"><div><div class="toggle-label">🎫 Tickets</div></div><label class="switch"><input type="checkbox" id="st-tickets2"><span class="switch-track"></span></label></div>
+        <div class="toggle-row" onclick="toggleEl('st-articles2')"><div><div class="toggle-label">📦 Articles</div></div><label class="switch"><input type="checkbox" id="st-articles2"><span class="switch-track"></span></label></div>
+        <div class="toggle-row" onclick="toggleEl('st-orders2')"><div><div class="toggle-label">📋 Commandes</div></div><label class="switch"><input type="checkbox" id="st-orders2"><span class="switch-track"></span></label></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn btn-primary" onclick="createStatsChannels()">✅ Créer les salons</button>
+        <button class="btn btn-red" onclick="deleteStatsChannels()">🗑️ Supprimer</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span>Salons actuels</div>
+      <div id="statsChannelsInfo"><div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Aucun salon actif</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: TICKETS ═══ -->
+<section class="page" id="page-tickets">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">🎫 Tickets</div></div>
+    <div class="ph-actions"><button class="btn btn-primary btn-sm" onclick="document.getElementById('ticketCatForm').classList.toggle('card')">➕ Catégorie</button></div>
+  </div>
+  <div id="ticketCatForm" style="margin-bottom:14px;display:none" class="card">
+    <div class="card-title"><span class="icon">➕</span>Nouvelle catégorie</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">ID unique</label><input class="form-input" id="tc-id" placeholder="vip-support" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')"></div><div class="form-group"><label class="form-label">Label</label><input class="form-input" id="tc-label" placeholder="👑 Support VIP"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="tc-desc" placeholder="Réservé aux VIP"></div><div class="form-group"><label class="form-label">Couleur</label><input type="color" class="form-input" id="tc-color" value="#7c6dfa"></div></div>
+    <div style="display:flex;gap:7px"><button class="btn btn-primary" onclick="addTicketCategory()">✅ Ajouter</button><button class="btn btn-ghost" onclick="document.getElementById('ticketCatForm').style.display='none'">Annuler</button></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><div class="card-title"><span class="icon">📁</span>Catégories <span class="tag tag-violet" id="catCountBadge">0</span></div><div id="ticketCategGrid"><div class="empty"><div class="empty-title">Aucune catégorie</div></div></div></div>
+    <div class="card"><div class="card-title"><span class="icon">🎫</span>Tickets ouverts <span class="tag tag-amber" id="openTicketsBadge">0</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Utilisateur</th><th>Salon</th><th>Catégorie</th><th>Actions</th></tr></thead><tbody id="ticketsTable"><tr><td colspan="4" style="text-align:center;padding:20px;color:var(--t2)">Aucun ticket</td></tr></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: GIVEAWAYS ═══ -->
+<section class="page" id="page-giveaways">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">🎉 Giveaways</div></div>
+    <div class="ph-actions"><button class="btn btn-primary btn-sm" onclick="openOv('ov-giveaway')">🎉 Créer</button><button class="btn btn-ghost btn-sm" onclick="loadGiveaways()">🔄</button></div>
+  </div>
+  <div id="giveawaysGrid"><div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Aucun giveaway</div></div></div>
+</section>
+
+<!-- ═══ PAGE: BIENVENUE ═══ -->
+<section class="page" id="page-welcome">
+  <div class="ph"><div class="ph-left"><div class="ph-title">👋 Message de bienvenue</div><div class="ph-sub">Personnalisez le message affiché à l'arrivée d'un membre</div></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span>Configuration</div>
+      <div class="toggle-row" onclick="toggleEl('wlc-enabled')"><div><div class="toggle-label">✅ Activer le message</div><div class="toggle-sub">Envoi automatique à chaque arrivée</div></div><label class="switch"><input type="checkbox" id="wlc-enabled"><span class="switch-track"></span></label></div>
+      <div class="form-group" style="margin-top:10px"><label class="form-label">Salon Discord</label><select class="form-select sel-ch" id="wlc-channel"><option value="">Chargement...</option></select></div>
+      <div class="form-group"><label class="form-label">Titre de l'embed (optionnel)</label><input class="form-input" id="wlc-title" placeholder="🎉 Bienvenue sur {server} !"></div>
+      <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" id="wlc-message" rows="5" oninput="updateWelcomePreview()" placeholder="👋 Bienvenue **{user}** !&#10;Nous sommes **{count}** membres 🎉&#10;&#10;Variables: {user} {server} {count} {mention}"></textarea></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Couleur</label><input type="color" class="form-input" id="wlc-color" value="#7c6dfa" oninput="updateWelcomePreview()"></div><div class="form-group"><label class="form-label">Footer</label><input class="form-input" id="wlc-footer" placeholder="Bienvenue sur {server}"></div></div>
+      <div class="form-group"><label class="form-label">Image de bannière (URL)</label><input class="form-input" id="wlc-image" placeholder="https://..."></div>
+      <div class="toggle-row" style="margin-bottom:14px" onclick="toggleEl('wlc-avatar')"><div><div class="toggle-label">🖼️ Afficher l'avatar</div></div><label class="switch"><input type="checkbox" id="wlc-avatar" checked><span class="switch-track"></span></label></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="saveWelcome()">💾 Sauvegarder</button>
+        <button class="btn btn-green" onclick="testWelcome()">🧪 Tester</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">👁️</span>Aperçu en direct</div>
+      <div class="welcome-demo">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px">Discord — #bienvenue</div>
+        <div id="welcomePreview" class="embed-preview">
+          <div class="embed-title" id="wlc-prev-title"></div>
+          <div class="embed-desc" id="wlc-prev-msg">Message de bienvenue...</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px 13px;background:rgba(255,255,255,.03);border-radius:var(--r2);border:1px solid var(--border);font-size:11.5px;color:var(--t2)">
+        <strong style="color:var(--t1);display:block;margin-bottom:5px">Variables disponibles :</strong>
+        <code style="color:#c4b5fd">{user}</code> — Pseudo du membre<br>
+        <code style="color:#c4b5fd">{server}</code> — Nom du serveur<br>
+        <code style="color:#c4b5fd">{count}</code> — Nombre de membres<br>
+        <code style="color:#c4b5fd">{mention}</code> — Mention @membre
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: RÔLES ═══ -->
+<section class="page" id="page-roles">
+  <div class="ph"><div class="ph-left"><div class="ph-title">🏷️ Gestion des rôles</div></div><div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="loadRoles()">🔄</button></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span>Tous les rôles</div>
+      <div id="rolesListEl"><div class="empty"><div class="empty-icon">🏷️</div><div class="empty-title">Chargement...</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">⭐</span>Rôles de niveau</div>
+      <div class="form-group"><label class="form-label">Niveau requis</label><input class="form-input" id="lvl-num" type="number" min="1" placeholder="5"></div>
+      <div class="form-group"><label class="form-label">Rôle à attribuer</label><select class="form-select sel-role" id="lvl-role"><option value="">Choisir un rôle...</option></select></div>
+      <button class="btn btn-primary" onclick="addLevelRole()" style="margin-bottom:14px">➕ Ajouter</button>
+      <div id="levelRolesList"><div class="empty"><div class="empty-title">Aucun rôle de niveau</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: ARTICLES ═══ -->
+<section class="page" id="page-shop">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">🛒 Articles</div><div class="ph-sub">Catalogue de ta boutique</div></div>
+    <div class="ph-actions">
+      <button class="btn btn-ghost btn-sm" onclick="go('nexusstore')">🌐 NexusStore</button>
+      <button class="btn btn-primary btn-sm" onclick="openOv('ov-article')">➕ Article</button>
+    </div>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+    <div class="stat-card"><div class="stat-glow" style="background:#00e5a0"></div><div class="stat-icon">🛒</div><div class="stat-value" id="shop-total">0</div><div class="stat-label">Articles total</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#ffb703"></div><div class="stat-icon">⚠️</div><div class="stat-value" id="shop-low">0</div><div class="stat-label">Stock faible</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#ff4d6d"></div><div class="stat-icon">❌</div><div class="stat-value" id="shop-out">0</div><div class="stat-label">Rupture</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#06d6ff"></div><div class="stat-icon">♾️</div><div class="stat-value" id="shop-inf">0</div><div class="stat-label">Stock infini</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:6px"><span class="icon">📦</span>Catalogue</span>
+      <div style="display:flex;gap:7px;align-items:center">
+        <input class="form-input" id="shopSearch" placeholder="Rechercher..." style="width:160px;padding:6px 11px;font-size:12px" oninput="filterShop()">
+        <select class="form-select" id="shopFilter" style="width:130px;padding:6px 11px;font-size:12px" onchange="filterShop()">
+          <option value="">Tous</option><option value="ok">En stock ✅</option><option value="low">Faible ⚠️</option><option value="out">Rupture ❌</option><option value="inf">Infini ♾️</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Article</th><th>Prix</th><th>Stock</th><th>Catégorie</th><th>Lien</th><th>Actions</th></tr></thead>
+      <tbody id="shopTable"><tr><td colspan="6" style="text-align:center;padding:28px;color:var(--t2)">Chargement...</td></tr></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: STOCK ═══ -->
+<section class="page" id="page-stock">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">📦 Gestion du stock</div><div class="ph-sub">Ajustez le stock de chaque article en temps réel</div></div>
+    <div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="loadStock()">🔄</button><button class="btn btn-amber btn-sm" onclick="openOv('ov-bulkstock')">⚡ Ajustement rapide</button></div>
+  </div>
+  <div id="stockAlerts" style="margin-bottom:12px"></div>
+  <div class="grid-auto" id="stockGrid"><div class="empty" style="grid-column:1/-1"><div class="empty-icon">📦</div><div class="empty-title">Chargement...</div></div></div>
+</section>
+
+<!-- ═══ PAGE: COMMANDES/ORDERS ═══ -->
+<section class="page" id="page-orders">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">📋 Commandes clients</div><div class="ph-sub">Suivi et gestion des commandes</div></div>
+    <div class="ph-actions"><button class="btn btn-primary btn-sm" onclick="openOv('ov-neworder')">➕ Commande</button><button class="btn btn-ghost btn-sm" onclick="loadOrders()">🔄</button></div>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:14px">
+    <div class="stat-card"><div class="stat-glow" style="background:#7c6dfa"></div><div class="stat-icon">📋</div><div class="stat-value" id="ord-total">0</div><div class="stat-label">Total</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#ffb703"></div><div class="stat-icon">⏳</div><div class="stat-value" id="ord-pending">0</div><div class="stat-label">En attente</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#06d6ff"></div><div class="stat-icon">✅</div><div class="stat-value" id="ord-confirmed">0</div><div class="stat-label">Confirmées</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#00e5a0"></div><div class="stat-icon">📦</div><div class="stat-value" id="ord-delivered">0</div><div class="stat-label">Livrées</div></div>
+    <div class="stat-card"><div class="stat-glow" style="background:#ff4d6d"></div><div class="stat-icon">❌</div><div class="stat-value" id="ord-cancelled">0</div><div class="stat-label">Annulées</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:6px"><span class="icon">📋</span>Liste des commandes</span>
+      <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
+        <input class="form-input" id="ordSearch" placeholder="Rechercher..." style="width:160px;padding:6px 11px;font-size:12px" oninput="filterOrders()">
+        <select class="form-select" id="ordFilter" style="width:140px;padding:6px 11px;font-size:12px" onchange="filterOrders()">
+          <option value="">Tous les statuts</option><option value="pending">⏳ En attente</option><option value="confirmed">✅ Confirmées</option><option value="delivered">📦 Livrées</option><option value="cancelled">❌ Annulées</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ID</th><th>Client</th><th>Article</th><th>Prix</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody id="ordersTable"><tr><td colspan="7" style="text-align:center;padding:28px;color:var(--t2)">Chargement...</td></tr></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: LIVRAISON ═══ -->
+<section class="page" id="page-delivery">
+  <div class="ph"><div class="ph-left"><div class="ph-title">📄 Fichiers de livraison</div><div class="ph-sub">Modèles envoyés automatiquement aux acheteurs</div></div></div>
+  <div class="grid-2">
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span class="icon">📄</span>Modèles</span><button class="btn btn-primary btn-xs" onclick="newDelivery()">➕ Nouveau</button></div>
+        <div id="deliveryList"><div class="empty"><div class="empty-icon">📄</div><div class="empty-title">Aucun modèle</div></div></div>
+      </div>
+      <div class="card" id="deliveryEditor" style="display:none">
+        <div class="card-title"><span id="dlvEdTitle">✏️ Nouveau modèle</span></div>
+        <div class="form-group"><label class="form-label">Nom du modèle</label><input class="form-input" id="dlv-name" placeholder="NexusPass VIP, Compte Premium..."></div>
+        <div class="form-group"><label class="form-label">Article associé</label><select class="form-select" id="dlv-article"><option value="">Tous les articles</option></select></div>
+        <div class="form-group"><label class="form-label">Format</label><select class="form-select" id="dlv-format" onchange="updateDeliveryPreview()"><option value="txt">📄 .txt — Texte</option><option value="md">📝 .md — Markdown</option><option value="html">🌐 .html — HTML</option></select></div>
+        <div style="font-size:11.5px;color:var(--t2);background:rgba(124,109,250,.06);border:1px solid rgba(124,109,250,.2);border-radius:var(--r2);padding:8px 12px;margin-bottom:12px">
+          📌 Variables : <code style="color:#c4b5fd">{acheteur}</code> <code style="color:#c4b5fd">{date}</code> <code style="color:#c4b5fd">{article}</code> <code style="color:#c4b5fd">{prix}</code> <code style="color:#c4b5fd">{commande_id}</code> <code style="color:#c4b5fd">{serveur}</code>
+        </div>
+        <div class="form-group"><label class="form-label">Contenu du fichier</label><textarea class="form-textarea" id="dlv-content" rows="14" style="font-family:'JetBrains Mono',monospace;font-size:12px" oninput="updateDeliveryPreview()" placeholder="═══════════════════════════
+⚡ NEXUSSTORE — LIVRAISON
+═══════════════════════════
+
+Merci {acheteur} pour ton achat !
+📦 Article : {article}
+💰 Prix : {prix}
+📅 Date : {date}
+🔖 Commande : #{commande_id}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTENU DE TA LIVRAISON :
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Ici : identifiants, lien, code...]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Support : Ticket Discord
+━━━━━━━━━━━━━━━━━━━━━━━━━━━"></textarea></div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="saveDelivery();saveDeliveryToDB()">💾 Sauvegarder</button>
+          <button class="btn btn-green" onclick="testDeliverySend()">📤 Tester</button>
+          <button class="btn btn-ghost" onclick="downloadDelivery()">⬇️ Télécharger</button>
+          <button class="btn btn-red" onclick="deleteDelivery()">🗑️ Supprimer</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title"><span class="icon">👁️</span>Aperçu</div>
+        <div style="background:rgba(0,0,0,.4);border-radius:var(--r2);border:1px solid var(--border);padding:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--t1);min-height:140px;white-space:pre-wrap;word-break:break-word" id="deliveryPreview">Remplissez le contenu pour voir l'aperçu...</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">⚙️</span>Options d'envoi auto</div>
+        <div class="toggle-row" onclick="toggleEl('dlv-auto')"><div><div class="toggle-label">📤 DM automatique à l'achat</div><div class="toggle-sub">⚡ Livraison AUTOMATIQUE à chaque nouvelle commande</div></div><label class="switch"><input type="checkbox" id="dlv-auto" checked><span class="switch-track"></span></label></div>
+        <div id="dlv-auto-warn" style="font-size:11.5px;color:var(--amber);background:rgba(255,183,3,.07);border:1px solid rgba(255,183,3,.2);border-radius:var(--r2);padding:8px 12px;margin-top:6px">⚡ Avec cette option, dès qu'une commande est créée, ce template sera envoyé automatiquement en DM au client.</div>
+        <div class="toggle-row" onclick="toggleEl('dlv-ticket')"><div><div class="toggle-label">📋 Copier dans le ticket</div><div class="toggle-sub">Poster aussi dans le ticket</div></div><label class="switch"><input type="checkbox" id="dlv-ticket" checked><span class="switch-track"></span></label></div>
+        <div class="toggle-row" onclick="toggleEl('dlv-wm')"><div><div class="toggle-label">🔒 Watermark acheteur</div><div class="toggle-sub">Ajouter l'ID en filigrane</div></div><label class="switch"><input type="checkbox" id="dlv-wm"><span class="switch-track"></span></label></div>
+        <div class="form-group" style="margin-top:10px"><label class="form-label">Message DM accompagnement</label><textarea class="form-textarea" id="dlv-dm" rows="3" placeholder="✅ Merci pour ton achat ! Voici ta livraison. Pour tout problème, ouvre un ticket."></textarea></div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveDeliveryOptions()">💾 Sauvegarder les options</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: NEXUSSTORE ═══ -->
+<section class="page" id="page-nexusstore">
+  <div class="ph"><div class="ph-left"><div class="ph-title">🌐 NexusStore</div><div class="ph-sub">Synchronisation avec ta boutique web</div></div></div>
+  <div style="background:linear-gradient(135deg,rgba(124,109,250,.1),rgba(168,85,247,.05));border:1px solid rgba(124,109,250,.2);border-radius:var(--r3);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px">
+    <div style="font-size:28px">🌐</div>
+    <div style="flex:1"><div style="font-size:15px;font-weight:800;font-family:'Outfit',sans-serif">Intégration NexusStore</div><div style="font-size:12px;color:var(--t2);margin-top:3px">Sync bidirectionnelle avec <code style="color:#c4b5fd;font-family:'JetBrains Mono',monospace">brian10122000.github.io/NexusStore</code></div></div>
+    <span id="nsStatusBadge" class="tag tag-amber">⚡ Non configuré</span>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span>Configuration Worker</div>
+      <div class="form-group"><label class="form-label">URL Worker Cloudflare</label><input class="form-input" id="ns-url" placeholder="https://nexusstore-worker.brian140915.workers.dev"></div>
+      <div class="form-group"><label class="form-label">Clé API secrète</label><input class="form-input" type="password" id="ns-key" placeholder="nexus2024secret"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="saveNsConfig()">💾 Sauvegarder</button>
+        <button class="btn btn-ghost" onclick="testNs()">🔌 Tester</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🔄</span>Synchronisation</div>
+      <div class="toggle-row" onclick="toggleEl('ns-autosync')"><div><div class="toggle-label">🔄 Sync automatique</div><div class="toggle-sub">Envoyer à chaque modification</div></div><label class="switch"><input type="checkbox" id="ns-autosync"><span class="switch-track"></span></label></div>
+      <div class="toggle-row" style="margin-bottom:14px" onclick="toggleEl('ns-stocksync')"><div><div class="toggle-label">📦 Sync du stock</div><div class="toggle-sub">Mettre à jour le stock en direct</div></div><label class="switch"><input type="checkbox" id="ns-stocksync"><span class="switch-track"></span></label></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="btn btn-primary" onclick="pushToNs()">📤 Envoyer → NexusStore</button>
+        <button class="btn btn-green" onclick="pullFromNs()">📥 Importer ← NexusStore</button>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border-radius:var(--r2);padding:10px 13px;font-size:12px;color:var(--t2)"><strong style="color:var(--t1)">Dernière sync</strong><br><span id="nsLastSync">Jamais synchronisé</span></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span class="icon">👁️</span>Aperçu articles</span><button class="btn btn-ghost btn-xs" onclick="previewNs()">🔄 Aperçu</button></div>
+    <div id="nsPreview"><div class="empty"><div class="empty-title">Cliquez sur Aperçu</div></div></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-title"><span class="icon">📢</span>Publier sur Discord</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Salon Discord</label><select class="form-select sel-ch" id="ns-channel"><option value="">Choisir un salon...</option></select></div>
+      <div class="form-group"><label class="form-label">Message</label><input class="form-input" id="ns-message" value="🛒 Notre boutique est disponible !"></div>
+    </div>
+    <button class="btn btn-primary" onclick="publishNsEmbed()">📤 Publier l'embed Discord</button>
+  </div>
+</section>
+
+<!-- ═══ PAGE: À PROPOS ═══ -->
+<section class="page" id="page-about">
+  <div class="ph"><div class="ph-left"><div class="ph-title">ℹ️ Page À propos</div><div class="ph-sub">Affiché sur NexusStore dans la section "À propos"</div></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="icon">📝</span>Informations</div>
+      <div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="abt-title" placeholder="À propos de NexusStore"></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="abt-desc" rows="5" placeholder="Bienvenue sur NexusStore..."></textarea></div>
+      <div class="form-row-3">
+        <div class="form-group"><label class="form-label">Discord</label><input class="form-input" id="abt-dc" placeholder="https://discord.gg/..."></div>
+        <div class="form-group"><label class="form-label">Twitter</label><input class="form-input" id="abt-tw" placeholder="@..."></div>
+        <div class="form-group"><label class="form-label">Instagram</label><input class="form-input" id="abt-ig" placeholder="@..."></div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group"><label class="form-label">Commandes</label><input class="form-input" id="abt-orders" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Clients</label><input class="form-input" id="abt-clients" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Note /5</label><input class="form-input" id="abt-rating" placeholder="5.0"></div>
+      </div>
+      <button class="btn btn-primary" onclick="saveAbout()">💾 Sauvegarder</button>
+    </div>
+    <div class="card">
+      <div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:6px"><span class="icon">👥</span>Équipe</span><button class="btn btn-primary btn-xs" onclick="document.getElementById('teamForm').style.display=document.getElementById('teamForm').style.display==='none'?'block':'none'">➕</button></div>
+      <div id="teamForm" style="display:none;background:rgba(255,255,255,.03);border-radius:var(--r2);padding:12px;margin-bottom:12px;border:1px solid var(--border)">
+        <div class="form-row"><div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="tm-name" placeholder="Jean"></div><div class="form-group"><label class="form-label">Rôle</label><input class="form-input" id="tm-role" placeholder="Fondateur"></div></div>
+        <div class="form-row"><div class="form-group"><label class="form-label">Discord</label><input class="form-input" id="tm-dc" placeholder="jean#0001"></div><div class="form-group"><label class="form-label">Avatar URL</label><input class="form-input" id="tm-av" placeholder="https://..."></div></div>
+        <div style="display:flex;gap:7px"><button class="btn btn-primary btn-sm" onclick="addTeam()">✅ Ajouter</button><button class="btn btn-ghost btn-sm" onclick="document.getElementById('teamForm').style.display='none'">Annuler</button></div>
+      </div>
+      <div id="teamList"><div class="empty"><div class="empty-icon">👥</div><div class="empty-title">Aucun membre</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGE: BANNIS ═══ -->
+<section class="page" id="page-bans">
+  <div class="ph"><div class="ph-left"><div class="ph-title">🔨 Membres bannis</div></div><div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="loadBans()">🔄</button></div></div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>Membre</th><th>ID</th><th>Raison</th><th>Action</th></tr></thead><tbody id="bansTable"><tr><td colspan="4" style="text-align:center;padding:28px;color:var(--t2)">Chargement...</td></tr></tbody></table></div></div>
+</section>
+
+<!-- ═══ PAGE: LOGS ═══ -->
+<section class="page" id="page-logs">
+  <div class="ph"><div class="ph-left"><div class="ph-title">📜 Logs système</div></div><div class="ph-actions"><button class="btn btn-ghost btn-sm" onclick="loadLogs()">🔄</button><button class="btn btn-red btn-sm" onclick="if(confirm('Effacer les logs ?'))document.getElementById('logsEl').innerHTML=''">🗑️ Effacer</button></div></div>
+  <div class="card"><div id="logsEl" style="max-height:600px;overflow-y:auto"><div class="empty"><div class="empty-title">Chargement...</div></div></div></div>
+</section>
+
+<!-- ═══ PAGE: ANNONCE ═══ -->
+<section class="page" id="page-announce">
+  <div class="ph"><div class="ph-left"><div class="ph-title">📢 Annonce</div></div></div>
+  <div class="card" style="max-width:560px">
+    <div class="form-group"><label class="form-label">Salon Discord</label><select class="form-select sel-ch" id="an-channel"><option value="">Choisir un salon...</option></select></div>
+    <div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="an-title" placeholder="📢 Annonce importante"></div>
+    <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" id="an-message" rows="6" placeholder="Contenu de l'annonce..."></textarea></div>
+    <div class="form-group"><label class="form-label">Mention</label><select class="form-select" id="an-mention"><option value="">Aucune mention</option><option value="@everyone">@everyone</option><option value="@here">@here</option></select></div>
+    <button class="btn btn-primary" onclick="sendAnnounce()">📢 Envoyer</button>
+  </div>
+</section>
+
+<!-- ═══ PAGE: PARAMÈTRES ═══ -->
+<section class="page" id="page-settings">
+  <div class="ph"><div class="ph-left"><div class="ph-title">⚙️ Paramètres</div></div><div class="ph-actions"><button class="btn btn-primary" onclick="saveAllConfig()">💾 Tout sauvegarder</button></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="icon">🚂</span>Connexion Railway</div>
+      <div class="form-group"><label class="form-label">URL du bot Railway</label><input class="form-input" id="railwayUrl" placeholder="https://nexusbot1-production.up.railway.app"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="saveRailwayUrl()">💾 Sauvegarder</button>
+        <button class="btn btn-ghost btn-sm" onclick="testConnection()">🔌 Tester</button>
+      </div>
+      <div id="connStatus" style="margin-top:10px;font-size:12px;color:var(--t2)"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🗄️</span>Supabase</div>
+      <div style="font-size:12.5px;color:var(--t2);line-height:1.7">
+        La DB est sauvegardée automatiquement dans Supabase.<br>
+        Toutes tes données (articles, commandes, économie...) sont persistantes même si Railway redémarre.
+      </div>
+      <div id="sbStatus" style="margin-top:10px;padding:8px 12px;background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);border-radius:var(--r2);font-size:12px;color:var(--emerald)">✅ Supabase configuré</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">🔄</span>Auto-sync</div>
+      <div class="toggle-row" onclick="toggleEl('auto-dash')"><div><div class="toggle-label">📊 Refresh dashboard</div><div class="toggle-sub">Toutes les 2 minutes</div></div><label class="switch"><input type="checkbox" id="auto-dash" checked><span class="switch-track"></span></label></div>
+      <div class="toggle-row" onclick="toggleEl('auto-guild')"><div><div class="toggle-label">🏰 Données Discord</div><div class="toggle-sub">Salons, rôles, membres toutes les 10 min</div></div><label class="switch"><input type="checkbox" id="auto-guild" checked><span class="switch-track"></span></label></div>
+      <div class="toggle-row" onclick="toggleEl('auto-ns')"><div><div class="toggle-label">🌐 Sync NexusStore</div><div class="toggle-sub">Toutes les 10 minutes</div></div><label class="switch"><input type="checkbox" id="auto-ns"><span class="switch-track"></span></label></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">ℹ️</span>À propos du panel</div>
+      <div style="font-size:12.5px;color:var(--t2);line-height:2">
+        <strong style="color:var(--t1)">NexusBot Command Center</strong> v8.0<br>
+        Panel admin ultra-complet pour serveurs Discord<br>
+        <span style="color:var(--violet)">Bot :</span> discord.js v14 sur Railway<br>
+        <span style="color:var(--emerald)">DB :</span> Supabase (persistante)<br>
+        <span style="color:var(--cyan)">Boutique :</span> GitHub Pages + Cloudflare Worker
+      </div>
+    </div>
+  </div>
+</section>
+
+  </div><!-- end .content -->
+</main>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Modal: Membre détail -->
+<div class="modal-overlay" id="ov-member">
+  <div class="modal" style="max-width:600px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;position:relative">
+      <img id="ov-memb-av" src="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid rgba(124,109,250,.4);background:linear-gradient(135deg,#7c6dfa,#a855f7)" onerror="this.style.display='none'">
+      <div style="flex:1">
+        <div style="font-size:20px;font-weight:800;font-family:'Outfit',sans-serif" id="ov-memb-name">—</div>
+        <div style="font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;margin-top:3px" id="ov-memb-tag">—</div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap" id="ov-memb-roles"></div>
+      </div>
+      <button onclick="closeOv('ov-member')" style="position:absolute;top:0;right:0;background:none;border:none;color:var(--t2);cursor:pointer;font-size:20px;padding:4px">✕</button>
+    </div>
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+      <div class="stat-card" style="padding:12px;text-align:center"><div class="stat-value" style="font-size:20px;color:var(--amber)" id="ov-memb-pts">—</div><div class="stat-label">Points</div></div>
+      <div class="stat-card" style="padding:12px;text-align:center"><div class="stat-value" style="font-size:20px;color:var(--violet)" id="ov-memb-lvl">—</div><div class="stat-label">Niveau</div></div>
+      <div class="stat-card" style="padding:12px;text-align:center"><div class="stat-value" style="font-size:20px;color:var(--rose)" id="ov-memb-warns">—</div><div class="stat-label">Warns</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+      <div class="stat-card" style="padding:12px;text-align:center"><div class="stat-value" style="font-size:20px;color:var(--cyan)" id="ov-memb-xp">—</div><div class="stat-label">XP</div></div>
+      <div class="stat-card" style="padding:12px;text-align:center"><div class="stat-value" style="font-size:20px;color:var(--emerald)" id="ov-memb-voice">—</div><div class="stat-label">Temps vocal</div></div>
+      <div class="stat-card" style="padding:12px;text-align:center"><div class="stat-value" style="font-size:20px;color:var(--sky)" id="ov-memb-rep">—</div><div class="stat-label">Réputation</div></div>
+    </div>
+    <!-- Info dates -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r2);padding:10px 13px"><div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Arrivée sur le serveur</div><div style="font-size:13px;font-weight:600" id="ov-memb-joined">—</div></div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r2);padding:10px 13px"><div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Compte créé le</div><div style="font-size:13px;font-weight:600" id="ov-memb-created">—</div></div>
+    </div>
+    <!-- Warns list -->
+    <div class="card-title"><span class="icon">⚠️</span>Avertissements</div>
+    <div id="ov-memb-warnslist" style="background:rgba(0,0,0,.2);border-radius:var(--r2);border:1px solid var(--border);padding:10px;max-height:160px;overflow-y:auto;margin-bottom:14px"></div>
+    <input type="hidden" id="ov-memb-id-hidden">
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-member')">Fermer</button>
+      <button class="btn btn-amber" onclick="modAction('warn');modMemberId=document.getElementById('ov-memb-id-hidden').value;closeOv('ov-member')">⚠️ Avertir</button>
+      <button class="btn btn-primary" onclick="go('moderation');searchModMemberById(document.getElementById('ov-memb-id-hidden').value);closeOv('ov-member')">🛡️ Gérer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Action modération -->
+<div class="modal-overlay" id="ov-modaction">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title" id="ov-modaction-title">Action</div>
+    <input type="hidden" id="ov-modaction-type">
+    <div id="ov-modaction-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-modaction')">Annuler</button>
+      <button class="btn btn-primary" onclick="execModAction()">✅ Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Article -->
+<div class="modal-overlay" id="ov-article">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title" id="ov-art-title">📦 Ajouter un article</div>
+    <input type="hidden" id="art-id-hidden">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Emoji</label><input class="form-input" id="art-emoji" placeholder="🛒" style="text-align:center;font-size:20px"></div>
+      <div class="form-group"><label class="form-label">Nom de l'article *</label><input class="form-input" id="art-name" placeholder="NexusPass VIP"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Prix *</label><input class="form-input" id="art-price" placeholder="9.99€"></div>
+      <div class="form-group"><label class="form-label">Catégorie</label><input class="form-input" id="art-cat" placeholder="VIP, Gaming..."></div>
+    </div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="art-desc" rows="3" placeholder="Description de l'article..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Stock (-1 = illimité)</label><input class="form-input" id="art-stock" type="number" value="-1" min="-1"></div>
+      <div class="form-group"><label class="form-label">Lien (optionnel)</label><input class="form-input" id="art-link" placeholder="https://..."></div>
+    </div>
+    <div class="form-group"><label class="form-label">Image URL (optionnel)</label><input class="form-input" id="art-image" placeholder="https://..."></div>
+    <div class="toggle-row" onclick="toggleEl('art-ns')"><div><div class="toggle-label">🌐 Sync NexusStore automatique</div></div><label class="switch"><input type="checkbox" id="art-ns" checked><span class="switch-track"></span></label></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-article')">Annuler</button>
+      <button class="btn btn-primary" id="ov-art-save" onclick="saveArticle()">➕ Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Giveaway -->
+<div class="modal-overlay" id="ov-giveaway">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">🎉 Créer un Giveaway</div>
+    <div class="form-group"><label class="form-label">Salon Discord</label><select class="form-select sel-ch" id="gw-channel"><option value="">Chargement des salons...</option></select></div>
+    <div class="form-group"><label class="form-label">Prix / Récompense *</label><input class="form-input" id="gw-prize" placeholder="NexusPass VIP, 500 points..."></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Durée (minutes)</label><input class="form-input" id="gw-minutes" type="number" value="60" min="1"></div>
+      <div class="form-group"><label class="form-label">Nombre de gagnants</label><input class="form-input" id="gw-winners" type="number" value="1" min="1"></div>
+    </div>
+    <div style="background:rgba(255,183,3,.07);border:1px solid rgba(255,183,3,.2);border-radius:var(--r2);padding:10px 13px;font-size:12px;color:var(--t1);margin-bottom:14px">🎉 Le giveaway sera posté dans le salon. Les membres participent avec le bouton. Le gagnant reçoit un DM automatiquement.</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-giveaway')">Annuler</button>
+      <button class="btn btn-primary" onclick="createGiveaway()">🎉 Lancer le giveaway</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nouvelle commande -->
+<div class="modal-overlay" id="ov-neworder">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">➕ Créer une commande</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">ID Discord client</label><input class="form-input" id="neword-uid" placeholder="123456789012345678"></div>
+      <div class="form-group"><label class="form-label">Pseudo client</label><input class="form-input" id="neword-name" placeholder="Jean_Discord"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Article</label><select class="form-select" id="neword-article"><option value="">Sélectionner un article...</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Prix (si différent)</label><input class="form-input" id="neword-price" placeholder="9.99€"></div>
+      <div class="form-group"><label class="form-label">Statut</label><select class="form-select" id="neword-status"><option value="pending">⏳ En attente</option><option value="confirmed">✅ Confirmée</option><option value="delivered">📦 Livrée</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes internes</label><textarea class="form-textarea" id="neword-notes" rows="2" placeholder="Notes..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-neworder')">Annuler</button>
+      <button class="btn btn-primary" onclick="createNewOrder()">✅ Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Statut commande -->
+<div class="modal-overlay" id="ov-orderstatus">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">📦 Modifier la commande <span id="ov-ord-id" style="color:var(--violet)"></span></div>
+    <input type="hidden" id="ov-ord-id-h">
+    <div class="form-group"><label class="form-label">Nouveau statut</label>
+      <select class="form-select" id="ov-ord-status" onchange="toggleDeliveryOptions()">
+        <option value="pending">⏳ En attente</option>
+        <option value="confirmed">✅ Confirmée</option>
+        <option value="delivered">📦 Livrée</option>
+        <option value="cancelled">❌ Annulée</option>
+        <option value="refunded">💸 Remboursée</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Note pour le client (optionnel)</label><textarea class="form-textarea" id="ov-ord-note" rows="2" placeholder="Message envoyé en DM..."></textarea></div>
+    <!-- Options livraison auto — visible seulement si status = delivered -->
+    <div id="ov-deliver-opts" style="display:none;background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.25);border-radius:var(--r2);padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--emerald);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;font-family:'JetBrains Mono',monospace">📦 Options de livraison</div>
+      <div class="toggle-row" onclick="toggleEl('ov-ord-auto-deliver')" style="background:rgba(0,0,0,.2);margin-bottom:8px">
+        <div><div class="toggle-label">📤 Envoyer le fichier en DM</div><div class="toggle-sub">Livraison automatique à la mise à jour</div></div>
+        <label class="switch"><input type="checkbox" id="ov-ord-auto-deliver" checked><span class="switch-track"></span></label>
+      </div>
+      <div id="ov-deliver-tpl-section">
+        <div class="form-group" style="margin-bottom:8px"><label class="form-label">Template de livraison</label>
+          <select class="form-select" id="ov-ord-tpl" style="margin-bottom:6px"><option value="">Aucun template sauvegardé</option></select>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="toggle-row" style="flex:1;background:rgba(0,0,0,.2)" onclick="toggleEl('ov-ord-wm')"><div><div class="toggle-label" style="font-size:12px">🔒 Watermark</div></div><label class="switch"><input type="checkbox" id="ov-ord-wm"><span class="switch-track"></span></label></div>
+          <div class="toggle-row" style="flex:1;background:rgba(0,0,0,.2)" onclick="toggleEl('ov-ord-ticket')"><div><div class="toggle-label" style="font-size:12px">🎫 Dans ticket</div></div><label class="switch"><input type="checkbox" id="ov-ord-ticket"><span class="switch-track"></span></label></div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11.5px;color:var(--t2);margin-bottom:14px">📩 Le client recevra une notification Discord en DM automatiquement.</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-orderstatus')">Annuler</button>
+      <button class="btn btn-primary" onclick="updateOrder()">✅ Mettre à jour</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Livraison manuelle -->
+<div class="modal-overlay" id="ov-deliver">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title">📦 Livrer la commande <span id="ov-dlv-ordid" style="color:var(--emerald)"></span></div>
+    <input type="hidden" id="ov-dlv-id">
+    <!-- Info commande -->
+    <div style="display:flex;gap:10px;align-items:center;background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);border-radius:var(--r2);padding:12px 14px;margin-bottom:16px">
+      <div style="font-size:22px">📦</div>
+      <div>
+        <div style="font-weight:700;font-size:14px" id="ov-dlv-article">—</div>
+        <div style="font-size:12px;color:var(--t2)">Client : <strong id="ov-dlv-username">—</strong></div>
+      </div>
+    </div>
+    <!-- Choisir template ou contenu custom -->
+    <div class="tabs" style="margin-bottom:14px">
+      <button class="tab active" onclick="switchTab('dlvm','tpl',this)">📄 Template sauvegardé</button>
+      <button class="tab" onclick="switchTab('dlvm','custom',this)">✏️ Contenu custom</button>
+    </div>
+    <!-- Tab template -->
+    <div id="dlvm-tpl">
+      <div class="form-group"><label class="form-label">Choisir un template</label>
+        <select class="form-select" id="ov-dlv-tpl" onchange="previewDeliveryTemplate()"><option value="">— Sélectionner un template —</option></select>
+      </div>
+      <div id="ov-dlv-tpl-preview" style="display:none;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--r2);padding:12px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--t1);white-space:pre-wrap;max-height:180px;overflow-y:auto;margin-top:8px"></div>
+    </div>
+    <!-- Tab custom -->
+    <div id="dlvm-custom" style="display:none">
+      <div class="form-group"><label class="form-label">Format</label>
+        <select class="form-select" id="ov-dlv-fmt"><option value="txt">📄 .txt</option><option value="md">📝 .md</option><option value="html">🌐 .html</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Contenu du fichier</label>
+        <textarea class="form-textarea" id="ov-dlv-content" rows="9" style="font-family:'JetBrains Mono',monospace;font-size:12px" placeholder="═══════════════════════════
+⚡ NEXUSSTORE — LIVRAISON
+═══════════════════════════
+
+Merci {acheteur} !
+📦 Article : {article}
+💰 Prix : {prix}
+🔖 Commande : #{commande_id}
+📅 Date : {date}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTENU :
+━━━━━━━━━━━━━━━━━━━━━━━━━
+[Identifiants, lien, code...]
+
+Support → Ticket Discord"></textarea>
+      </div>
+      <div class="form-group"><label class="form-label">Message DM accompagnant</label>
+        <input class="form-input" id="ov-dlv-dm" placeholder="✅ Merci pour ton achat ! Voici ta livraison 📦">
+      </div>
+    </div>
+    <!-- Options communes -->
+    <div style="display:flex;gap:8px;margin-top:10px;margin-bottom:14px">
+      <div class="toggle-row" style="flex:1" onclick="toggleEl('ov-dlv-wm')"><div><div class="toggle-label" style="font-size:12px">🔒 Watermark client</div></div><label class="switch"><input type="checkbox" id="ov-dlv-wm"><span class="switch-track"></span></label></div>
+      <div class="toggle-row" style="flex:1" onclick="toggleEl('ov-dlv-ticket')"><div><div class="toggle-label" style="font-size:12px">🎫 Copier dans ticket</div></div><label class="switch"><input type="checkbox" id="ov-dlv-ticket" checked><span class="switch-track"></span></label></div>
+    </div>
+    <div id="ov-dlv-result" style="display:none;padding:10px 14px;border-radius:var(--r2);font-size:13px;margin-bottom:12px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-deliver')">Annuler</button>
+      <button class="btn btn-primary" onclick="sendDelivery()">📤 Livrer maintenant</button>
+      <button class="btn btn-green" onclick="sendDeliveryAndClose()">📦 Livrer + Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Ajouter points -->
+<div class="modal-overlay" id="ov-addpoints">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-title" id="ov-pts-name">💰 Ajouter des points</div>
+    <input type="hidden" id="ov-pts-id">
+    <div class="form-group"><label class="form-label">Points (négatif pour retirer)</label><input class="form-input" id="ov-pts-val" type="number" value="100" placeholder="100"></div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:14px">💡 Valeur négative = retrait de points</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-addpoints')">Annuler</button>
+      <button class="btn btn-primary" onclick="addPointsConfirm()">✅ Appliquer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Ajustement rapide stock -->
+<div class="modal-overlay" id="ov-bulkstock">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-title">⚡ Ajustement rapide stock</div>
+    <div class="form-group"><label class="form-label">Article</label><select class="form-select" id="blk-article"><option value="">Sélectionner...</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Action</label>
+        <select class="form-select" id="blk-action">
+          <option value="set">🔢 Définir à</option>
+          <option value="add">➕ Ajouter</option>
+          <option value="sub">➖ Retirer</option>
+          <option value="inf">♾️ Illimité</option>
+          <option value="zero">❌ Rupture</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Valeur</label><input class="form-input" id="blk-value" type="number" value="10" min="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Raison (optionnel)</label><input class="form-input" id="blk-reason" placeholder="Réassort, vente flash..."></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-bulkstock')">Annuler</button>
+      <button class="btn btn-primary" onclick="doBulkStock()">⚡ Appliquer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Historique stock -->
+<div class="modal-overlay" id="ov-histstock">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title" id="ov-hist-title">📜 Historique stock</div>
+    <div id="ov-hist-body" style="max-height:350px;overflow-y:auto"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeOv('ov-histstock')">Fermer</button></div>
+  </div>
+</div>
+
+<!-- Modal: Test livraison -->
+<div class="modal-overlay" id="ov-dlvtest">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title">📤 Tester la livraison</div>
+    <div class="form-group"><label class="form-label">ID Discord de test</label><input class="form-input" id="dlv-test-uid" placeholder="Ton propre ID Discord"></div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:14px">Le fichier sera envoyé en DM à cet utilisateur avec les variables de test.</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOv('ov-dlvtest')">Annuler</button>
+      <button class="btn btn-primary" onclick="execDeliveryTest()">📤 Envoyer le test</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bouton mobile -->
+<button class="mob-btn" onclick="document.getElementById('sb').classList.toggle('open')">☰</button>
+
+<!-- Toasts -->
+<div id="toasts"></div>
+
+</div>
+<script>
+// ══════════════════════════════════════════════════════════════════
+//  NEXUSBOT COMMAND CENTER v8 — JavaScript Complet
+// ══════════════════════════════════════════════════════════════════
+
+// ─── CONFIG ────────────────────────────────────────────────────
+const RAILWAY_DEFAULT = 'https://nexusbot1-production.up.railway.app';
+function getRailwayUrl(){return(localStorage.getItem('railwayUrl')||RAILWAY_DEFAULT).replace(/\/$/,'');}
+
+// ─── STATE ─────────────────────────────────────────────────────
+let guildData={textChannels:[],voiceChannels:[],categories:[],roles:[],members:[],guild:{}};
+let arts=[], allOrders=[], allWarns={}, ecoData={};
+let nsConf=JSON.parse(localStorage.getItem('nsConf')||'{}');
+let dlvTemplates=JSON.parse(localStorage.getItem('dlvTpls')||'[]');
+let currentDlvIdx=-1;
+let monacoEd=null, modMemberId=null, aboutData={team:[]};
+
+// ─── API ───────────────────────────────────────────────────────
+async function api(path,opts={}){
+  let pw=localStorage.getItem('nbpw');
+  if(!pw){pw=prompt('🔐 Mot de passe du panel :');if(!pw)return null;localStorage.setItem('nbpw',pw);}
+  const isGH=window.location.hostname.includes('github.io');
+  const base=isGH?getRailwayUrl():'';
+  try{
+    const r=await fetch(base+path,{...opts,headers:{Authorization:'Basic '+btoa(':'+pw),'Content-Type':'application/json',...(opts.headers||{})}});
+    if(r.status===401||r.status===403){localStorage.removeItem('nbpw');toast('❌ Mot de passe incorrect','err');return null;}
+    return r.json();
+  }catch{return null;}
+}
+
+// ─── NAV ───────────────────────────────────────────────────────
+const PAGE_TITLES={dashboard:'Dashboard',activity:'Activité Live',members:'Membres',economy:'Économie & XP',moderation:'Modération',editor:'Éditeur de code',cmds:'Mes commandes','stats-setup':'Salons stats',tickets:'Tickets',giveaways:'Giveaways',welcome:'Message de bienvenue',roles:'Rôles',shop:'Articles',stock:'Gestion du stock',orders:'Commandes clients',delivery:'Livraison',nexusstore:'NexusStore',about:'À propos',bans:'Bannis',logs:'Logs',announce:'Annonce',settings:'Paramètres'};
+const PAGE_LOADERS={dashboard:loadDashboard,activity:loadActivity,members:loadMembers,economy:loadEconomy,moderation:loadModeration,cmds:loadCmds,'stats-setup':loadStatsSetup,tickets:loadTickets,giveaways:loadGiveaways,welcome:loadWelcome,roles:loadRoles,shop:loadShop,stock:loadStock,orders:loadOrders,delivery:loadDelivery,nexusstore:loadNs,about:loadAbout,bans:loadBans,logs:loadLogs};
+
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  const pg=document.getElementById('page-'+id);
+  if(pg)pg.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+id+"'"))b.classList.add('active');});
+  document.getElementById('pageTitle').textContent=PAGE_TITLES[id]||id;
+  document.getElementById('sb').classList.remove('open');
+  if(PAGE_LOADERS[id])PAGE_LOADERS[id]();
+  if(id==='editor')setTimeout(initMonaco,100);
+}
+
+// ─── TOAST ─────────────────────────────────────────────────────
+function toast(msg,type='ok'){
+  const el=document.createElement('div');
+  el.className='toast toast-'+type;el.textContent=msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+// ─── UTILS ─────────────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function refreshPage(){const id=document.querySelector('.page.active')?.id?.replace('page-','');if(id)go(id);}
+function toggleEl(id){const el=document.getElementById(id);if(el)el.checked=!el.checked;el?.dispatchEvent(new Event('change'));}
+function openOv(id){document.getElementById(id).classList.add('open');}
+function closeOv(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+function switchTab(group,tab,btn){
+  document.querySelectorAll('[id^="'+group+'-"]').forEach(el=>el.style.display='none');
+  document.getElementById(group+'-'+tab).style.display='block';
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─── GUILD DATA ────────────────────────────────────────────────
+async function loadGuildData(){
+  const d=await api('/api/guild');if(!d?.ok)return;
+  guildData=d;
+  // Update selects
+  const textOpts='<option value="">Sélectionner un salon...</option>'+guildData.textChannels.map(c=>`<option value="${c.id}">#${c.name} — ${c.category}</option>`).join('');
+  const voiceOpts='<option value="">Sélectionner...</option>'+guildData.voiceChannels.map(c=>`<option value="${c.id}">🔊 ${c.name}</option>`).join('');
+  const roleOpts='<option value="">Sélectionner un rôle...</option>'+guildData.roles.map(r=>`<option value="${r.id}" style="color:${r.color||'inherit'}">@${r.name} (${r.memberCount})</option>`).join('');
+  document.querySelectorAll('.sel-ch').forEach(el=>{const v=el.value;el.innerHTML=textOpts;if(v)el.value=v;});
+  document.querySelectorAll('.sel-voice').forEach(el=>{const v=el.value;el.innerHTML=voiceOpts;if(v)el.value=v;});
+  document.querySelectorAll('.sel-role').forEach(el=>{const v=el.value;el.innerHTML=roleOpts;if(v)el.value=v;});
+  // Update role filter in members
+  const rf=document.getElementById('membRoleFilter');
+  if(rf)rf.innerHTML='<option value="">Tous les rôles</option>'+guildData.roles.map(r=>`<option value="${r.id}">@${r.name}</option>`).join('');
+  // Guild info
+  const gi=document.getElementById('guildIcon');if(gi&&d.guild.icon){gi.src=d.guild.icon;gi.style.display='block';}
+  const gn=document.getElementById('guildName');if(gn&&d.guild.name)gn.textContent=d.guild.name;
+}
+
+// ─── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard(){
+  document.getElementById('db-sub').textContent='Dernière mise à jour : '+new Date().toLocaleTimeString('fr-FR');
+  const[st,stats]=await Promise.all([api('/api/status'),api('/api/stats')]);
+  if(st){document.getElementById('botStatus').textContent=st.tag||'En ligne';}
+  if(stats){
+    const fields=[['st-members','members'],['st-online','online'],['st-voice','voiceActive'],['st-tickets','tickets'],['st-warns','totalWarns'],['st-articles','articles'],['st-orders','orders'],['st-ping','ping']];
+    fields.forEach(([id,k])=>{const e=document.getElementById(id);if(e)e.textContent=(k==='ping'?(st?.ping||'—')+'ms':(stats[k]??'—'));});
+    // Update sidebar badges
+    document.getElementById('liveCount').textContent=stats.voiceActive||0;
+    document.getElementById('membCount').textContent=stats.members||0;
+    document.getElementById('warnCount').textContent=stats.totalWarns||0;
+    document.getElementById('cmdCount').textContent=stats.customCmds||0;
+    document.getElementById('tickCount').textContent=stats.tickets||0;
+    document.getElementById('gwCount').textContent=stats.giveaways||0;
+    document.getElementById('artCount').textContent=stats.articles||0;
+    document.getElementById('ordCount').textContent=stats.orders||0;
+    // Top membres
+    const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
+    document.getElementById('topMembersEl').innerHTML=stats.topPoints?.length
+      ?stats.topPoints.map((u,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="font-size:18px;width:24px">${medals[i]||'•'}</span>${u.avatar?`<img src="${u.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(124,109,250,.3)" onerror="this.style.display='none'">`:'<div style="width:32px;height:32px;border-radius:50%;background:var(--grad-main);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">'+(u.username||'?')[0]+'</div>'}<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.username||u.id)}</div><div style="font-size:11px;color:var(--t2)">${u.points} pts — Niv.${u.level}</div></div></div>`).join('')
+      :'<div class="empty"><div class="empty-icon">💰</div><div class="empty-title">Aucun joueur</div></div>';
+  }
+  // Logs récents
+  const logs=await api('/api/logs');
+  document.getElementById('recentActivity').innerHTML=logs?.slice(0,8).map(l=>`<div class="feed-item"><div class="feed-icon" style="background:rgba(124,109,250,.1);color:#c4b5fd">📡</div><div class="feed-content"><div class="feed-text">${esc(l.msg)}</div><div class="feed-time">${l.time}</div></div></div>`).join('')||'<div class="empty"><div class="empty-title">Aucun log</div></div>';
+  // Voice live sur dashboard
+  loadVoiceLiveDash();
+}
+
+async function loadVoiceLiveDash(){
+  const data=await api('/api/voice-live');
+  const el=document.getElementById('voiceLiveEl');const cnt=document.getElementById('voiceLiveCount');
+  if(!data?.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔇</div><div class="empty-title">Personne en vocal</div></div>';cnt.textContent='0 membres';return;}
+  let tot=0;
+  el.innerHTML=data.map(vc=>{tot+=vc.members.length;return`<div class="voice-channel"><div class="voice-header"><span style="font-size:17px">🔊</span><span class="voice-name">${esc(vc.channelName)}</span><span class="voice-count">${vc.members.length} membre${vc.members.length>1?'s':''}</span></div>${vc.members.map(m=>`<div class="voice-member"><div class="voice-av">${m.avatar?`<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentNode.textContent='${(m.username||'?')[0]}'">`:(m.username||'?')[0].toUpperCase()}</div><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(m.username)}</div><div style="font-size:10.5px;color:var(--t2);font-family:'JetBrains Mono',monospace">${m.id}</div></div><div style="display:flex;gap:5px;align-items:center">${m.muted?'<span title="Muté" style="opacity:.6;font-size:14px">🔇</span>':''}${m.deafened?'<span title="Sourd" style="opacity:.6;font-size:14px">🔕</span>':''}${m.streaming?'<span class="live-pill">LIVE</span>':''}<button class="btn btn-ghost btn-xs" onclick="quickWarn('${m.id}')">⚠️</button></div></div>`).join('')}</div>`;}).join('');
+  cnt.textContent=tot+' membre'+(tot>1?'s':'');
+}
+
+// ─── ACTIVITÉ LIVE ─────────────────────────────────────────────
+async function loadActivity(){
+  const data=await api('/api/voice-live');
+  const el=document.getElementById('voiceChannelsEl');
+  if(!data?.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔇</div><div class="empty-title">Aucun salon vocal actif</div></div>';document.getElementById('liveCount').textContent='0';return;}
+  let tot=0;
+  el.innerHTML=data.map(vc=>{tot+=vc.members.length;return`<div class="voice-channel"><div class="voice-header"><span style="font-size:17px">🔊</span><span class="voice-name">${esc(vc.channelName)}</span><span class="voice-count">${vc.members.length} membres</span></div>${vc.members.map(m=>`<div class="voice-member"><div class="voice-av">${m.avatar?`<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:(m.username||'?')[0]}</div><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(m.username)}</div><div style="font-size:10.5px;color:var(--t2);font-family:'JetBrains Mono',monospace">${m.id}</div></div><div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">${m.muted?'🔇':''}${m.deafened?'🔕':''}${m.streaming?'<span class="live-pill">LIVE</span>':''}</div></div>`).join('')}</div>`;}).join('');
+  document.getElementById('liveCount').textContent=tot;
+  // Voice stats
+  const vs=await api('/api/voice-stats');
+  const vsel=document.getElementById('voiceStatsEl');
+  if(vs?.stats?.length){
+    vsel.innerHTML=vs.stats.slice(0,10).map((s,i)=>{
+      const member=guildData.members.find(m=>m.id===s.id);
+      return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;width:20px">#${i+1}</span><div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(member?.username||s.id)}</div><div style="font-size:11px;color:var(--t2)">${Math.round((s.totalMinutes||0)/60)}h ${(s.totalMinutes||0)%60}min · ${s.sessions||0} sessions</div></div>${s.isActive?'<span class="live-pill">EN VOCAL</span>':''}</div>`;
+    }).join('');
+  }else{vsel.innerHTML='<div class="empty"><div class="empty-title">Aucune stat vocale</div></div>';}
+}
+setInterval(()=>{if(document.getElementById('page-activity')?.classList.contains('active'))loadActivity();},30000);
+setInterval(()=>{if(document.getElementById('page-dashboard')?.classList.contains('active')){loadDashboard();}},2*60*1000);
+
+// ─── MEMBRES ───────────────────────────────────────────────────
+let allMembers=[];
+async function loadMembers(){
+  if(!guildData.members.length)await loadGuildData();
+  allMembers=guildData.members||[];
+  document.getElementById('membSub').textContent=allMembers.length+' membres sur le serveur';
+  document.getElementById('membCount').textContent=allMembers.length;
+  renderMembers(allMembers);
+}
+function filterMembers(){
+  const q=(document.getElementById('membSearch')?.value||'').toLowerCase();
+  const role=document.getElementById('membRoleFilter')?.value||'';
+  const sort=document.getElementById('membSort')?.value||'points';
+  let arr=allMembers.filter(m=>!q||(m.username||'').toLowerCase().includes(q)||(m.id||'').includes(q)||(m.nickname||'').toLowerCase().includes(q));
+  if(role)arr=arr.filter(m=>m.roles?.some&&m.roles.some(r=>typeof r==='object'?r.id===role:r===role));
+  arr.sort((a,b)=>{
+    if(sort==='points')return(b.points||0)-(a.points||0);
+    if(sort==='level')return(b.level||1)-(a.level||1);
+    if(sort==='name')return(a.username||'').localeCompare(b.username||'');
+    if(sort==='warns')return(b.warns||0)-(a.warns||0);
+    return 0;
+  });
+  renderMembers(arr);
+  document.getElementById('membCount2').textContent=arr.length+' membres';
+}
+function renderMembers(data){
+  const grid=document.getElementById('membersGrid');
+  if(!data.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👥</div><div class="empty-title">Aucun membre trouvé</div></div>';return;}
+  grid.innerHTML=data.map(m=>{
+    const roles=(m.roles||[]).slice(0,3);
+    const roleHtml=roles.map(r=>{
+      const rObj=typeof r==='object'?r:guildData.roles.find(gr=>gr.id===r);
+      if(!rObj)return'';
+      const col=rObj.color&&rObj.color!=='#000000'?rObj.color:'#7c6dfa';
+      return`<span class="member-role" style="background:${col}22;color:${col};border-color:${col}44">${rObj.name}</span>`;
+    }).join('');
+    const warnColor=m.warns>5?'var(--rose)':m.warns>2?'var(--amber)':'var(--emerald)';
+    return`<div class="member-card" onclick="openMemberDetail('${m.id}')">
+      <div class="member-banner"><div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(124,109,250,.3),rgba(168,85,247,.2))"></div></div>
+      <img class="member-avatar" src="${m.avatar||''}" onerror="this.src=''" alt="" style="background:linear-gradient(135deg,#7c6dfa,#a855f7)">
+      <div class="member-body">
+        <div class="member-name">${esc(m.nickname||m.username)}</div>
+        <div class="member-tag">@${esc(m.username)} · Rejoint ${m.joinedAt||'—'}</div>
+        <div class="member-roles">${roleHtml||'<span style="font-size:10.5px;color:var(--t3)">Aucun rôle</span>'}</div>
+        <div class="member-stats">
+          <div class="member-stat"><div class="member-stat-v" style="color:var(--amber)">${m.points||0}</div><div class="member-stat-l">Points</div></div>
+          <div class="member-stat"><div class="member-stat-v" style="color:var(--violet)">${m.level||1}</div><div class="member-stat-l">Niveau</div></div>
+          <div class="member-stat"><div class="member-stat-v" style="color:${warnColor}">${m.warns||0}</div><div class="member-stat-l">Warns</div></div>
+        </div>
+        <div class="member-actions">
+          <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();quickWarn('${m.id}')">⚠️ Warn</button>
+          <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();searchModMemberById('${m.id}');go('moderation')">🛡️ Mod</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function openMemberDetail(id){
+  const d=await api('/api/member/'+id);if(!d)return;
+  openOv('ov-member');
+  document.getElementById('ov-memb-name').textContent=d.nickname||d.username;
+  document.getElementById('ov-memb-tag').textContent='@'+d.username+' · '+d.id;
+  document.getElementById('ov-memb-av').src=d.avatar||'';
+  document.getElementById('ov-memb-joined').textContent='Arrivé : '+d.joinedAt;
+  document.getElementById('ov-memb-created').textContent='Compte créé : '+d.createdAt;
+  document.getElementById('ov-memb-pts').textContent=d.points;
+  document.getElementById('ov-memb-lvl').textContent=d.level;
+  document.getElementById('ov-memb-xp').textContent=d.xp;
+  document.getElementById('ov-memb-warns').textContent=d.warns?.length||0;
+  document.getElementById('ov-memb-voice').textContent=Math.round((d.voiceMin||0)/60)+'h '+((d.voiceMin||0)%60)+'min';
+  document.getElementById('ov-memb-rep').textContent=d.rep||0;
+  const roles=d.roles||[];
+  document.getElementById('ov-memb-roles').innerHTML=roles.length?roles.map(r=>`<span class="tag tag-violet">${esc(r.name||r)}</span>`).join(' '):'<span style="color:var(--t3)">Aucun rôle</span>';
+  const warns=d.warns||[];
+  document.getElementById('ov-memb-warnslist').innerHTML=warns.length?warns.map((w,i)=>`<div class="feed-item"><div class="feed-icon" style="background:rgba(255,183,3,.1);color:var(--amber);font-size:12px">#${i+1}</div><div class="feed-content"><div class="feed-text">${esc(w.reason||'Aucune raison')}</div><div class="feed-time">${w.date||'—'} · Par ${w.modId||'—'}</div></div></div>`).join(''):'<div style="font-size:12.5px;color:var(--t2);padding:8px">✅ Aucun avertissement</div>';
+  document.getElementById('ov-memb-id-hidden').value=id;
+}
+
+// ─── ÉCONOMIE ──────────────────────────────────────────────────
+async function loadEconomy(){
+  const[stats,data]=await Promise.all([api('/api/stats'),api('/api/economy')]);
+  if(data){
+    ecoData=data;
+    const pts=Object.values(data).map(u=>u.points||0);
+    const total=pts.reduce((a,b)=>a+b,0);
+    const maxLvl=Math.max(...Object.values(data).map(u=>u.level||1));
+    const avg=pts.length?Math.round(total/pts.length):0;
+    ['eco-total','eco-players','eco-maxlvl','eco-avg'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=[total,Object.keys(data).length,maxLvl,avg][i];});
+    renderEco(Object.entries(data).sort(([,a],[,b])=>b.points-a.points));
+  }
+}
+function filterEco(){
+  const q=(document.getElementById('ecoSearch')?.value||'').toLowerCase();
+  const entries=Object.entries(ecoData||{}).sort(([,a],[,b])=>b.points-a.points);
+  const filtered=q?entries.filter(([id])=>{const m=guildData.members.find(x=>x.id===id);return(m?.username||id).toLowerCase().includes(q);}):entries;
+  renderEco(filtered);
+}
+function renderEco(entries){
+  const tb=document.getElementById('ecoTable');if(!tb)return;
+  if(!entries.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--t2)">Aucun joueur</td></tr>';return;}
+  const medals=['🥇','🥈','🥉'];
+  tb.innerHTML=entries.map(([id,u],i)=>{
+    const memb=guildData.members.find(m=>m.id===id);
+    const needed=(u.level||1)*100;
+    const xpPct=Math.min(100,Math.round(((u.xp||0)/needed)*100));
+    return`<tr>
+      <td><span style="font-size:16px">${medals[i]||'#'+(i+1)}</span></td>
+      <td><div style="display:flex;align-items:center;gap:9px">${memb?.avatar?`<img src="${memb.avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:30px;height:30px;border-radius:50%;background:var(--grad-main);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">'+(memb?.username||id)[0]+'</div>'}<div><div style="font-weight:600;font-size:13px">${esc(memb?.username||id)}</div><div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace">${id}</div></div></div></td>
+      <td><span style="font-weight:700;color:var(--amber);font-size:14px">${u.points||0}</span></td>
+      <td><div style="font-size:12px">${u.xp||0}/${needed}</div><div class="progress" style="margin-top:3px;width:80px"><div class="progress-fill" style="width:${xpPct}%"></div></div></td>
+      <td><span class="tag tag-violet">Niv. ${u.level||1}</span></td>
+      <td style="color:var(--t2);font-size:12px">${u.messages||0}</td>
+      <td><div style="display:flex;gap:4px"><button class="btn btn-amber btn-xs" onclick="openAddPoints('${id}','${esc(memb?.username||id)}')">💰 Pts</button><button class="btn btn-ghost btn-xs" onclick="openMemberDetail('${id}')">👤</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── MODÉRATION ────────────────────────────────────────────────
+async function loadModeration(){loadSanctions();}
+async function loadSanctions(){
+  const tb=document.getElementById('sanctionsTable');if(!tb)return;
+  const warns=allWarns;
+  const entries=[];
+  Object.entries(warns||{}).forEach(([uid,ws])=>{(ws||[]).forEach(w=>{const m=guildData.members.find(x=>x.id===uid);entries.push({uid,username:m?.username||uid,reason:w.reason,modId:w.modId,date:w.date});});});
+  entries.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!entries.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--t2)">✅ Aucune sanction récente</td></tr>';return;}
+  tb.innerHTML=entries.slice(0,50).map(e=>`<tr><td><div style="font-weight:600">${esc(e.username)}</div><div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace">${e.uid}</div></td><td><span class="tag tag-amber">⚠️ Warn</span></td><td style="color:var(--t2);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(e.reason||'—')}</td><td style="color:var(--t2);font-size:12px">${esc(e.modId||'—')}</td><td style="color:var(--t2);font-size:12px">${esc(e.date||'—')}</td></tr>`).join('');
+}
+async function searchModMember(){const id=document.getElementById('modSearch').value.trim();if(!id){toast('ID requis','warn');return;}searchModMemberById(id);}
+async function searchModMemberById(id){
+  const d=await api('/api/member/'+id);
+  if(!d||d.error){toast('Membre introuvable','err');return;}
+  modMemberId=d.id;
+  document.getElementById('mod-av').src=d.avatar||'';
+  document.getElementById('mod-name').textContent=d.nickname||d.username;
+  document.getElementById('mod-id').textContent='@'+d.username+' · '+d.id;
+  document.getElementById('mod-warns').textContent=(d.warns?.length||0)+' warn(s)';
+  document.getElementById('mod-pts').textContent=(d.points||0)+' pts';
+  document.getElementById('mod-lvl').textContent='Niv. '+(d.level||1);
+  const wl=document.getElementById('warnsList');
+  wl.innerHTML=(d.warns||[]).length?(d.warns||[]).map((w,i)=>`<div class="feed-item"><div class="feed-icon" style="background:rgba(255,183,3,.1);color:var(--amber);font-size:11px">#${i+1}</div><div class="feed-content"><div class="feed-text">${esc(w.reason||'—')}</div><div class="feed-time">${w.date||'—'}</div></div></div>`).join(''):'<div style="font-size:12.5px;color:var(--t2);padding:8px">✅ Aucun avertissement</div>';
+  document.getElementById('modMemberBox').style.display='block';
+  document.getElementById('modSearch').value=id;
+}
+function modAction(type){
+  if(!modMemberId){toast('Aucun membre sélectionné','warn');return;}
+  document.getElementById('ov-modaction-title').textContent={warn:'⚠️ Avertir',mute:'🔇 Mettre en sourdine',kick:'👢 Expulser',ban:'🔨 Bannir',addpoints:'💰 Ajouter des points',clearwarns:'🗑️ Clear les warns'}[type]||type;
+  document.getElementById('ov-modaction-type').value=type;
+  const body=document.getElementById('ov-modaction-body');
+  body.innerHTML={
+    warn:`<div class="form-group"><label class="form-label">Raison</label><input class="form-input" id="mod-reason" placeholder="Comportement inapproprié..."></div>`,
+    mute:`<div class="form-row"><div class="form-group"><label class="form-label">Durée (minutes)</label><input class="form-input" id="mod-duration" type="number" value="10" min="1"></div><div class="form-group"><label class="form-label">Raison</label><input class="form-input" id="mod-reason" placeholder="Raison..."></div></div>`,
+    kick:`<div class="form-group"><label class="form-label">Raison</label><input class="form-input" id="mod-reason" placeholder="Raison..."></div>`,
+    ban:`<div class="form-group"><label class="form-label">Raison</label><input class="form-input" id="mod-reason" placeholder="Raison..."></div><div class="form-group"><label class="form-label">Durée (jours, 0=permanent)</label><input class="form-input" id="mod-bandays" type="number" value="0" min="0"></div>`,
+    addpoints:`<div class="form-group"><label class="form-label">Points à ajouter (négatif pour retirer)</label><input class="form-input" id="mod-points" type="number" placeholder="100" value="100"></div>`,
+    clearwarns:`<div style="padding:12px;background:rgba(255,77,109,.08);border-radius:var(--r2);border:1px solid rgba(255,77,109,.2);font-size:13px;color:var(--t1)">Tous les warns seront supprimés définitivement.</div>`,
+  }[type]||'';
+  openOv('ov-modaction');
+}
+async function execModAction(){
+  const type=document.getElementById('ov-modaction-type').value;
+  const body={userId:modMemberId,reason:document.getElementById('mod-reason')?.value||''};
+  if(type==='mute')body.minutes=parseInt(document.getElementById('mod-duration')?.value||'10');
+  if(type==='ban')body.days=parseInt(document.getElementById('mod-bandays')?.value||'0');
+  if(type==='addpoints')body.points=parseInt(document.getElementById('mod-points')?.value||'0');
+  const eps={warn:'/api/mod/warn',mute:'/api/mod/mute',kick:'/api/mod/kick',ban:'/api/mod/ban',addpoints:'/api/mod/addpoints',clearwarns:'/api/mod/clearwarns'};
+  const d=await api(eps[type],{method:'POST',body:JSON.stringify(body)});
+  if(d?.ok){toast('✅ Action effectuée !','ok');closeOv('ov-modaction');searchModMemberById(modMemberId);}
+  else toast(d?.error||'Erreur','err');
+}
+async function quickWarn(id){modMemberId=id;modAction('warn');openOv('ov-modaction');}
+async function saveModConfig(){
+  const body={antispam:document.getElementById('tog-spam').checked,antilink:document.getElementById('tog-link').checked,anticaps:document.getElementById('tog-caps').checked,autosanction:document.getElementById('tog-auto').checked,dm:document.getElementById('tog-dm').checked};
+  const d=await api('/api/mod-config',{method:'POST',body:JSON.stringify(body)});
+  if(d?.ok)toast('⚙️ Config sauvegardée','ok');
+}
+async function lockdown(){const msg=prompt('Message du lockdown :');if(!confirm('⚠️ Verrouiller TOUS les salons ?'))return;const d=await api('/api/mod/lockdown',{method:'POST',body:JSON.stringify({message:msg||'🚨 Lockdown.'})});if(d?.ok)toast('🚨 Lockdown activé !','warn');else toast('Erreur','err');}
+
+// ─── ÉDITEUR CODE ──────────────────────────────────────────────
+function initMonaco(){
+  if(monacoEd||!document.getElementById('monacoEl'))return;
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js';
+  s.onload=()=>{
+    require.config({paths:{vs:'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs'}});
+    require(['vs/editor/editor.main'],()=>{
+      monaco.editor.defineTheme('nexus8',{base:'vs-dark',inherit:true,rules:[{token:'comment',foreground:'3a4060',fontStyle:'italic'},{token:'keyword',foreground:'c4b5fd',fontStyle:'bold'},{token:'string',foreground:'a7f3d0'},{token:'number',foreground:'ffb703'},{token:'type',foreground:'06d6ff'}],colors:{'editor.background':'#04050a','editor.foreground':'#e8ecff','editor.lineHighlightBackground':'#ffffff06','editor.selectionBackground':'#7c6dfa25','editorLineNumber.foreground':'#3a4060','editorLineNumber.activeForeground':'#7c6dfa','editorCursor.foreground':'#7c6dfa','editorWidget.background':'#080b14','editorSuggestWidget.selectedBackground':'#7c6dfa20','scrollbarSlider.background':'#ffffff0f'}});
+      monacoEd=monaco.editor.create(document.getElementById('monacoEl'),{value:`// NexusBot — Commande JS\n// Disponible: interaction, guild, user, db, addPts, addXP, getUser, EmbedBuilder, C\n\nawait interaction.reply({\n  embeds: [new EmbedBuilder()\n    .setTitle('✅ Titre')\n    .setDescription(\`Bonjour \${user.username} !\`)\n    .setColor(C('#7c6dfa'))\n    .setTimestamp()]\n});`,language:'javascript',theme:'nexus8',fontSize:13,fontFamily:"'JetBrains Mono',monospace",minimap:{enabled:false},scrollBeyondLastLine:false,lineNumbers:'on',wordWrap:'on',automaticLayout:true,tabSize:2,insertSpaces:true,folding:true,padding:{top:14,bottom:14},scrollbar:{verticalScrollbarSize:4,horizontalScrollbarSize:4}});
+      monacoEd.onDidChangeModelContent(()=>{const n=monacoEd.getModel().getLineCount();const el=document.getElementById('editorLines');if(el)el.textContent=n+' lignes';});
+    });
+  };document.head.appendChild(s);
+}
+const SNIPS={
+  reply:`await interaction.reply({ content: \`Bonjour \${user.username} ! 👋\` });`,
+  embed:`const emb = new EmbedBuilder()\n  .setTitle('✅ Titre')\n  .setDescription(\`Bonjour \${user.username} !\`)\n  .setColor(C('#7c6dfa'))\n  .setTimestamp();\nawait interaction.reply({ embeds: [emb] });`,
+  user:`const u = getUser(user.id);\nawait interaction.reply({ embeds: [new EmbedBuilder().setTitle(\`👤 \${user.username}\`).addFields({name:'💰 Points',value:\`\${u.points}\`,inline:true},{name:'⭐ Niveau',value:\`\${u.level}\`,inline:true}).setColor(C('#7c6dfa'))] });`,
+  points:`addPts(user.id, 100);\nawait interaction.reply({ content: \`💰 +100 points ! Total : **\${getUser(user.id).points} pts**\` });`,
+  top3:`const top=Object.entries(db.economy).sort(([,a],[,b])=>b.points-a.points).slice(0,3);\nawait interaction.reply({embeds:[new EmbedBuilder().setTitle('🏆 Top 3').setDescription(top.map(([id,d],i)=>\`\${'🥇🥈🥉'[i]} <@\${id}> — **\${d.points} pts**\`).join('\\n')).setColor(C('#ffb703'))]});`,
+  shop:`const arts=db.articles.filter(a=>a.stock!==0);\nawait interaction.reply({embeds:[new EmbedBuilder().setTitle('🛒 Boutique').setDescription(arts.map(a=>\`\${a.emoji||'🛒'} **\${a.name}** — \${a.price}\`).join('\\n')||'Aucun article').setColor(C('#00e5a0'))]});`,
+  crime:`const win=Math.random()>0.45;const u=getUser(user.id);\nif(win){const g=Math.floor(Math.random()*300)+100;addPts(user.id,g);await interaction.reply({content:\`🔫 Réussi ! **+\${g} pts**\`});}\nelse{const l=Math.min(u.points,150);u.points-=l;await interaction.reply({content:\`🚔 Arrêté ! **-\${l} pts**\`});}`,
+  timer:`await interaction.reply({content:'⏱️ Lancé !'});\nsetTimeout(()=>interaction.channel?.send({content:\`⏰ <@\${user.id}> Terminé !\`}),30000);`,
+};
+function insertSnippet(k){if(monacoEd){const pos=monacoEd.getPosition();monacoEd.executeEdits('snip',[{range:new monaco.Range(pos.lineNumber,pos.column,pos.lineNumber,pos.column),text:'\n'+SNIPS[k]+'\n',forceMoveMarkers:true}]);monacoEd.focus();}}
+function formatCode(){if(monacoEd)monacoEd.getAction('editor.action.formatDocument')?.run();}
+async function validateCode(){
+  const code=monacoEd?monacoEd.getValue():'';
+  const d=await api('/api/exec',{method:'POST',body:JSON.stringify({code})});
+  const box=document.getElementById('validationBox');const dot=document.getElementById('editorDot');const msg=document.getElementById('editorStatus');
+  box.style.display='block';
+  if(d?.ok){box.style.background='rgba(0,229,160,.08)';box.style.border='1px solid rgba(0,229,160,.3)';box.style.color='var(--emerald)';box.textContent='✅ Code valide — '+d.lines+' lignes';if(dot)dot.style.background='var(--emerald)';if(msg)msg.textContent='✅ '+d.lines+' lignes OK';}
+  else{box.style.background='rgba(255,77,109,.08)';box.style.border='1px solid rgba(255,77,109,.3)';box.style.color='var(--rose)';box.textContent='❌ Erreurs :\n'+(d?.errors||[]).join('\n');if(dot)dot.style.background='var(--rose)';if(msg)msg.textContent='❌ '+(d?.errors?.length||1)+' erreur(s)';}
+}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'&&monacoEd){e.preventDefault();validateCode();}});
+function updateEmbedPreview(){const c=document.getElementById('emb-content')?.value||'';const col=document.getElementById('emb-color')?.value||'#7c6dfa';const p=document.getElementById('embedPreview');const t=document.getElementById('embed-title-prev');const d=document.getElementById('embed-desc-prev');if(p)p.style.borderColor=col;if(t)t.style.color=col;if(d)d.textContent=c||'Contenu...';}
+async function saveCmd(type){
+  let payload={};
+  if(type==='text'){const n=document.getElementById('txt-name').value.trim(),r=document.getElementById('txt-reply').value.trim();if(!n||!r){toast('Nom et réponse requis','warn');return;}payload={name:n,desc:document.getElementById('txt-desc').value.trim(),reponse:r,type:'text'};}
+  else if(type==='embed'){const n=document.getElementById('emb-name').value.trim(),c=document.getElementById('emb-content').value.trim();if(!n||!c){toast('Nom et contenu requis','warn');return;}payload={name:n,desc:document.getElementById('emb-desc').value.trim(),reponse:c,type:'embed',color:document.getElementById('emb-color').value,ephemeral:document.getElementById('emb-eph').value==='true'};}
+  else{const n=document.getElementById('code-name').value.trim(),code=monacoEd?monacoEd.getValue():'';if(!n||!code.trim()){toast('Nom et code requis','warn');return;}const v=await api('/api/exec',{method:'POST',body:JSON.stringify({code})});if(v&&!v.ok){toast('❌ Code invalide — vérifiez d\'abord','err');return;}payload={name:n,desc:document.getElementById('code-desc').value.trim(),code,type:'text'};}
+  const d=await api('/api/cmds',{method:'POST',body:JSON.stringify(payload)});
+  if(d?.ok){toast('✅ Commande /cmd '+d.name+' déployée !','ok');}else toast('Erreur lors du déploiement','err');
+}
+async function loadCmds(){
+  const data=await api('/api/cmds');const grid=document.getElementById('cmdsGrid');
+  if(!data?.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⚡</div><div class="empty-title">Aucune commande</div></div>';return;}
+  grid.innerHTML=data.map(c=>`<div style="background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);padding:16px;position:relative;overflow:hidden;transition:.2s" onmouseenter="this.style.borderColor='rgba(124,109,250,.3)'" onmouseleave="this.style.borderColor='var(--border)'"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad-main)"></div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#c4b5fd;margin-bottom:4px">/cmd ${esc(c.name)}</div><span class="tag ${c.code?'tag-green':c.type==='embed'?'tag-cyan':'tag-violet'}" style="margin-bottom:8px;display:inline-flex">${c.code?'💻 Code JS':c.type==='embed'?'🎨 Embed':'💬 Texte'}</span><div style="font-size:12.5px;color:var(--t2);margin-bottom:8px">${esc(c.desc||'Aucune description')}</div><div style="background:rgba(0,0,0,.25);border-radius:6px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:10px">${esc((c.code||c.reponse||'').substring(0,80))}</div><div style="display:flex;gap:5px"><button class="btn btn-ghost btn-xs" onclick='editCmd(${JSON.stringify(JSON.stringify(c))})'>✏️ Éditer</button><button class="btn btn-red btn-xs" onclick="delCmd('${esc(c.name)}')">🗑️</button></div></div>`).join('');
+  document.getElementById('cmdCount').textContent=data.length;
+}
+function editCmd(cs){const c=JSON.parse(cs);if(c.code){switchTab('ed','code',document.getElementById('ed-code').previousElementSibling);document.getElementById('code-name').value=c.name;document.getElementById('code-desc').value=c.desc||'';setTimeout(()=>{initMonaco();if(monacoEd)monacoEd.setValue(c.code);},200);}else if(c.type==='embed'){switchTab('ed','embed',document.querySelectorAll('.tabs .tab')[1]);document.getElementById('emb-name').value=c.name;document.getElementById('emb-content').value=c.reponse||'';}else{document.getElementById('txt-name').value=c.name;document.getElementById('txt-reply').value=c.reponse||'';}go('editor');}
+async function delCmd(name){if(!confirm('Supprimer /cmd '+name+' ?'))return;const d=await api('/api/cmds/'+name,{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimée','ok');loadCmds();}else toast('Erreur','err');}
+
+// ─── STATS CHANNELS ────────────────────────────────────────────
+async function loadStatsSetup(){const d=await api('/api/stats-channels-info');const el=document.getElementById('statsChannelsInfo');if(!d||!Object.keys(d.active||{}).length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Aucun salon créé</div></div>';return;}const e=Object.entries(d.active).filter(([k])=>k!=='categoryId');el.innerHTML=`<div style="display:grid;gap:6px">${e.map(([k,id])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);border-radius:var(--r2);font-size:12.5px"><span style="color:var(--t1)">${k}</span><code style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:10.5px">${id}</code></div>`).join('')}</div>`;}
+async function createStatsChannels(){const catname=document.getElementById('statCatName').value.trim();const sel={membres:document.getElementById('st-members2').checked,humains:document.getElementById('st-humans').checked,bots:document.getElementById('st-bots').checked,enligne:document.getElementById('st-online2').checked,vocal:document.getElementById('st-voice2').checked,tickets:document.getElementById('st-tickets2').checked,articles:document.getElementById('st-articles2').checked,orders:document.getElementById('st-orders2').checked};if(!Object.values(sel).some(v=>v)){toast('Sélectionnez au moins un compteur','warn');return;}const d=await api('/api/stats-channels',{method:'POST',body:JSON.stringify({catName:catname,...sel})});if(d?.ok){toast('✅ '+d.count+' salon(s) créé(s) !','ok');loadStatsSetup();}else toast(d?.error||'Erreur','err');}
+async function deleteStatsChannels(){if(!confirm('Supprimer tous les salons stats ?'))return;const d=await api('/api/stats-channels',{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimés','ok');loadStatsSetup();}else toast('Erreur','err');}
+
+// ─── TICKETS ───────────────────────────────────────────────────
+async function loadTickets(){
+  const d=await api('/api/tickets');if(!d)return;
+  const cats=d.categories||[];
+  document.getElementById('catCountBadge').textContent=cats.length;
+  document.getElementById('tickCount').textContent=cats.length;
+  const cg=document.getElementById('ticketCategGrid');
+  cg.innerHTML=cats.length?cats.map(c=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--glass);border:1px solid var(--border);border-left:3px solid ${c.color||'var(--violet)'};border-radius:var(--r2);margin-bottom:7px;transition:.1s" onmouseenter="this.style.borderColor='rgba(124,109,250,.4)'" onmouseleave="this.style.borderColor='var(--border)'"><div style="font-size:18px">${c.label.split(' ')[0]||'🎫'}</div><div style="flex:1"><div style="font-weight:700;font-size:13px">${esc(c.label)}</div><div style="font-size:11px;color:var(--t2)">${esc(c.desc||'')}</div></div><button class="btn btn-red btn-xs" onclick="removeTicketCat('${c.id}')">✕</button></div>`).join(''):'<div class="empty"><div class="empty-icon">🎫</div><div class="empty-title">Aucune catégorie</div></div>';
+  const active=d.active||{};const ent=Object.entries(active);
+  document.getElementById('openTicketsBadge').textContent=ent.length;
+  const tb=document.getElementById('ticketsTable');
+  tb.innerHTML=ent.length?ent.map(([uid,chId])=>`<tr><td><code style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#c4b5fd">${uid}</code></td><td><code style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--t2)">${chId}</code></td><td>—</td><td><button class="btn btn-ghost btn-xs" onclick="closeTicket('${uid}')">🔒 Fermer</button></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--t2)">✅ Aucun ticket ouvert</td></tr>';
+}
+async function addTicketCategory(){const b={id:document.getElementById('tc-id').value.trim(),label:document.getElementById('tc-label').value.trim(),desc:document.getElementById('tc-desc').value.trim(),color:document.getElementById('tc-color').value};if(!b.id||!b.label){toast('ID et label requis','warn');return;}const d=await api('/api/ticket-category',{method:'POST',body:JSON.stringify(b)});if(d?.ok){toast('✅ Catégorie ajoutée !','ok');document.getElementById('ticketCatForm').style.display='none';loadTickets();}else toast('Erreur','err');}
+async function removeTicketCat(id){if(!confirm('Supprimer ?'))return;const d=await api('/api/ticket-category/'+id,{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimée','ok');loadTickets();}else toast('Erreur','err');}
+async function closeTicket(uid){if(!confirm('Fermer le ticket de '+uid+' ?'))return;const d=await api('/api/ticket/close',{method:'POST',body:JSON.stringify({userId:uid})});if(d?.ok){toast('🔒 Ticket fermé','ok');loadTickets();}else toast('Erreur','err');}
+
+// ─── GIVEAWAYS ─────────────────────────────────────────────────
+async function loadGiveaways(){
+  const d=await api('/api/giveaways');const grid=document.getElementById('giveawaysGrid');
+  const gws=d?.giveaways||[];
+  document.getElementById('gwCount').textContent=gws.filter(g=>!g.ended).length;
+  if(!gws.length){grid.innerHTML='<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Aucun giveaway</div><div class="empty-sub">Créez-en un avec le bouton ➕</div></div>';return;}
+  grid.innerHTML=gws.map(g=>{const ended=g.ended||Date.now()>g.end;const tl=!ended?Math.max(0,Math.round((g.end-Date.now())/60000)):0;return`<div class="gw-card ${ended?'ended':''}"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:24px">${ended?'🏁':'🎉'}</div><div style="flex:1"><div style="font-size:15px;font-weight:800;font-family:'Outfit',sans-serif">${esc(g.prize)}</div><div style="font-size:11px;color:var(--t2);font-family:'JetBrains Mono',monospace;margin-top:3px">ID: ${g.id} · ${g.entries} participants</div></div><div class="tag ${ended?'tag-gray':'tag-amber'}">${ended?'🏁 Terminé':'⏳ '+tl+' min'}</div></div>${g.winner?`<div style="background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);border-radius:var(--r2);padding:8px 12px;font-size:12.5px;margin-bottom:12px">🏆 Gagnant : <code style="color:var(--emerald);font-family:'JetBrains Mono',monospace">${g.winner}</code></div>`:''}<div style="display:flex;gap:6px;flex-wrap:wrap">${!ended?`<button class="btn btn-red btn-sm" onclick="endGw('${g.id}')">🏁 Terminer</button>`:''}<button class="btn btn-ghost btn-sm" onclick="rerollGw('${g.id}')">🔄 Reroll</button><button class="btn btn-red btn-xs" onclick="delGw('${g.id}')">🗑️</button></div></div>`;}).join('');}
+async function createGiveaway(){const body={channelId:document.getElementById('gw-channel')?.value||'',prize:document.getElementById('gw-prize').value.trim(),minutes:parseInt(document.getElementById('gw-minutes').value)||60,winners:parseInt(document.getElementById('gw-winners').value)||1};if(!body.channelId){toast('Sélectionner un salon','warn');return;}if(!body.prize){toast('Prix requis','warn');return;}const d=await api('/api/giveaways',{method:'POST',body:JSON.stringify(body)});if(d?.ok){toast('🎉 Giveaway lancé !','ok');closeOv('ov-giveaway');document.getElementById('gw-prize').value='';loadGiveaways();}else toast(d?.error||'Erreur','err');}
+async function endGw(id){const d=await api('/api/giveaways/'+id+'/end',{method:'POST',body:'{}',headers:{'Content-Type':'application/json'}});if(d?.ok){toast('🏁 Terminé !','ok');loadGiveaways();}else toast('Erreur','err');}
+async function rerollGw(id){const d=await api('/api/giveaways/'+id+'/reroll',{method:'POST',body:'{}',headers:{'Content-Type':'application/json'}});if(d?.ok){toast('🔄 Nouveau gagnant sélectionné !','ok');loadGiveaways();}else toast(d?.error||'Erreur','err');}
+async function delGw(id){if(!confirm('Supprimer ce giveaway ?'))return;const d=await api('/api/giveaways/'+id,{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimé','ok');loadGiveaways();}else toast('Erreur','err');}
+
+// ─── BIENVENUE ─────────────────────────────────────────────────
+async function loadWelcome(){
+  const d=await api('/api/welcome');if(!d?.config)return;const c=d.config;
+  const E=id=>document.getElementById(id);
+  if(E('wlc-enabled'))E('wlc-enabled').checked=c.enabled||false;
+  if(E('wlc-channel'))E('wlc-channel').value=c.channelId||'';
+  if(E('wlc-title'))E('wlc-title').value=c.title||'';
+  if(E('wlc-message'))E('wlc-message').value=c.message||'';
+  if(E('wlc-color'))E('wlc-color').value=c.color||'#7c6dfa';
+  if(E('wlc-footer'))E('wlc-footer').value=c.footerText||'';
+  if(E('wlc-image'))E('wlc-image').value=c.imageUrl||'';
+  if(E('wlc-avatar'))E('wlc-avatar').checked=c.showAvatar!==false;
+  updateWelcomePreview();
+}
+function updateWelcomePreview(){
+  const msg=document.getElementById('wlc-message')?.value||'';
+  const title=document.getElementById('wlc-title')?.value||'';
+  const color=document.getElementById('wlc-color')?.value||'#7c6dfa';
+  const prev=msg.replace(/{user}/g,'<strong>Jean_Discord</strong>').replace(/{server}/g,'<strong>NexusBot</strong>').replace(/{count}/g,'<strong>42</strong>').replace(/{mention}/g,'<strong>@Jean_Discord</strong>');
+  const pt=document.getElementById('wlc-prev-title');const pm=document.getElementById('wlc-prev-msg');const pbox=document.getElementById('welcomePreview');
+  if(pt){pt.textContent=title.replace(/{user}/g,'Jean').replace(/{server}/g,'NexusBot');pt.style.display=title?'block':'none';}
+  if(pm)pm.innerHTML=prev.replace(/\n/g,'<br>')||'Message vide...';
+  if(pbox){pbox.style.borderLeftColor=color;pbox.style.background=color+'15';}
+}
+async function saveWelcome(){
+  const body={enabled:document.getElementById('wlc-enabled')?.checked,channelId:document.getElementById('wlc-channel')?.value||'',message:document.getElementById('wlc-message')?.value||'',title:document.getElementById('wlc-title')?.value||'',color:document.getElementById('wlc-color')?.value,footerText:document.getElementById('wlc-footer')?.value||'',imageUrl:document.getElementById('wlc-image')?.value||'',showAvatar:document.getElementById('wlc-avatar')?.checked};
+  const d=await api('/api/welcome',{method:'POST',body:JSON.stringify(body)});
+  if(d?.ok)toast('💾 Message de bienvenue sauvegardé !','ok');else toast('Erreur','err');
+}
+async function testWelcome(){const d=await api('/api/welcome/test',{method:'POST',body:'{}'});if(d?.ok)toast('🧪 Test envoyé dans le salon !','ok');else toast(d?.error||'Erreur — vérifiez CH_WELCOME dans Railway','err');}
+
+// ─── RÔLES ─────────────────────────────────────────────────────
+async function loadRoles(){
+  if(!guildData.roles.length)await loadGuildData();
+  const el=document.getElementById('rolesListEl');
+  el.innerHTML=guildData.roles.length?guildData.roles.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:${r.color||'#7c6dfa'};flex-shrink:0;box-shadow:0 0 6px ${r.color||'#7c6dfa'}44"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">@${esc(r.name)}</div><div style="font-size:10.5px;color:var(--t2)">${r.memberCount} membres · pos.${r.position}</div></div><code style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3)">${r.id}</code></div>`).join(''):'<div class="empty"><div class="empty-title">Chargement...</div></div>';
+}
+async function addLevelRole(){const lvl=parseInt(document.getElementById('lvl-num').value)||0;const role=document.getElementById('lvl-role').value;if(!lvl||!role){toast('Niveau et rôle requis','warn');return;}const d=await api('/api/mod-config',{method:'POST',body:JSON.stringify({levelRoles:{[lvl]:role}})});if(d?.ok){toast('✅ Rôle de niveau ajouté !','ok');}else toast('Erreur','err');}
+
+// ─── BOUTIQUE ──────────────────────────────────────────────────
+async function loadShop(){
+  const data=await api('/api/articles');arts=data||[];
+  renderShop(arts);
+  const tot=arts.length,low=arts.filter(a=>a.stock>0&&a.stock<=3).length,out=arts.filter(a=>a.stock===0).length,inf=arts.filter(a=>a.stock===-1).length;
+  ['shop-total','shop-low','shop-out','shop-inf'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=[tot,low,out,inf][i];});
+  document.getElementById('artCount').textContent=tot;
+  document.getElementById('stockAlert').textContent=out;
+  // Remplir le select article dans les modals
+  const sels=['blk-article','dlv-article','neword-article'];
+  sels.forEach(selId=>{const sel=document.getElementById(selId);if(sel)sel.innerHTML='<option value="">Sélectionner...</option>'+arts.map(a=>`<option value="${a.id}" data-price="${esc(a.price)}">${a.emoji||'🛒'} ${esc(a.name)} — ${esc(a.price)}</option>`).join('');});
+}
+function filterShop(){
+  const q=(document.getElementById('shopSearch')?.value||'').toLowerCase();const f=document.getElementById('shopFilter')?.value||'';
+  let arr=arts.filter(a=>!q||(a.name||'').toLowerCase().includes(q));
+  if(f==='ok')arr=arr.filter(a=>a.stock>3||a.stock===-1);else if(f==='low')arr=arr.filter(a=>a.stock>0&&a.stock<=3);else if(f==='out')arr=arr.filter(a=>a.stock===0);else if(f==='inf')arr=arr.filter(a=>a.stock===-1);
+  renderShop(arr);
+}
+function renderShop(data){
+  const tb=document.getElementById('shopTable');if(!tb)return;
+  if(!data.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--t2)">Aucun article</td></tr>';return;}
+  tb.innerHTML=data.map(a=>{
+    const stk=a.stock===-1?'<span class="tag tag-cyan">♾️ Illimité</span>':a.stock===0?'<span class="tag tag-red">❌ Rupture</span>':a.stock<=3?`<span class="tag tag-amber">⚠️ ${a.stock}</span>`:`<span class="tag tag-green">✅ ${a.stock}</span>`;
+    return`<tr><td><div style="display:flex;align-items:center;gap:9px"><span style="font-size:20px">${a.emoji||'🛒'}</span><div><div style="font-weight:700;font-size:13px">${esc(a.name)}</div><div style="font-size:11px;color:var(--t2)">${esc((a.description||'').substring(0,40))}</div></div></div></td><td><span class="tag tag-green">${esc(a.price)}</span></td><td>${stk}</td><td><span class="tag tag-violet">${esc(a.category||'—')}</span></td><td>${a.link?`<a href="${esc(a.link)}" target="_blank" style="color:var(--violet);font-size:11.5px;font-family:'JetBrains Mono',monospace">Voir →</a>`:'—'}</td><td><div style="display:flex;gap:4px"><button class="btn btn-ghost btn-xs" onclick='openEditArticle(${JSON.stringify(JSON.stringify(a))})'>✏️</button><button class="btn btn-ghost btn-xs" onclick="quickStock(${a.id},1)">+</button><button class="btn btn-ghost btn-xs" onclick="quickStock(${a.id},-1)">−</button><button class="btn btn-red btn-xs" onclick="delArticle(${a.id})">🗑️</button></div></td></tr>`;
+  }).join('');
+}
+function openArticleModal(){document.getElementById('ov-art-title').textContent='📦 Ajouter un article';document.getElementById('ov-art-save').textContent='➕ Ajouter';document.getElementById('art-id-hidden').value='';['art-name','art-price','art-link','art-desc','art-emoji','art-cat','art-image'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('art-stock').value='-1';openOv('ov-article');}
+function openEditArticle(as){const a=JSON.parse(as);document.getElementById('ov-art-title').textContent='✏️ Modifier l\'article';document.getElementById('ov-art-save').textContent='💾 Sauvegarder';document.getElementById('art-id-hidden').value=a.id;document.getElementById('art-name').value=a.name||'';document.getElementById('art-price').value=a.price||'';document.getElementById('art-link').value=a.link||'';document.getElementById('art-desc').value=a.description||'';document.getElementById('art-emoji').value=a.emoji||'🛒';document.getElementById('art-stock').value=a.stock??-1;document.getElementById('art-cat').value=a.category||'';document.getElementById('art-image').value=a.image||'';openOv('ov-article');}
+async function saveArticle(){
+  const editId=document.getElementById('art-id-hidden').value;
+  const body={name:document.getElementById('art-name').value.trim(),price:document.getElementById('art-price').value.trim(),link:document.getElementById('art-link').value.trim(),description:document.getElementById('art-desc').value.trim(),emoji:document.getElementById('art-emoji').value.trim()||'🛒',stock:parseInt(document.getElementById('art-stock').value)||-1,category:document.getElementById('art-cat').value.trim(),image:document.getElementById('art-image').value.trim(),syncNexusStore:document.getElementById('art-ns')?.checked??true};
+  if(!body.name||!body.price){toast('Nom et prix requis','warn');return;}
+  const method=editId?'PUT':'POST',path=editId?'/api/articles/'+editId:'/api/articles';
+  const d=await api(path,{method,body:JSON.stringify(body)});
+  if(d?.ok){toast(editId?'💾 Modifié !':'✅ Article ajouté !','ok');closeOv('ov-article');loadShop();loadStock();}else toast('Erreur','err');
+}
+async function quickStock(id,delta){const a=arts.find(x=>x.id===id);if(!a)return;if(a.stock===-1){toast('Stock illimité — utilisez Gestion stock','warn');return;}const ns=Math.max(0,a.stock+delta);const d=await api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:ns,reason:delta>0?'+'+delta:String(delta)})});if(d?.ok){toast((delta>0?'+':'')+delta+' stock','ok');loadShop();loadStock();}else toast('Erreur','err');}
+async function delArticle(id){if(!confirm('Supprimer cet article ?'))return;const d=await api('/api/articles/'+id,{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimé','ok');loadShop();loadStock();}else toast('Erreur','err');}
+
+// ─── STOCK ─────────────────────────────────────────────────────
+let stockHist={};
+async function loadStock(){
+  const data=await api('/api/articles');arts=data||[];
+  const al=document.getElementById('stockAlerts');
+  const rup=arts.filter(a=>a.stock===0),fbl=arts.filter(a=>a.stock>0&&a.stock<=3);
+  if(al){al.innerHTML='';if(rup.length)al.innerHTML+=`<div style="background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.25);border-radius:var(--r2);padding:10px 14px;margin-bottom:8px;font-size:12.5px">🔴 <strong>${rup.length} rupture${rup.length>1?'s':''} :</strong> ${rup.map(a=>`<span style="color:var(--rose)">${a.emoji||'🛒'} ${esc(a.name)}</span>`).join(', ')}</div>`;if(fbl.length)al.innerHTML+=`<div style="background:rgba(255,183,3,.08);border:1px solid rgba(255,183,3,.25);border-radius:var(--r2);padding:10px 14px;margin-bottom:8px;font-size:12.5px">🟡 <strong>Stock faible :</strong> ${fbl.map(a=>`<span style="color:var(--amber)">${a.emoji||'🛒'} ${esc(a.name)} (${a.stock})</span>`).join(', ')}</div>`;}
+  document.getElementById('stockAlert').textContent=rup.length;
+  const grid=document.getElementById('stockGrid');
+  if(!arts.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📦</div><div class="empty-title">Aucun article</div></div>';return;}
+  grid.innerHTML=arts.map(a=>{const isI=a.stock===-1,isO=a.stock===0,isL=a.stock>0&&a.stock<=3;const bc=isI?'tag-cyan':isO?'tag-red':isL?'tag-amber':'tag-green';const bt=isI?'♾️ Illimité':isO?'❌ Rupture':isL?'⚠️ Faible':'✅ En stock';const h=stockHist[a.id]||[];return`<div class="stock-card"><div class="stock-top"><div class="stock-emoji">${a.emoji||'🛒'}</div><div style="flex:1;min-width:0"><div class="stock-name">${esc(a.name)}</div><div class="stock-price">${esc(a.price)}</div></div><span class="tag ${bc} stock-badge">${bt}</span></div><div class="stock-controls"><div style="font-size:10px;font-weight:700;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px">Stock</div><div style="display:flex;align-items:center;gap:8px"><div class="stock-btns"><button class="stock-btn minus" onclick="adjStock(${a.id},-10)" style="font-size:12px;width:auto;padding:0 8px">-10</button><button class="stock-btn minus" onclick="adjStock(${a.id},-1)">−</button></div><div class="stock-value ${isI?'infinite':isO?'zero':isL?'low':''}">${isI?'∞':String(a.stock)}</div><div class="stock-btns"><button class="stock-btn" onclick="adjStock(${a.id},1)">+</button><button class="stock-btn" onclick="adjStock(${a.id},10)" style="font-size:12px;width:auto;padding:0 8px">+10</button></div></div></div><div class="stock-actions"><button class="btn btn-green btn-xs" onclick="setInfinite(${a.id})">♾️</button><button class="btn btn-amber btn-xs" onclick="setStock(${a.id},'${esc(a.name)}')">🔢</button><button class="btn btn-red btn-xs" onclick="setZero(${a.id})">❌</button><button class="btn btn-ghost btn-xs" onclick="showStockHist(${a.id},'${esc(a.name)}')">${h.length} modif.</button></div></div>`;}).join('');}
+function addStockHist(id,name,delta,reason){if(!stockHist[id])stockHist[id]=[];stockHist[id].unshift({name,delta,reason,time:new Date().toLocaleString('fr-FR')});if(stockHist[id].length>20)stockHist[id].pop();}
+async function adjStock(id,delta){const a=arts.find(x=>x.id===id);if(!a)return;if(a.stock===-1&&delta<0){toast('Stock illimité — utilisez "Définir"','warn');return;}const ns=a.stock===-1?Math.max(0,delta):Math.max(0,a.stock+delta);const d=await api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:ns,reason:delta>0?'+'+delta:String(delta)})});if(d?.ok){addStockHist(id,a.name,delta,delta>0?'+'+delta:String(delta));toast((delta>0?'+':'')+delta+' stock','ok');loadStock();}else toast('Erreur','err');}
+async function setInfinite(id){const a=arts.find(x=>x.id===id);const d=await api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:-1,reason:'Illimité'})});if(d?.ok){addStockHist(id,a?.name||'?',0,'→ Illimité');toast('♾️ Stock illimité','ok');loadStock();}else toast('Erreur','err');}
+async function setZero(id){if(!confirm('Mettre en rupture ?'))return;const a=arts.find(x=>x.id===id);const d=await api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:0,reason:'Rupture manuelle'})});if(d?.ok){addStockHist(id,a?.name||'?',-999,'Rupture');toast('❌ Rupture','ok');loadStock();}else toast('Erreur','err');}
+function setStock(id,name){const v=prompt('Stock pour "'+name+'" (-1=infini, 0=rupture) :');if(v===null)return;const n=parseInt(v);if(isNaN(n)||n<-1){toast('Valeur invalide','err');return;}const a=arts.find(x=>x.id===id);api('/api/articles/'+id+'/stock',{method:'POST',body:JSON.stringify({stock:n,reason:'Défini:'+n})}).then(d=>{if(d?.ok){addStockHist(id,a?.name||'?',0,'→'+n);toast('Stock→'+(n===-1?'∞':n),'ok');loadStock();}else toast('Erreur','err');});}
+function showStockHist(id,name){const h=stockHist[id]||[];document.getElementById('ov-hist-title').textContent='📜 Historique — '+name;document.getElementById('ov-hist-body').innerHTML=h.length?h.map(x=>`<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="font-size:16px">${x.delta>0?'📈':x.delta<0?'📉':'🔄'}</span><div style="flex:1"><div style="font-size:12.5px">${esc(x.reason)}</div><div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace">${x.time}</div></div><div style="font-weight:700;color:${x.delta>=0?'var(--emerald)':'var(--rose)'};">${x.delta>0?'+':''}${x.delta===0?'SET':x.delta}</div></div>`).join(''):'<div class="empty"><div class="empty-title">Aucune modification dans cette session</div></div>';openOv('ov-histstock');}
+async function doBulkStock(){const artId=document.getElementById('blk-article').value,action=document.getElementById('blk-action').value,val=parseInt(document.getElementById('blk-value').value)||1,reason=document.getElementById('blk-reason').value.trim()||action;if(!artId){toast('Sélectionner un article','warn');return;}const a=arts.find(x=>String(x.id)===String(artId));let stock;if(action==='set')stock=val;else if(action==='add')stock=Math.max(0,(a?.stock||0)===-1?val:(a?.stock||0)+val);else if(action==='sub')stock=Math.max(0,(a?.stock||0)-val);else if(action==='inf')stock=-1;else stock=0;const d=await api('/api/articles/'+artId+'/stock',{method:'POST',body:JSON.stringify({stock,reason})});if(d?.ok){addStockHist(artId,a?.name||'?',0,reason);toast('✅ Stock→'+(stock===-1?'∞':stock),'ok');closeOv('ov-bulkstock');loadShop();loadStock();}else toast('Erreur','err');}
+
+// ─── COMMANDES/ORDERS ──────────────────────────────────────────
+let allOrdersData=[];
+async function loadOrders(){
+  const d=await api('/api/orders');allOrdersData=d?.orders||[];
+  renderOrders(allOrdersData);
+  const tot=allOrdersData.length,pend=allOrdersData.filter(o=>o.status==='pending').length,conf=allOrdersData.filter(o=>o.status==='confirmed').length,del=allOrdersData.filter(o=>o.status==='delivered').length,canc=allOrdersData.filter(o=>o.status==='cancelled').length;
+  ['ord-total','ord-pending','ord-confirmed','ord-delivered','ord-cancelled'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=[tot,pend,conf,del,canc][i];});
+  document.getElementById('ordCount').textContent=pend||tot;
+}
+function filterOrders(){const q=(document.getElementById('ordSearch')?.value||'').toLowerCase();const f=document.getElementById('ordFilter')?.value||'';let arr=allOrdersData.filter(o=>!q||o.id?.toLowerCase().includes(q)||o.username?.toLowerCase().includes(q)||o.articleName?.toLowerCase().includes(q));if(f)arr=arr.filter(o=>o.status===f);renderOrders(arr);}
+function renderOrders(data){
+  const tb=document.getElementById('ordersTable');if(!tb)return;
+  if(!data.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--t2)">Aucune commande</td></tr>';return;}
+  const SE={pending:'tag-amber',confirmed:'tag-cyan',delivered:'tag-green',cancelled:'tag-red',refunded:'tag-violet'};
+  const SL={pending:'⏳ En attente',confirmed:'✅ Confirmée',delivered:'📦 Livrée',cancelled:'❌ Annulée',refunded:'💸 Remboursée'};
+  tb.innerHTML=data.map(o=>`<tr>
+    <td><code style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#c4b5fd">${o.id}</code>${o.deliveryFile?'<div style="font-size:9px;color:var(--emerald);margin-top:2px">📄 Livré</div>':''}</td>
+    <td><div style="font-weight:700;font-size:13px">${esc(o.username||'—')}</div><div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace">${esc(o.discordId||'')}</div></td>
+    <td>${esc(o.articleName||'—')}</td>
+    <td><span class="tag tag-green">${esc(o.price||'—')}</span></td>
+    <td style="font-size:12px;color:var(--t2)">${o.date||'—'}</td>
+    <td><span class="tag ${SE[o.status]||'tag-gray'}">${SL[o.status]||o.status}</span></td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-green btn-xs" onclick="openDeliverModal('${o.id}','${esc(o.username||'')}','${esc(o.articleName||'')}')" title="Livrer">📦</button>
+      <button class="btn btn-ghost btn-xs" onclick="openOrderStatus('${o.id}','${o.status}')">✏️</button>
+      <button class="btn btn-red btn-xs" onclick="delOrder('${o.id}')">🗑️</button>
+    </div></td>
+  </tr>`).join('');
+}
+function openOrderStatus(id,status){document.getElementById('ov-ord-id').textContent=id;document.getElementById('ov-ord-id-h').value=id;document.getElementById('ov-ord-status').value=status;document.getElementById('ov-ord-note').value='';openOv('ov-orderstatus');}
+async function updateOrder(){
+  const id=document.getElementById('ov-ord-id-h').value;
+  const status=document.getElementById('ov-ord-status').value;
+  const autoDeliver=document.getElementById('ov-ord-auto-deliver')?.checked;
+  const body={
+    status,
+    notes:document.getElementById('ov-ord-note').value,
+    autoDeliver,
+    templateName:document.getElementById('ov-ord-tpl')?.value||'',
+    watermark:document.getElementById('ov-ord-wm')?.checked||false,
+    ticket:document.getElementById('ov-ord-ticket')?.checked||false,
+  };
+  const d=await api('/api/orders/'+id,{method:'PUT',body:JSON.stringify(body)});
+  if(d?.ok){
+    if(autoDeliver&&status==='delivered')toast('📦 Commande livrée + fichier envoyé en DM !','ok');
+    else toast('✅ Commande mise à jour !','ok');
+    closeOv('ov-orderstatus');loadOrders();
+  }else toast(d?.error||'Erreur','err');
+}
+async function createNewOrder(){const artSel=document.getElementById('neword-article');const artOpt=artSel?.options[artSel.selectedIndex];const body={userId:document.getElementById('neword-uid').value.trim(),discordId:document.getElementById('neword-uid').value.trim(),username:document.getElementById('neword-name').value.trim()||'Client',articleId:artSel?.value||null,articleName:artOpt?.textContent?.split(' — ')[0]?.trim()||'',price:document.getElementById('neword-price').value.trim()||artOpt?.dataset?.price||'—',notes:document.getElementById('neword-notes').value.trim(),status:document.getElementById('neword-status').value};if(!body.articleName){toast('Sélectionner un article','warn');return;}const d=await api('/api/orders',{method:'POST',body:JSON.stringify(body)});if(d?.ok){toast('✅ Commande '+d.order.id+' créée !','ok');closeOv('ov-neworder');loadOrders();}else toast('Erreur','err');}
+async function delOrder(id){if(!confirm('Supprimer la commande '+id+' ?'))return;const d=await api('/api/orders/'+id,{method:'DELETE'});if(d?.ok){toast('🗑️ Supprimée','ok');loadOrders();}else toast('Erreur','err');}
+
+// ─── LIVRAISON ─────────────────────────────────────────────────
+const DLV_VARS={'{acheteur}':'Jean_Discord','{date}':new Date().toLocaleDateString('fr-FR'),'{article}':'NexusPass VIP','{prix}':'9.99€','{commande_id}':'CMD-0001','{serveur}':'NexusBot'};
+function loadDelivery(){if(!arts.length)loadShop();renderDeliveryList();}
+function renderDeliveryList(){const el=document.getElementById('deliveryList');if(!dlvTemplates.length){el.innerHTML='<div class="empty"><div class="empty-icon">📄</div><div class="empty-title">Aucun modèle</div></div>';return;}el.innerHTML=dlvTemplates.map((t,i)=>`<div style="display:flex;align-items:center;gap:9px;padding:10px 13px;background:${i===currentDlvIdx?'rgba(124,109,250,.1)':'rgba(255,255,255,.03)'};border:1px solid ${i===currentDlvIdx?'rgba(124,109,250,.4)':'var(--border)'};border-radius:var(--r2);margin-bottom:6px;cursor:pointer;transition:.13s" onclick="selectDelivery(${i})"><span style="font-size:18px">📄</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.name||'Sans titre')}</div><div style="font-size:10.5px;color:var(--t2)">.${t.format||'txt'} · ${t.article?'Article spécifique':'Tous'}</div></div><span style="font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(124,109,250,.15);color:#c4b5fd;font-family:'JetBrains Mono',monospace">${i===currentDlvIdx?'✎ actif':'→'}</span></div>`).join('');}
+function newDelivery(){currentDlvIdx=-1;document.getElementById('dlvEdTitle').textContent='✏️ Nouveau modèle';['dlv-name'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('dlv-format').value='txt';document.getElementById('dlv-content').value='';document.getElementById('deliveryEditor').style.display='block';updateDeliveryPreview();renderDeliveryList();}
+function selectDelivery(i){currentDlvIdx=i;const t=dlvTemplates[i];document.getElementById('dlvEdTitle').textContent='✏️ Modifier';document.getElementById('dlv-name').value=t.name||'';document.getElementById('dlv-article').value=t.article||'';document.getElementById('dlv-format').value=t.format||'txt';document.getElementById('dlv-content').value=t.content||'';document.getElementById('deliveryEditor').style.display='block';updateDeliveryPreview();renderDeliveryList();}
+function updateDeliveryPreview(){let c=document.getElementById('dlv-content').value;Object.entries(DLV_VARS).forEach(([k,v])=>{c=c.split(k).join(v);});document.getElementById('deliveryPreview').textContent=c;}
+function saveDelivery(){const name=document.getElementById('dlv-name').value.trim();if(!name){toast('Nom requis','warn');return;}const t={name,article:document.getElementById('dlv-article').value,format:document.getElementById('dlv-format').value,content:document.getElementById('dlv-content').value,auto:document.getElementById('dlv-auto').checked,ticket:document.getElementById('dlv-ticket').checked,watermark:document.getElementById('dlv-wm').checked,dm:document.getElementById('dlv-dm').value,savedAt:new Date().toLocaleString('fr-FR')};if(currentDlvIdx>=0)dlvTemplates[currentDlvIdx]=t;else{dlvTemplates.push(t);currentDlvIdx=dlvTemplates.length-1;}localStorage.setItem('dlvTpls',JSON.stringify(dlvTemplates));toast('💾 Modèle sauvegardé !','ok');renderDeliveryList();}
+function deleteDelivery(){if(currentDlvIdx<0){toast('Aucun modèle sélectionné','warn');return;}if(!confirm('Supprimer ?'))return;dlvTemplates.splice(currentDlvIdx,1);currentDlvIdx=-1;localStorage.setItem('dlvTpls',JSON.stringify(dlvTemplates));document.getElementById('deliveryEditor').style.display='none';toast('🗑️ Supprimé','ok');renderDeliveryList();}
+function downloadDelivery(){const name=document.getElementById('dlv-name').value.trim()||'livraison';const fmt=document.getElementById('dlv-format').value;let content=document.getElementById('dlv-content').value;Object.entries(DLV_VARS).forEach(([k,v])=>{content=content.split(k).join(v);});const blob=new Blob([content],{type:fmt==='html'?'text/html':'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name+'.'+fmt;a.click();toast('⬇️ Téléchargé !','ok');}
+function testDeliverySend(){if(currentDlvIdx<0){toast('Sélectionnez un modèle','warn');return;}openOv('ov-dlvtest');}
+async function execDeliveryTest(){const uid=document.getElementById('dlv-test-uid').value.trim();if(!uid){toast('ID requis','warn');return;}const t=dlvTemplates[currentDlvIdx];const d=await api('/api/delivery/test',{method:'POST',body:JSON.stringify({userId:uid,template:t})});if(d?.ok){toast('📤 Envoyé en DM !','ok');closeOv('ov-dlvtest');}else toast(d?.error||'Erreur','err');}
+function saveDeliveryOptions(){toast('💾 Options sauvegardées','ok');}
+
+// ─── NEXUSSTORE ────────────────────────────────────────────────
+async function loadNs(){
+  const u=document.getElementById('ns-url'),k=document.getElementById('ns-key');
+  if(u&&nsConf.url)u.value=nsConf.url;if(k&&nsConf.key)k.value=nsConf.key;
+  if(document.getElementById('ns-autosync'))document.getElementById('ns-autosync').checked=nsConf.auto||false;
+  if(document.getElementById('ns-stocksync'))document.getElementById('ns-stocksync').checked=nsConf.stk||false;
+  const st=document.getElementById('nsStatusBadge');if(st){st.textContent=nsConf.url?'✅ Connecté':'⚡ Non configuré';st.className='tag '+(nsConf.url?'tag-green':'tag-amber');}
+  const sl=document.getElementById('nsLastSync');if(sl)sl.textContent=nsConf.last||'Jamais synchronisé';
+  if(!arts.length)await loadShop();
+}
+function saveNsConfig(){nsConf.url=(document.getElementById('ns-url')?.value||'').trim();nsConf.key=(document.getElementById('ns-key')?.value||'').trim();nsConf.auto=document.getElementById('ns-autosync')?.checked||false;nsConf.stk=document.getElementById('ns-stocksync')?.checked||false;localStorage.setItem('nsConf',JSON.stringify(nsConf));toast('💾 Config sauvegardée !','ok');}
+async function testNs(){const url=(document.getElementById('ns-url')?.value||'').trim();if(!url){toast('URL requise','warn');return;}toast('🔌 Test...','info');try{const r=await fetch(url+'/ping',{headers:{'X-Api-Key':nsConf.key||''},mode:'cors'});if(r.ok){toast('✅ Connexion OK !','ok');const st=document.getElementById('nsStatusBadge');if(st){st.textContent='✅ Connecté';st.className='tag tag-green';}}else toast('❌ Erreur '+r.status,'err');}catch{toast('❌ Connexion impossible','err');}}
+async function pushToNs(){if(!arts.length)await loadShop();if(!nsConf.url){toast('URL requise','warn');return;}toast('📤 Envoi...','info');try{const payload=arts.map(a=>({id:a.id,name:a.name,price:a.price,description:a.description,emoji:a.emoji,stock:a.stock,image:a.image,link:a.link,category:a.category}));const r=await fetch((nsConf.url||'').replace(/\/$/,'')+'/sync-products',{method:'POST',headers:{'Content-Type':'application/json','X-Api-Key':nsConf.key||''},body:JSON.stringify({products:payload}),mode:'cors'});if(r.ok){const now=new Date().toLocaleString('fr-FR');nsConf.last=now;localStorage.setItem('nsConf',JSON.stringify(nsConf));const sl=document.getElementById('nsLastSync');if(sl)sl.textContent='Dernière sync : '+now;const st=document.getElementById('nsStatusBadge');if(st){st.textContent='✅ Connecté';st.className='tag tag-green';}toast('✅ '+payload.length+' articles envoyés !','ok');}else toast('❌ Erreur '+r.status,'err');}catch{toast('❌ Connexion impossible','err');}}
+async function pullFromNs(){if(!nsConf.url){toast('URL requise','warn');return;}toast('📥 Import...','info');try{const r=await fetch((nsConf.url||'').replace(/\/$/,'')+'/get-products',{headers:{'X-Api-Key':nsConf.key||''},mode:'cors'});if(!r.ok){toast('❌ Erreur '+r.status,'err');return;}const data=await r.json();if(!data.products?.length){toast('Aucun article sur NexusStore','warn');return;}let added=0,updated=0;for(const p of data.products){const existing=arts.find(a=>String(a.id)===String(p.id));if(existing){const d=await api('/api/articles/'+p.id,{method:'PUT',body:JSON.stringify(p)});if(d?.ok)updated++;}else{const d=await api('/api/articles',{method:'POST',body:JSON.stringify(p)});if(d?.ok)added++;}}toast('✅ '+added+' ajouté(s), '+updated+' mis à jour','ok');loadShop();loadStock();}catch{toast('❌ Connexion impossible','err');}}
+function previewNs(){const el=document.getElementById('nsPreview');if(!arts.length){el.innerHTML='<div class="empty"><div class="empty-title">Aucun article</div></div>';return;}el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:8px">${arts.map(a=>`<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;display:flex;align-items:center;gap:8px"><span style="font-size:18px">${a.emoji||'🛒'}</span><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(a.name)}</div><div style="font-size:10px;color:var(--t2)">${esc(a.price)} · ${a.stock===-1?'∞':a.stock}</div></div></div>`).join('')}</div>`;}
+async function publishNsEmbed(){const chId=document.getElementById('ns-channel')?.value||'';const msg=document.getElementById('ns-message')?.value||'';if(!chId){toast('Sélectionner un salon','warn');return;}const d=await api('/api/announce',{method:'POST',body:JSON.stringify({channelId:chId,title:'🛒 NexusStore — Boutique officielle',message:msg,link:'https://brian10122000.github.io/NexusStore/',color:'#7c6dfa'})});if(d?.ok)toast('✅ Embed publié !','ok');else toast('Erreur','err');}
+// Auto-sync NexusStore toutes les 10 min
+setInterval(async()=>{if(nsConf.url&&nsConf.auto)pushToNs();},10*60*1000);
+
+// ─── À PROPOS ──────────────────────────────────────────────────
+async function loadAbout(){const d=await api('/api/about');if(!d?.about)return;aboutData=d.about;const E=id=>document.getElementById(id);if(E('abt-title'))E('abt-title').value=aboutData.title||'';if(E('abt-desc'))E('abt-desc').value=aboutData.description||'';if(E('abt-dc'))E('abt-dc').value=aboutData.socials?.discord||'';if(E('abt-tw'))E('abt-tw').value=aboutData.socials?.twitter||'';if(E('abt-ig'))E('abt-ig').value=aboutData.socials?.instagram||'';if(E('abt-orders'))E('abt-orders').value=aboutData.stats?.orders||0;if(E('abt-clients'))E('abt-clients').value=aboutData.stats?.clients||0;if(E('abt-rating'))E('abt-rating').value=aboutData.stats?.rating||'5.0';renderTeam();}
+function renderTeam(){const el=document.getElementById('teamList');const team=aboutData.team||[];if(!team.length){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">Aucun membre</div></div>';return;}el.innerHTML=team.map((m,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:7px"><div style="width:36px;height:36px;border-radius:50%;background:var(--grad-main);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0">${(m.name||'?')[0]}</div><div style="flex:1"><div style="font-weight:700;font-size:13px">${esc(m.name)}</div><div style="font-size:11.5px;color:var(--t2)">${esc(m.role||'')} ${m.discord?'· '+esc(m.discord):''}</div></div><button class="btn btn-red btn-xs" onclick="removeTeam(${i})">✕</button></div>`).join('');}
+function addTeam(){const name=document.getElementById('tm-name')?.value.trim();if(!name){toast('Nom requis','warn');return;}if(!aboutData.team)aboutData.team=[];aboutData.team.push({name,role:document.getElementById('tm-role')?.value.trim(),discord:document.getElementById('tm-dc')?.value.trim(),avatar:document.getElementById('tm-av')?.value.trim()});renderTeam();document.getElementById('teamForm').style.display='none';toast('✅ Ajouté — sauvegardez !','ok');}
+function removeTeam(i){if(!confirm('Retirer ?'))return;aboutData.team.splice(i,1);renderTeam();}
+async function saveAbout(){const body={title:document.getElementById('abt-title')?.value.trim(),description:document.getElementById('abt-desc')?.value.trim(),team:aboutData.team||[],socials:{discord:document.getElementById('abt-dc')?.value.trim(),twitter:document.getElementById('abt-tw')?.value.trim(),instagram:document.getElementById('abt-ig')?.value.trim()},stats:{orders:parseInt(document.getElementById('abt-orders')?.value)||0,clients:parseInt(document.getElementById('abt-clients')?.value)||0,rating:document.getElementById('abt-rating')?.value||'5.0'}};const d=await api('/api/about',{method:'POST',body:JSON.stringify(body)});if(d?.ok)toast('💾 Page À propos sauvegardée !','ok');else toast('Erreur','err');}
+
+// ─── BANNIS ────────────────────────────────────────────────────
+async function loadBans(){const data=await api('/api/bans');const tb=document.getElementById('bansTable');if(!data?.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--t2)">✅ Aucun membre banni</td></tr>';return;}tb.innerHTML=data.map(b=>`<tr><td style="font-weight:700">${esc(b.user.username)}</td><td><code style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#c4b5fd">${b.user.id}</code></td><td style="color:var(--t2);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(b.reason||'—')}</td><td><button class="btn btn-green btn-xs" onclick="unban('${b.user.id}')">🔓 Débannir</button></td></tr>`).join('');}
+async function unban(id){if(!confirm('Débannir ?'))return;const d=await api('/api/mod/unban',{method:'POST',body:JSON.stringify({userId:id})});if(d?.ok){toast('🔓 Débanni !','ok');loadBans();}else toast(d?.error||'Erreur','err');}
+
+// ─── LOGS ──────────────────────────────────────────────────────
+async function loadLogs(){const data=await api('/api/logs');document.getElementById('logsEl').innerHTML=data?.map(l=>`<div class="feed-item"><div class="feed-icon" style="background:rgba(124,109,250,.1);color:#c4b5fd;font-size:12px">📡</div><div class="feed-content"><div class="feed-text">${esc(l.msg)}</div><div class="feed-time">${l.time}</div></div></div>`).join('')||'<div class="empty"><div class="empty-title">Aucun log</div></div>';}
+
+// ─── ANNONCE ───────────────────────────────────────────────────
+async function sendAnnounce(){const body={channelId:document.getElementById('an-channel')?.value||'',title:document.getElementById('an-title')?.value.trim()||'📢 Annonce',message:document.getElementById('an-message')?.value.trim()||'',mention:document.getElementById('an-mention')?.value||''};if(!body.channelId){toast('Sélectionner un salon','warn');return;}if(!body.message){toast('Message requis','warn');return;}const d=await api('/api/announce',{method:'POST',body:JSON.stringify(body)});if(d?.ok){toast('📢 Annonce envoyée !','ok');document.getElementById('an-message').value='';}else toast(d?.error||'Erreur','err');}
+
+// ─── ÉCONOMIE API ───────────────────────────────────────────────
+function openAddPoints(id,name){document.getElementById('ov-pts-id').value=id;document.getElementById('ov-pts-name').textContent='💰 Points pour '+name;document.getElementById('ov-pts-val').value=100;openOv('ov-addpoints');}
+async function addPointsConfirm(){const id=document.getElementById('ov-pts-id').value;const pts=parseInt(document.getElementById('ov-pts-val').value)||0;const d=await api('/api/mod/addpoints',{method:'POST',body:JSON.stringify({userId:id,points:pts})});if(d?.ok){toast((pts>0?'+':'')+pts+' pts appliqués !','ok');closeOv('ov-addpoints');loadEconomy();}else toast('Erreur','err');}
+
+// ─── PARAMÈTRES ────────────────────────────────────────────────
+function saveRailwayUrl(){const url=document.getElementById('railwayUrl')?.value.trim();if(!url){toast('URL requise','warn');return;}localStorage.setItem('railwayUrl',url);toast('✅ URL Railway sauvegardée !','ok');}
+async function testConnection(){const el=document.getElementById('connStatus');el.textContent='🔄 Test...';el.style.color='var(--t2)';const d=await api('/api/status');if(d){el.textContent='✅ Connecté — '+d.tag;el.style.color='var(--emerald)';}else{el.textContent='❌ Connexion impossible';el.style.color='var(--rose)';}}
+
+// ─── SAVE ALL CONFIG ───────────────────────────────────────────
+async function saveAllConfig(){
+  toast('💾 Sauvegarde...','info');
+  const welcomeBody={enabled:document.getElementById('wlc-enabled')?.checked,channelId:document.getElementById('wlc-channel')?.value||'',message:document.getElementById('wlc-message')?.value||'',title:document.getElementById('wlc-title')?.value||'',color:document.getElementById('wlc-color')?.value,footerText:document.getElementById('wlc-footer')?.value||'',imageUrl:document.getElementById('wlc-image')?.value||'',showAvatar:document.getElementById('wlc-avatar')?.checked};
+  const d=await api('/api/config',{method:'POST',body:JSON.stringify({welcomeConfig:welcomeBody})});
+  localStorage.setItem('nsConf',JSON.stringify(nsConf));
+  localStorage.setItem('dlvTpls',JSON.stringify(dlvTemplates));
+  if(d?.ok)toast('✅ Configuration sauvegardée dans Supabase !','ok');else toast('❌ Erreur lors de la sauvegarde','err');
+}
+
+// ─── GLOBAL SEARCH ─────────────────────────────────────────────
+function globalSearchFn(){const q=(document.getElementById('globalSearch')?.value||'').toLowerCase();if(q.length<2)return;const member=guildData.members.find(m=>(m.username||'').toLowerCase().includes(q)||(m.id||'').includes(q));if(member){go('members');setTimeout(()=>{document.getElementById('membSearch').value=q;filterMembers();},200);return;}const art=arts.find(a=>(a.name||'').toLowerCase().includes(q));if(art){go('shop');setTimeout(()=>{document.getElementById('shopSearch').value=q;filterShop();},200);}}
+
+
+// ══════════════════════════════════════════════════════════════
+//  SYSTÈME DE LIVRAISON — Manuel & Automatique
+// ══════════════════════════════════════════════════════════════
+
+let deliveryTemplates = [];
+
+// Charger les templates de livraison depuis le bot
+async function loadDeliveryTemplates() {
+  const d = await api('/api/delivery-templates');
+  deliveryTemplates = d?.templates || [];
+  // Mettre à jour tous les selects de templates
+  const tplOpts = '<option value="">— Sélectionner —</option>' +
+    deliveryTemplates.map(t => `<option value="${esc(t.name)}">${esc(t.name)}${t.article ? ' (article spécifique)' : ''}</option>`).join('');
+  ['ov-dlv-tpl', 'ov-ord-tpl', 'dlv-tpl-sel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.innerHTML = tplOpts || '<option value="">Aucun template</option>'; }
+  });
+  return deliveryTemplates;
+}
+
+// Afficher/masquer options livraison selon statut
+function toggleDeliveryOptions() {
+  const status = document.getElementById('ov-ord-status')?.value;
+  const opts   = document.getElementById('ov-deliver-opts');
+  if (opts) opts.style.display = status === 'delivered' ? 'block' : 'none';
+}
+
+// Ouvrir le modal de livraison manuelle
+async function openDeliverModal(orderId, username, articleName) {
+  document.getElementById('ov-dlv-id').value      = orderId;
+  document.getElementById('ov-dlv-ordid').textContent = orderId;
+  document.getElementById('ov-dlv-username').textContent = username || '—';
+  document.getElementById('ov-dlv-article').textContent  = articleName || '—';
+  document.getElementById('ov-dlv-result').style.display = 'none';
+  document.getElementById('ov-dlv-content').value = '';
+  document.getElementById('ov-dlv-dm').value = '✅ Merci pour ton achat ! Voici ta livraison 📦';
+
+  // Charger les templates
+  await loadDeliveryTemplates();
+
+  openOv('ov-deliver');
+}
+
+// Prévisualiser un template sélectionné
+function previewDeliveryTemplate() {
+  const name = document.getElementById('ov-dlv-tpl')?.value;
+  const tpl  = deliveryTemplates.find(t => t.name === name);
+  const prev = document.getElementById('ov-dlv-tpl-preview');
+  if (!prev) return;
+  if (tpl && tpl.content) {
+    prev.style.display = 'block';
+    const DLV_VARS = {
+      '{acheteur}':    'Jean_Discord',
+      '{date}':        new Date().toLocaleDateString('fr-FR'),
+      '{article}':     document.getElementById('ov-dlv-article')?.textContent || 'Article',
+      '{prix}':        '9.99€',
+      '{commande_id}': document.getElementById('ov-dlv-id')?.value || 'CMD-0001',
+      '{serveur}':     'NexusBot',
+    };
+    let preview = tpl.content;
+    Object.entries(DLV_VARS).forEach(([k, v]) => { preview = preview.split(k).join(v); });
+    prev.textContent = preview;
+  } else {
+    prev.style.display = 'none';
+  }
+}
+
+// Envoyer la livraison
+async function sendDelivery(closeAfter = false) {
+  const id      = document.getElementById('ov-dlv-id')?.value;
+  const isTpl   = document.getElementById('dlvm-tpl')?.style.display !== 'none';
+  const watermark = document.getElementById('ov-dlv-wm')?.checked || false;
+  const ticket    = document.getElementById('ov-dlv-ticket')?.checked || true;
+
+  let body = { watermark, ticket };
+
+  if (isTpl) {
+    const tplName = document.getElementById('ov-dlv-tpl')?.value;
+    if (!tplName) { toast('Sélectionner un template', 'warn'); return; }
+    body.templateName = tplName;
+    const tpl = deliveryTemplates.find(t => t.name === tplName);
+    if (tpl) {
+      body.customContent = tpl.content;
+      body.format = tpl.format || 'txt';
+      body.dm     = tpl.dm || '✅ Merci pour ton achat !';
+    }
+  } else {
+    const customContent = document.getElementById('ov-dlv-content')?.value.trim();
+    if (!customContent) { toast('Contenu requis', 'warn'); return; }
+    body.customContent = customContent;
+    body.format = document.getElementById('ov-dlv-fmt')?.value || 'txt';
+    body.dm     = document.getElementById('ov-dlv-dm')?.value || '✅ Livraison !';
+  }
+
+  const resultEl = document.getElementById('ov-dlv-result');
+  resultEl.style.display = 'block';
+  resultEl.style.background = 'rgba(124,109,250,.08)';
+  resultEl.style.border = '1px solid rgba(124,109,250,.2)';
+  resultEl.style.color = '#c4b5fd';
+  resultEl.textContent = '📤 Envoi en cours...';
+
+  const d = await api('/api/orders/' + id + '/deliver', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+  if (d?.ok) {
+    resultEl.style.background = 'rgba(0,229,160,.08)';
+    resultEl.style.border     = '1px solid rgba(0,229,160,.25)';
+    resultEl.style.color      = 'var(--emerald)';
+    resultEl.textContent      = '✅ Livraison envoyée à ' + d.username + ' ! Fichier : ' + d.filename;
+    toast('📦 Livraison envoyée en DM à ' + d.username + ' !', 'ok');
+    loadOrders();
+    if (closeAfter) setTimeout(() => closeOv('ov-deliver'), 1500);
+  } else {
+    resultEl.style.background = 'rgba(255,77,109,.08)';
+    resultEl.style.border     = '1px solid rgba(255,77,109,.25)';
+    resultEl.style.color      = 'var(--rose)';
+    resultEl.textContent      = '❌ Erreur : ' + (d?.error || 'Connexion impossible');
+    toast('❌ ' + (d?.error || 'Erreur'), 'err');
+  }
+}
+
+async function sendDeliveryAndClose() {
+  await sendDelivery(true);
+}
+
+// Sauvegarder un template de livraison dans la DB bot (Supabase)
+async function saveDeliveryToDB() {
+  const name    = document.getElementById('dlv-name')?.value.trim();
+  const content = document.getElementById('dlv-content')?.value.trim();
+  if (!name || !content) { toast('Nom et contenu requis', 'warn'); return; }
+
+  const body = {
+    name,
+    content,
+    format:    document.getElementById('dlv-format')?.value || 'txt',
+    article:   document.getElementById('dlv-article')?.value || '',
+    dm:        document.getElementById('dlv-dm')?.value || '',
+    watermark: document.getElementById('dlv-wm')?.checked || false,
+    ticket:    document.getElementById('dlv-ticket')?.checked || false,
+    auto:      document.getElementById('dlv-auto')?.checked || false,
+  };
+
+  const d = await api('/api/delivery-templates', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+  if (d?.ok) {
+    toast('✅ Template sauvegardé dans Supabase !', 'ok');
+    // Sauvegarder aussi localement
+    const localIdx = dlvTemplates.findIndex(t => t.name === name);
+    if (localIdx >= 0) dlvTemplates[localIdx] = body;
+    else dlvTemplates.push(body);
+    localStorage.setItem('dlvTpls', JSON.stringify(dlvTemplates));
+    currentDlvIdx = dlvTemplates.length - 1;
+    renderDeliveryList();
+    await loadDeliveryTemplates();
+  } else {
+    toast(d?.error || 'Erreur de sauvegarde', 'err');
+  }
+}
+
+// Supprimer un template de la DB bot
+async function deleteDeliveryFromDB(name) {
+  if (!confirm('Supprimer le template "' + name + '" ?')) return;
+  const d = await api('/api/delivery-templates/' + encodeURIComponent(name), { method: 'DELETE' });
+  if (d?.ok) {
+    toast('🗑️ Template supprimé', 'ok');
+    await loadDeliveryTemplates();
+  } else toast('Erreur', 'err');
+}
+
+// Charger les templates au chargement de la page livraison
+const origLoadDelivery = loadDelivery;
+async function loadDelivery() {
+  if (!arts.length) await loadShop();
+  renderDeliveryList();
+  await loadDeliveryTemplates();
+}
+
+// ─── INIT ──────────────────────────────────────────────────────
+async function init(){
+  // Pré-remplir URL Railway dans settings
+  const ru=document.getElementById('railwayUrl');if(ru)ru.value=getRailwayUrl();
+  // Charger les données Discord
+  await loadGuildData();
+  // Charger le dashboard
+  loadDashboard();
+  // Config NexusStore
+  const u=document.getElementById('ns-url');if(u&&nsConf.url)u.value=nsConf.url;
+  // Auto-refresh guild data toutes les 10 min
+  setInterval(()=>{if(document.getElementById('auto-guild')?.checked!==false)loadGuildData();},10*60*1000);
+  // Auto-refresh dashboard toutes les 2 min
+  setInterval(()=>{if(document.getElementById('page-dashboard')?.classList.contains('active')&&document.getElementById('auto-dash')?.checked!==false)loadDashboard();},2*60*1000);
+  // Auto-refresh vocaux live toutes les 30s
+  setInterval(()=>{if(document.getElementById('page-activity')?.classList.contains('active'))loadActivity();if(document.getElementById('page-dashboard')?.classList.contains('active'))loadVoiceLiveDash();},30*1000);
+}
+init();
+
+</script>
+</body>
+</html>
