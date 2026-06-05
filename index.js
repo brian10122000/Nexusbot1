@@ -233,7 +233,7 @@ const SB = {
 };
 
 // ─── CONFIG ─────────────────────────────────────────────────
-const TOKEN          = process.env.DISCORD_TOKEN || 'METS_TON_TOKEN_ICI';
+const TOKEN          = process.env.DISCORD_TOKEN || 'MTQ5NDk4MzI0NTg3NDU5MzgwMg.Gdx-jr.Ev-_lWilgxvaIKKVc4sX_dkZJub_FlG3i2As_0';
 const CLIENT_ID      = '1494983245874593802';
 const GUILD_ID       = '1498728768158568468';
 const SH_KEY         = process.env.SELLHUB_KEY   || '';
